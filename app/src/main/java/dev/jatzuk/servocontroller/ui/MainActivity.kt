@@ -1,63 +1,36 @@
 package dev.jatzuk.servocontroller.ui
 
-import android.app.Activity
-import android.bluetooth.BluetoothAdapter
-import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import dev.jatzuk.servocontroller.R
-import dev.jatzuk.servocontroller.bluetooth.BluetoothConnection
-import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
-import kotlinx.android.synthetic.main.activity_main.*
-
-private const val TAG = "MainActivity"
+import dev.jatzuk.servocontroller.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var switchView: SwitchView
-    private lateinit var bluetoothConnection: BluetoothConnection
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
-        switchView = findViewById(R.id.switchView)
+        navController = findNavController(R.id.nav_host_fragment)
+        appBarConfiguration = AppBarConfiguration(navController.graph, binding.drawerLayout)
 
-        bluetoothConnection = BluetoothConnection(this)
-
-        if (!bluetoothConnection.bluetoothAdapter!!.isEnabled) {
-            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
-        }
-
-        setupOnClickListeners()
+        setupActionBarWithNavController(navController, appBarConfiguration)
+        binding.navView.setupWithNavController(navController)
     }
 
-    private fun setupOnClickListeners() {
-        connect.setOnClickListener {
-            bluetoothConnection.buildDeviceList()
-        }
-
-        sendData.setOnClickListener {
-            val data = "pos: ${switchView.positionInDegrees}\n"
-            bluetoothConnection.sendData(data.toByteArray())
-        }
-
-        disconnect.setOnClickListener {
-            bluetoothConnection.disconnect()
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                REQUEST_ENABLE_BT -> {
-                    // TODO: 13/08/2020 bluetooth enabled
-                    Toast.makeText(this, "BT enabled", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 }

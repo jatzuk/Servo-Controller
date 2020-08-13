@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Servo Controller</string>
+    <string name="servos">Servos</string>
+    <string name="settings">Settings</string>
 </resources>
