@@ -1,4 +1,4 @@
-package dev.jatzuk.servocontroller
+package dev.jatzuk.servocontroller.ui
 
 import android.content.Context
 import android.graphics.*
@@ -21,7 +21,8 @@ class SwitchView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private var radius = 0f
-    private var positionInDegrees = 0
+    var positionInDegrees = 0
+        private set
     private val pointPosition = PointF(0f, 0f)
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
