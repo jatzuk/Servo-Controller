@@ -10,15 +10,19 @@
         <item name="colorSurface">@color/colorPrimaryDark</item>
 
 
+        <item name="appBarLayoutStyle">@style/AppbarStyle</item>
         <item name="toolbarStyle">@style/ToolbarStyle</item>
         <item name="drawerArrowStyle">@style/ToolbarDrawerIconStyle</item>
 
         <item name="materialButtonStyle">@style/ButtonStyle</item>
     </style>
 
+    <style name="AppbarStyle" parent="@style/Widget.MaterialComponents.AppBarLayout.Primary">
+        <item name="backgroundColor">@color/colorPrimary</item>
+    </style>
+
     <style name="ToolbarStyle" parent="@style/Widget.MaterialComponents.Toolbar">
         <item name="titleTextColor">@color/colorAccent</item>
-        <item name="colorOnPrimary">@color/colorAccent</item>
     </style>
 
     <style name="ToolbarDrawerIconStyle" parent="Widget.AppCompat.DrawerArrowToggle">
