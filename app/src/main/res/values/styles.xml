@@ -6,7 +6,27 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
-        <item name="android:colorBackground">@android:color/white</item>
+        <item name="android:colorBackground">@color/colorPrimaryDark</item>
+        <item name="colorSurface">@color/colorPrimaryDark</item>
+
+
+        <item name="toolbarStyle">@style/ToolbarStyle</item>
+        <item name="drawerArrowStyle">@style/ToolbarDrawerIconStyle</item>
+
+        <item name="materialButtonStyle">@style/ButtonStyle</item>
+    </style>
+
+    <style name="ToolbarStyle" parent="@style/Widget.MaterialComponents.Toolbar">
+        <item name="titleTextColor">@color/colorAccent</item>
+        <item name="colorOnPrimary">@color/colorAccent</item>
+    </style>
+
+    <style name="ToolbarDrawerIconStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">@color/colorAccent</item>
+    </style>
+
+    <style name="ButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/colorAccent</item>
     </style>
 
 </resources>
