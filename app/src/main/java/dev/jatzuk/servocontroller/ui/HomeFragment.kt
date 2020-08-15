@@ -33,7 +33,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
 
             sendData.setOnClickListener {
-                val data = "pos: ${switchView.positionInDegrees}\n"
+                val data = "pos: ${servoView.positionInDegrees}\n"
                 bluetoothConnection.sendData(data.toByteArray())
             }
 

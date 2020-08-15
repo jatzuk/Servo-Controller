@@ -6,36 +6,36 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import dev.jatzuk.servocontroller.R
 import kotlin.math.*
 
 private const val RADIUS_OFFSET_LABEL = 25
 private const val RADIUS_OFFSET_INDICATOR = -5
 private const val LABEL_TEXT_SIZE = 22f
 private const val ZOOM_TEXT_SIZE = LABEL_TEXT_SIZE * 2
-private const val TAG = "CustomView"
+private const val SERVO_BASE_OFFSET = 170f
+private const val TAG = "ServoView"
 
-class SwitchView @JvmOverloads constructor(
+class ServoView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
+    // TODO: 15/08/2020 fix better servo images
+    private val servoBase = BitmapFactory.decodeResource(resources, R.drawable.servo_base)
+    private val servoPointerMatrix = Matrix()
+    private val servoPointer = BitmapFactory.decodeResource(resources, R.drawable.servo_pointer)
+
     private var radius = 0f
     var positionInDegrees = 0
         private set
-    private val pointPosition = PointF(0f, 0f)
+    private val pointPosition = PointF()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
         textAlign = Paint.Align.CENTER
         typeface = Typeface.create("", Typeface.BOLD)
     }
-
-//    private var bitmap = Bitmap.createBitmap(200, 100, Bitmap.Config.ARGB_8888)
-//    private lateinit var shader: Shader
-//    private val shaderPaint = Paint()
-//    private val shaderMatrix = Matrix()
-//    private val magnifierSize = 50f
-//    private var zoomPoint = PointF(0f, 0f)
 
     private var isZooming = false
 
@@ -46,26 +46,37 @@ class SwitchView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        paint.color = Color.GREEN
-        canvas.drawCircle((width / 2).toFloat(), (height / 2).toFloat(), radius, paint)
+        canvas.drawBitmap(
+            servoBase,
+            (width / 2f) - servoBase.width / 2,
+            SERVO_BASE_OFFSET,
+            paint
+        )
 
-        drawPointer(positionInDegrees, canvas)
+        servoPointerMatrix.apply {
+            reset()
+            postRotate(
+                positionInDegrees.toFloat(),
+                servoPointer.width - 50f,
+                servoPointer.height / 2f - 10f
+            )
+            postTranslate(
+                width / 2f - servoBase.width - 70,
+                servoPointer.height / 2 + SERVO_BASE_OFFSET
+            )
+        }
+        canvas.drawBitmap(
+            servoPointer,
+            servoPointerMatrix,
+            null
+        )
+
+//        drawPointer(positionInDegrees, canvas)
         drawLabels(canvas)
-
-//        if (!isZooming) {
-//            buildDrawingCache()
-//        } else {
-//            shader = BitmapShader(drawingCache, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP)
-//            shaderPaint.shader = shader
-//            shaderMatrix.reset()
-//            shaderMatrix.postScale(2f, 2f, zoomPoint.x, zoomPoint.y)
-//            shaderPaint.shader.setLocalMatrix(shaderMatrix)
-//            canvas.drawCircle(width / 2f, height / 8f, magnifierSize, shaderPaint)
-//        }
 
         if (isZooming) {
             paint.textSize = ZOOM_TEXT_SIZE
-            canvas.drawText(positionInDegrees.toString(), width / 2f, height / 8f, paint)
+            canvas.drawText(positionInDegrees.toString(), width / 2f, height / 6f, paint)
         }
     }
 
@@ -76,7 +87,6 @@ class SwitchView @JvmOverloads constructor(
         val y = height / 2 - event.y
 
         positionInDegrees = getPositionInDegrees(y, x)
-//        zoomPoint.computeXY(positionInDegrees, radius + 10)
 
         if (positionInDegrees !in 0..180) return false
 
@@ -112,7 +122,7 @@ class SwitchView @JvmOverloads constructor(
         val startAngle = PI * (9 / 8)
         val angle = startAngle + radians * (PI / 180)
         x = (radius * cos(angle)).toFloat() + width / 2
-        y = (radius * sin(angle)).toFloat() + height / 2
+        y = (radius * sin(angle)).toFloat() + servoBase.height / 2 + 20f
     }
 
     private fun getPositionInDegrees(y: Float, x: Float): Int =

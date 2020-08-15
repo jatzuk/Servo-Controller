@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <dev.jatzuk.servocontroller.ui.SwitchView
-        android:id="@+id/switchView"
+    <dev.jatzuk.servocontroller.ui.ServoView
+        android:id="@+id/servo_view"
         android:layout_width="250dp"
         android:layout_height="250dp"
         android:layout_marginTop="32dp"
@@ -21,10 +21,10 @@
         android:text="connect"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/switchView" />
+        app:layout_constraintTop_toBottomOf="@+id/servo_view" />
 
     <Button
-        android:id="@+id/sendData"
+        android:id="@+id/send_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
@@ -41,7 +41,7 @@
         android:text="disconnect"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sendData" />
+        app:layout_constraintTop_toBottomOf="@+id/send_data" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
