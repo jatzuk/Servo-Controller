@@ -39,8 +39,17 @@ class ServoView @JvmOverloads constructor(
 
     private var isZooming = false
 
+    private var setupRectF = RectF()
+
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        radius = (min(width, height) / 2 * 0.8).toFloat()
+        radius = (min(width, height) / 2 * 0.9).toFloat()
+
+        setupRectF.apply {
+            left = (width / 2f) - servoBase.width / 2
+            top = 300f
+            right = (width / 2f) + servoBase.width / 2
+            bottom = height.toFloat()
+        }
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -52,6 +61,8 @@ class ServoView @JvmOverloads constructor(
             SERVO_BASE_OFFSET,
             paint
         )
+
+        canvas.drawRect(setupRectF, paint)
 
         servoPointerMatrix.apply {
             reset()
@@ -85,6 +96,17 @@ class ServoView @JvmOverloads constructor(
 
         val x = width / 2 - event.x
         val y = height / 2 - event.y
+
+
+        Log.d(TAG, "onTouchEvent: ${event.x} ${event.y}")
+        val isInside =
+            setupRectF.intersects(event.x - 10f, event.y - 10f, event.x + 10, event.y + 10f)
+        Log.d(TAG, "onTouchEvent: isInside: $isInside")
+
+        if (isInside) {
+            (context as ServoViewSettingsOnClickListener).onClick()
+            return true
+        }
 
         positionInDegrees = getPositionInDegrees(y, x)
 
@@ -138,5 +160,10 @@ class ServoView @JvmOverloads constructor(
             pointPosition.computeXY(i * 10, labelRadius)
             canvas.drawText((i * 10).toString(), pointPosition.x, pointPosition.y, paint)
         }
+    }
+
+    interface ServoViewSettingsOnClickListener {
+
+        fun onClick()
     }
 }
