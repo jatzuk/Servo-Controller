@@ -10,10 +10,10 @@ import dev.jatzuk.servocontroller.R
 import kotlin.math.*
 
 private const val RADIUS_OFFSET_LABEL = 25
-private const val RADIUS_OFFSET_INDICATOR = -5
 private const val LABEL_TEXT_SIZE = 22f
 private const val ZOOM_TEXT_SIZE = LABEL_TEXT_SIZE * 2
 private const val SERVO_BASE_OFFSET = 170f
+private const val SETUP_DIALOG_CLICK_LISTENER_DELAY = 1000L
 private const val TAG = "ServoView"
 
 class ServoView @JvmOverloads constructor(
@@ -26,6 +26,8 @@ class ServoView @JvmOverloads constructor(
     private val servoBase = BitmapFactory.decodeResource(resources, R.drawable.servo_base)
     private val servoPointerMatrix = Matrix()
     private val servoPointer = BitmapFactory.decodeResource(resources, R.drawable.servo_pointer)
+    private var servoSetupRectF = RectF()
+    private var lastClickTime = 0L
 
     private var radius = 0f
     var positionInDegrees = 0
@@ -37,14 +39,14 @@ class ServoView @JvmOverloads constructor(
         typeface = Typeface.create("", Typeface.BOLD)
     }
 
-    private var isZooming = false
+    private var isAdjusting = false
 
-    private var setupRectF = RectF()
+    lateinit var onSetupClickListener: OnSetupClickListener
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         radius = (min(width, height) / 2 * 0.9).toFloat()
 
-        setupRectF.apply {
+        servoSetupRectF.apply {
             left = (width / 2f) - servoBase.width / 2
             top = 300f
             right = (width / 2f) + servoBase.width / 2
@@ -61,8 +63,6 @@ class ServoView @JvmOverloads constructor(
             SERVO_BASE_OFFSET,
             paint
         )
-
-        canvas.drawRect(setupRectF, paint)
 
         servoPointerMatrix.apply {
             reset()
@@ -82,10 +82,9 @@ class ServoView @JvmOverloads constructor(
             null
         )
 
-//        drawPointer(positionInDegrees, canvas)
         drawLabels(canvas)
 
-        if (isZooming) {
+        if (isAdjusting) {
             paint.textSize = ZOOM_TEXT_SIZE
             canvas.drawText(positionInDegrees.toString(), width / 2f, height / 6f, paint)
         }
@@ -97,47 +96,35 @@ class ServoView @JvmOverloads constructor(
         val x = width / 2 - event.x
         val y = height / 2 - event.y
 
-
-        Log.d(TAG, "onTouchEvent: ${event.x} ${event.y}")
-        val isInside =
-            setupRectF.intersects(event.x - 10f, event.y - 10f, event.x + 10, event.y + 10f)
-        Log.d(TAG, "onTouchEvent: isInside: $isInside")
-
-        if (isInside) {
-            (context as ServoViewSettingsOnClickListener).onClick()
+        val clickTime = System.currentTimeMillis()
+        val isIntersects = servoSetupRectF.intersects(event.x, event.y, event.x, event.y)
+        if (isIntersects && clickTime - lastClickTime > SETUP_DIALOG_CLICK_LISTENER_DELAY) {
+            lastClickTime = clickTime
+            onSetupClickListener.onClick()
             return true
         }
 
         positionInDegrees = getPositionInDegrees(y, x)
-
         if (positionInDegrees !in 0..180) return false
 
         return when (event.action) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
-                isZooming = true
+                isAdjusting = true
                 performClick()
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 Log.d(TAG, "final position: $positionInDegrees")
-                isZooming = false
+                isAdjusting = false
                 performClick()
             }
             else -> false
         }
-
     }
 
     override fun performClick(): Boolean {
         super.performClick()
         invalidate()
         return true
-    }
-
-    private fun drawPointer(pos: Int, canvas: Canvas) {
-        val markerRadius = radius + RADIUS_OFFSET_INDICATOR
-        pointPosition.computeXY(pos, markerRadius)
-        paint.color = Color.BLUE
-        canvas.drawCircle(pointPosition.x, pointPosition.y, radius / 24, paint)
     }
 
     private fun PointF.computeXY(radians: Int, radius: Float) {
@@ -162,7 +149,7 @@ class ServoView @JvmOverloads constructor(
         }
     }
 
-    interface ServoViewSettingsOnClickListener {
+    interface OnSetupClickListener {
 
         fun onClick()
     }

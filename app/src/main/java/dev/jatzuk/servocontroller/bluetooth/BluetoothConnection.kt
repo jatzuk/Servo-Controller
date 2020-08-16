@@ -3,7 +3,6 @@ package dev.jatzuk.servocontroller.bluetooth
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
-import android.content.Context
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,18 +13,10 @@ import java.util.*
 private const val TAG = "BTConnectionService"
 private const val UUIDString = "00001101-0000-1000-8000-00805f9b34fb"
 
-class BluetoothConnection(
-    context: Context
-) {
+class BluetoothConnection {
 
     val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
     private var socket: BluetoothSocket? = null
-
-    init {
-        if (bluetoothAdapter == null) {
-            Log.d(TAG, "onCreate: bluetooth is not supported on this device")
-        }
-    }
 
     fun buildDeviceList() {
         val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
