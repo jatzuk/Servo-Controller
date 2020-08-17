@@ -3,59 +3,47 @@ package dev.jatzuk.servocontroller.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
+import android.view.*
 import android.widget.Toast
+import androidx.annotation.DrawableRes
 import androidx.fragment.app.Fragment
+import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.databinding.FragmentHomeBinding
 import dev.jatzuk.servocontroller.mvp.homefragment.HomeFragmentContract
-import dev.jatzuk.servocontroller.mvp.homefragment.HomeFragmentPresenter
-import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
+import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT_1
+import javax.inject.Inject
 
+private const val TAG = "HomeFragment"
+
+@AndroidEntryPoint
 class HomeFragment
     : Fragment(R.layout.fragment_home), ServoView.OnSetupClickListener, HomeFragmentContract.View {
 
     private var binding: FragmentHomeBinding? = null
+    private lateinit var connectionIcon: MenuItem
 
-    private lateinit var presenter: HomeFragmentContract.Presenter
+    @Inject
+    lateinit var presenter: HomeFragmentContract.Presenter
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        setHasOptionsMenu(true)
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentHomeBinding.bind(view)
 
-        setPresenter(HomeFragmentPresenter(this))
-        setupOnClickListeners()
+        assignPresenter(presenter)
+        binding!!.servoView.onSetupClickListener = this
 
-        if (!presenter.isBluetoothSupported()) {
-            Toast.makeText(
-                requireContext(),
-                "Bluetooth not supported on this device",
-                Toast.LENGTH_SHORT
-            ).show()
-            // TODO: 16/08/20 disable bluetooth views and functionality
-        }
-
-        if (!presenter.isBluetoothEnabled()) {
-            presenter.requestBluetoothIfNeeded()
-        }
-    }
-
-    private fun setupOnClickListeners() {
-        binding!!.apply {
-            connect.setOnClickListener {
-                presenter.buildDeviceList()
-            }
-
-            sendData.setOnClickListener {
-                val data = "pos: ${servoView.positionInDegrees}\n"
-                presenter.sendCommand(data.toByteArray())
-            }
-
-            disconnect.setOnClickListener {
-                presenter.disconnect()
-            }
-
-            servoView.onSetupClickListener = this@HomeFragment
+        if (presenter.isConnectionTypeSupported() && !presenter.isConnected()) {
+            presenter.requestConnectionHardware()
         }
     }
 
@@ -67,20 +55,40 @@ class HomeFragment
         presenter.onServoSettingsTapped()
     }
 
-    override fun setPresenter(presenter: HomeFragmentContract.Presenter) {
-        this.presenter = presenter
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
-                REQUEST_ENABLE_BT -> {
-                    // TODO: 13/08/2020 bluetooth enabled
-                    Toast.makeText(requireContext(), "BT enabled", Toast.LENGTH_SHORT).show()
-                }
+                REQUEST_ENABLE_BT_1 -> presenter.onBTRequestEnableReceived()
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.home_menu, menu)
+        connectionIcon = menu.getItem(0)
+        presenter.optionsMenuCreated()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.ic_connection_action -> {
+            presenter.connectionIconPressed()
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
+    }
+
+    override fun updateConnectionStateIcon(@DrawableRes resourceId: Int) {
+        connectionIcon.setIcon(resourceId)
+    }
+
+    override fun showToast(message: String, length: Int) {
+        Toast.makeText(requireContext(), message, length).show()
+    }
+
+    override fun updateConnectionMenuIconVisibility(isVisible: Boolean) {
+        connectionIcon.isVisible = isVisible
     }
 
     override fun onDestroyView() {

@@ -7,6 +7,10 @@
             android:icon="@drawable/ic_launcher_foreground"
             android:title="@string/app_name" />
         <item
+            android:id="@+id/devicesFragment"
+            android:icon="@drawable/ic_bluetooth"
+            android:title="@string/devices" />
+        <item
             android:id="@+id/settingsFragment"
             android:icon="@mipmap/ic_launcher_round"
             android:title="@string/settings" />

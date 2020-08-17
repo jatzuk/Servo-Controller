@@ -43,6 +43,8 @@ class ServoView @JvmOverloads constructor(
 
     lateinit var onSetupClickListener: OnSetupClickListener
 
+    private var tag = "Test Tag"
+
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         radius = (min(width, height) / 2 * 0.9).toFloat()
 
@@ -88,6 +90,8 @@ class ServoView @JvmOverloads constructor(
             paint.textSize = ZOOM_TEXT_SIZE
             canvas.drawText(positionInDegrees.toString(), width / 2f, height / 6f, paint)
         }
+
+        drawTag(canvas)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -146,6 +150,14 @@ class ServoView @JvmOverloads constructor(
         repeat(19) { i ->
             pointPosition.computeXY(i * 10, labelRadius)
             canvas.drawText((i * 10).toString(), pointPosition.x, pointPosition.y, paint)
+        }
+    }
+
+    private fun drawTag(canvas: Canvas) {
+        paint.apply {
+            textSize = LABEL_TEXT_SIZE * 2
+            color = Color.BLACK
+            canvas.drawText(tag, 100f, height - LABEL_TEXT_SIZE, this)
         }
     }
 

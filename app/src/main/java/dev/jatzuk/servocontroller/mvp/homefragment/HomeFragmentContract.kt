@@ -1,5 +1,7 @@
 package dev.jatzuk.servocontroller.mvp.homefragment
 
+import android.widget.Toast
+import androidx.annotation.DrawableRes
 import dev.jatzuk.servocontroller.mvp.BasePresenter
 import dev.jatzuk.servocontroller.mvp.BaseView
 
@@ -7,23 +9,39 @@ interface HomeFragmentContract {
 
     interface Presenter : BasePresenter {
 
-        fun isBluetoothSupported(): Boolean
+        fun optionsMenuCreated()
 
-        fun isBluetoothEnabled(): Boolean
+        fun onBTRequestEnableReceived()
 
-        fun requestBluetoothIfNeeded()
+        fun connectionIconPressed()
+
+        fun isConnectionTypeSupported(): Boolean
+
+        fun isConnected(): Boolean
+
+        fun requestConnectionHardware()
 
         fun onServoSettingsTapped()
 
         fun buildDeviceList()
 
-        fun sendCommand(data: ByteArray)
+        fun connect(): Boolean
 
-        fun disconnect()
+        fun sendData(data: ByteArray): Boolean
+
+        fun disconnect(): Boolean
     }
 
     interface View : BaseView<Presenter> {
 
         fun showServoSettingsDialog()
+
+        fun showToast(message: String, length: Int = Toast.LENGTH_SHORT)
+
+        fun updateConnectionStateIcon(@DrawableRes resourceId: Int)
+
+        fun updateConnectionMenuIconVisibility(isVisible: Boolean)
+
+        override fun assignPresenter(presenter: Presenter) {}
     }
 }
