@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">Servo Controller</string>
+
+    <!--    fragments-->
     <string name="servos">Servos</string>
     <string name="settings">Settings</string>
+
+    <!--    preferences-->
+    <string name="connection_type">Connection Type</string>
+    <string name="devices">Devices</string>
+    <string name="connection_state">Connection state</string>
 </resources>
