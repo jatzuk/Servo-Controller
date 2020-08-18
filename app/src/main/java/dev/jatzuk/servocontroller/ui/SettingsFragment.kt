@@ -3,30 +3,53 @@ package dev.jatzuk.servocontroller.ui
 import android.os.Bundle
 import android.util.Log
 import androidx.preference.DropDownPreference
-import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SeekBarPreference
+import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
-import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAME
+import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAMEE
+import dev.jatzuk.servocontroller.utils.PreferenceDropDownSummaryProvider
+import dev.jatzuk.servocontroller.utils.SettingsHolder
+import javax.inject.Inject
 
 private const val TAG = "SettingsFragment"
 
+@AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat() {
 
+    @Inject
+    lateinit var settingsHolder: SettingsHolder
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        preferenceManager.sharedPreferencesName = SHARED_PREFERENCES_NAME
+        preferenceManager.sharedPreferencesName = SHARED_PREFERENCES_NAMEE
         setPreferencesFromResource(R.xml.preferences, rootKey)
 
         preferenceScreen.findPreference<DropDownPreference>(
             getString(R.string.key_connection_type)
         )?.apply {
-            summaryProvider = Preference.SummaryProvider<DropDownPreference> {
-                Log.d(TAG, "summaryProvider: ${it.entry}")
-                it?.entry.toString()
-            }
+            summaryProvider = PreferenceDropDownSummaryProvider()
             updateIcon()
             setOnPreferenceChangeListener { preference, newValue ->
                 Log.d(TAG, "changeListener: $newValue")
                 (preference as DropDownPreference).updateIcon(newValue.toString())
+                true
+            }
+        }
+
+        preferenceScreen.findPreference<DropDownPreference>(
+            getString(R.string.key_servos_textures)
+        )?.apply {
+            summaryProvider = PreferenceDropDownSummaryProvider()
+        }
+
+        preferenceScreen.findPreference<SeekBarPreference>(
+            getString(R.string.key_servos_count)
+        )?.apply {
+            setOnPreferenceChangeListener { preference, newValue ->
+                // FIXME: 18/08/2020 ???
+                settingsHolder.applyChanges(
+                    servosCount = newValue as Int
+                )
                 true
             }
         }

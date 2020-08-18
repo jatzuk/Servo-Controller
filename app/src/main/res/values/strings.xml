@@ -9,4 +9,5 @@
     <string name="connection_type">Connection Type</string>
     <string name="devices">Devices</string>
     <string name="connection_state">Connection state</string>
+    <string name="servos_textures">Servo texture</string>
 </resources>

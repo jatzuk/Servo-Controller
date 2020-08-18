@@ -12,17 +12,21 @@
             app:title="@string/connection_type" />
 
         <SeekBarPreference
-            android:max="20"
-            app:icon="@drawable/ic_bluetooth"
-            app:key="servos_count"
+            android:max="5"
+            app:icon="@drawable/ic_amount"
+            app:key="@string/key_servos_count"
             app:min="1"
             app:showSeekBarValue="true"
-            app:title="Servos count">
+            app:title="Servos count" />
 
-        </SeekBarPreference>
-
+        <DropDownPreference
+            android:icon="@drawable/ic_texture"
+            app:entries="@array/servo_view"
+            app:entryValues="@array/servo_view"
+            app:key="@string/key_servos_textures"
+            app:summary="textures"
+            app:title="@string/servos_textures" />
 
     </PreferenceCategory>
-
 
 </PreferenceScreen>

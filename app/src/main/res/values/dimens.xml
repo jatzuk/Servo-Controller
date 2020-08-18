@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="drawer_width_offset">220dp</dimen>
+    <dimen name="item_decoration_padding_offset">8dp</dimen>
 </resources>

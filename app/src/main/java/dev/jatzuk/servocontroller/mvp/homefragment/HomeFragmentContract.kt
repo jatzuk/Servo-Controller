@@ -2,14 +2,22 @@ package dev.jatzuk.servocontroller.mvp.homefragment
 
 import android.widget.Toast
 import androidx.annotation.DrawableRes
+import androidx.recyclerview.widget.RecyclerView
 import dev.jatzuk.servocontroller.mvp.BasePresenter
 import dev.jatzuk.servocontroller.mvp.BaseView
+import dev.jatzuk.servocontroller.other.Servo
 
 interface HomeFragmentContract {
 
     interface Presenter : BasePresenter {
 
         fun optionsMenuCreated()
+
+        fun notifyViewCreated()
+
+        fun getRecyclerViewLayoutManager(): RecyclerView.LayoutManager
+
+        fun onReadyToRequestServosList()
 
         fun onBTRequestEnableReceived()
 
@@ -41,6 +49,8 @@ interface HomeFragmentContract {
         fun updateConnectionStateIcon(@DrawableRes resourceId: Int)
 
         fun updateConnectionMenuIconVisibility(isVisible: Boolean)
+
+        fun submitServosList(servos: List<Servo>)
 
         override fun assignPresenter(presenter: Presenter) {}
     }

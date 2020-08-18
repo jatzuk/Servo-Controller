@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="key_connection_type" translatable="false">key_connection_type</string>
+    <string name="key_servos_count" translatable="false">key_servos_count</string>
+    <string name="key_servos_textures" translatable="false">key_servos_textures</string>
 </resources>

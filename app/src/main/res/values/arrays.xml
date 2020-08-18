@@ -4,4 +4,9 @@
         <item>Bluetooth</item>
         <item>Wi-Fi</item>
     </array>
+
+    <array name="servo_view">
+        <item>Texture</item>
+        <item>Seekbar</item>
+    </array>
 </resources>

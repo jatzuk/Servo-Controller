@@ -5,26 +5,34 @@ import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.connection.BluetoothConnection
 import dev.jatzuk.servocontroller.connection.Connection
 import dev.jatzuk.servocontroller.connection.ConnectionType
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT_1
+import dev.jatzuk.servocontroller.other.Servo
+import dev.jatzuk.servocontroller.ui.HomeFragment
 import dev.jatzuk.servocontroller.ui.ServoSetupDialog
+import dev.jatzuk.servocontroller.utils.SettingsHolder
 import javax.inject.Inject
 
 private const val TAG = "HomeFragmentPresenter"
 
 class HomeFragmentPresenter @Inject constructor(
     private var view: HomeFragmentContract.View?,
-    var connectionType: ConnectionType,
+    var settingsHolder: SettingsHolder,
     var connection: Connection
 ) : HomeFragmentContract.Presenter {
+
+    private val servos = mutableListOf<Servo>()
 
     override fun optionsMenuCreated() {
         if (!isConnectionTypeSupported()) {
             // TODO: 16/08/20 disable bluetooth views and functionality
-            val message = "$connectionType module is not found on this device"
+            val message = "${settingsHolder.connectionType} module is not found on this device"
             Log.d(TAG, message)
             view?.apply {
                 showToast(message)
@@ -32,6 +40,20 @@ class HomeFragmentPresenter @Inject constructor(
             }
         }
         view?.updateConnectionStateIcon(getIconBasedOnConnectionState())
+    }
+
+    override fun getRecyclerViewLayoutManager(): RecyclerView.LayoutManager {
+        return if (servos.size > 2) GridLayoutManager((view as HomeFragment).requireContext(), 2)
+        else LinearLayoutManager((view as HomeFragment).requireContext())
+    }
+
+    override fun onReadyToRequestServosList() {
+        (view as HomeFragment).submitServosList(servos)
+    }
+
+    override fun notifyViewCreated() {
+        Log.d(TAG, "notifyViewCreated:")
+        updateServoList()
     }
 
     override fun isConnectionTypeSupported() = connection.isConnectionTypeSupported()
@@ -86,7 +108,7 @@ class HomeFragmentPresenter @Inject constructor(
                 Log.d(TAG, message)
                 view?.showToast(message)
             } else {
-                if (connectionType == ConnectionType.BLUETOOTH) R.drawable.ic_bluetooth_disabled
+                if (settingsHolder.connectionType == ConnectionType.BLUETOOTH) R.drawable.ic_bluetooth_disabled
                 else R.drawable.ic_wifi_disabled
 
                 val message = "Could not connect to a selected device"
@@ -114,7 +136,7 @@ class HomeFragmentPresenter @Inject constructor(
 
     }
 
-    private fun getIconBasedOnConnectionState() = when (connectionType) {
+    private fun getIconBasedOnConnectionState() = when (settingsHolder.connectionType) {
         ConnectionType.BLUETOOTH -> {
             if (isConnected()) R.drawable.ic_bluetooth_connected
             else R.drawable.ic_bluetooth_disabled
@@ -122,6 +144,15 @@ class HomeFragmentPresenter @Inject constructor(
         ConnectionType.WIFI -> {
             if (isConnected()) R.drawable.ic_wifi_connected
             else R.drawable.ic_wifi_disabled
+        }
+    }
+
+    private fun updateServoList() {
+        servos.clear()
+        val size = settingsHolder.servosCount
+        Log.d(TAG, "updateServoList: ${size}")
+        repeat(size) {
+            servos.add(Servo(it, "command#$it", "tag$it"))
         }
     }
 }
