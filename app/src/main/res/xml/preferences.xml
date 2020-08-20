@@ -12,7 +12,7 @@
             app:title="@string/connection_type" />
 
         <SeekBarPreference
-            android:max="5"
+            android:max="10"
             app:icon="@drawable/ic_amount"
             app:key="@string/key_servos_count"
             app:min="1"
