@@ -1,18 +1,19 @@
 package dev.jatzuk.servocontroller.ui
 
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.*
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import dev.jatzuk.servocontroller.R
+import dev.jatzuk.servocontroller.utils.SettingsHolder
 import kotlin.math.*
 
 private const val RADIUS_OFFSET_LABEL = 25
 private const val LABEL_TEXT_SIZE = 22f
 private const val ZOOM_TEXT_SIZE = LABEL_TEXT_SIZE * 2
-private const val SERVO_BASE_OFFSET = 170f
 private const val SETUP_DIALOG_CLICK_LISTENER_DELAY = 1000L
 private const val TAG = "ServoView"
 
@@ -23,18 +24,21 @@ class ServoView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     // TODO: 15/08/2020 fix better servo images
-    private val servoBase = BitmapFactory.decodeResource(resources, R.drawable.servo_base)
+    private var servoBase = BitmapFactory.decodeResource(resources, R.drawable.servo_base)
     private val servoPointerMatrix = Matrix()
-    private val servoPointer = BitmapFactory.decodeResource(resources, R.drawable.servo_pointer)
+    private var servoPointer = BitmapFactory.decodeResource(resources, R.drawable.servo_pointer)
     private var servoSetupRectF = RectF()
     private var lastClickTime = 0L
+    private var servoBaseOffset = 170f
+    private val servoPointerOffset = 50f
 
     private var radius = 0f
-    var positionInDegrees = 0
+    var positionInDegrees = 90
         private set
-    private val pointPosition = PointF()
+    private val labelPosition = PointF()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
+        textSize = ZOOM_TEXT_SIZE
         textAlign = Paint.Align.CENTER
         typeface = Typeface.create("", Typeface.BOLD)
     }
@@ -43,17 +47,73 @@ class ServoView @JvmOverloads constructor(
 
     lateinit var onSetupClickListener: OnSetupClickListener
 
-    private var tag = "Test Tag"
+    var settingsHolder: SettingsHolder = SettingsHolder(context)
+    private var desiredWidth = 0
+    private var desiredHeight = 0
+    var windowWidth = 0
+    var windowHeight = 0
+
+    var tag = "test tag!!"
+    private var shouldRotateTagToFitSelf = false
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val servosSize = settingsHolder.servosCount
+        windowWidth = context.resources.displayMetrics.widthPixels
+        windowHeight = context.resources.displayMetrics.heightPixels
+
+        desiredWidth = windowWidth
+
+        desiredHeight =
+            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                windowHeight / 3
+            } else {
+                windowHeight / 2
+            }
+
+        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+        val widthSize = MeasureSpec.getSize(widthMeasureSpec)
+        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+        val heightSize = MeasureSpec.getSize(heightMeasureSpec)
+
+        val width = when (widthMode) {
+            MeasureSpec.EXACTLY -> widthSize
+            MeasureSpec.AT_MOST -> min(desiredWidth, widthSize)
+            else -> desiredWidth
+        }
+
+        val height = when (heightMode) {
+            MeasureSpec.EXACTLY -> heightSize
+            MeasureSpec.AT_MOST -> min(desiredHeight, heightSize)
+            else -> desiredHeight
+        }
+
+        setMeasuredDimension(width, height)
+    }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        radius = (min(width, height) / 2 * 0.9).toFloat()
+        radius = 220f
 
         servoSetupRectF.apply {
             left = (width / 2f) - servoBase.width / 2
-            top = 300f
+            top = 250f
             right = (width / 2f) + servoBase.width / 2
             bottom = height.toFloat()
         }
+
+//        val options = BitmapFactory.Options()
+//        options.inJustDecodeBounds = true
+//        options.inJustDecodeBounds = false
+
+        val servosSize = settingsHolder.servosCount
+        if (servosSize > 2) {
+//            servoBase = servoBase.scale(width / 2, (height / (servosSize * 1.5f)).toInt())
+
+//        servoPointer = servoPointer.scale(width / 4, height / 4)
+        } else {
+//            servoBase = servoBase.scale(servoBase.width, 300)
+        }
+
+        shouldRotateTagToFitSelf = paint.measureText(tag) > width / 2
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -62,7 +122,7 @@ class ServoView @JvmOverloads constructor(
         canvas.drawBitmap(
             servoBase,
             (width / 2f) - servoBase.width / 2,
-            SERVO_BASE_OFFSET,
+            servoBaseOffset,
             paint
         )
 
@@ -70,28 +130,30 @@ class ServoView @JvmOverloads constructor(
             reset()
             postRotate(
                 positionInDegrees.toFloat(),
-                servoPointer.width - 50f,
+                servoPointer.width - servoPointerOffset,
                 servoPointer.height / 2f - 10f
             )
             postTranslate(
                 width / 2f - servoBase.width - 70,
-                servoPointer.height / 2 + SERVO_BASE_OFFSET
+                servoPointer.height / 2 + servoBaseOffset
             )
         }
-        canvas.drawBitmap(
-            servoPointer,
-            servoPointerMatrix,
-            null
-        )
-
-        drawLabels(canvas)
+        canvas.drawBitmap(servoPointer, servoPointerMatrix, paint)
 
         if (isAdjusting) {
             paint.textSize = ZOOM_TEXT_SIZE
-            canvas.drawText(positionInDegrees.toString(), width / 2f, height / 6f, paint)
+            canvas.drawText(
+                positionInDegrees.toString(),
+                width - paint.measureText("10"),
+                height - 10f,
+                paint
+            )
         }
 
+        drawLabels(canvas)
         drawTag(canvas)
+
+        canvas.drawRect(servoSetupRectF, paint)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -108,8 +170,10 @@ class ServoView @JvmOverloads constructor(
             return true
         }
 
-        positionInDegrees = getPositionInDegrees(y, x)
-        if (positionInDegrees !in 0..180) return false
+        val position = getPositionInDegrees(y, x)
+        if (position !in 0..180) return false
+
+        positionInDegrees = position
 
         return when (event.action) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
@@ -142,22 +206,41 @@ class ServoView @JvmOverloads constructor(
         ((180 / PI) * atan2(y, x)).roundToInt()
 
     private fun drawLabels(canvas: Canvas) {
+//        canvas.save()
+//        canvas.rotate(
+//            positionInDegrees.toFloat() - 90,
+//            width / 2f,
+//            height / 2f
+//        )
+
         paint.apply {
             textSize = LABEL_TEXT_SIZE
             color = Color.BLACK
         }
         val labelRadius = radius + RADIUS_OFFSET_LABEL
         repeat(19) { i ->
-            pointPosition.computeXY(i * 10, labelRadius)
-            canvas.drawText((i * 10).toString(), pointPosition.x, pointPosition.y, paint)
+            labelPosition.computeXY(i * 10, labelRadius)
+            canvas.drawText((i * 10).toString(), labelPosition.x, labelPosition.y, paint)
         }
+
+//        canvas.restore()
     }
 
     private fun drawTag(canvas: Canvas) {
         paint.apply {
-            textSize = LABEL_TEXT_SIZE * 2
+            textSize = ZOOM_TEXT_SIZE
             color = Color.BLACK
-            canvas.drawText(tag, 100f, height - LABEL_TEXT_SIZE, this)
+        }
+
+        if (shouldRotateTagToFitSelf) {
+            canvas.run {
+                save()
+                rotate(-90f, width / 2f, height / 2f)
+                drawText(tag, paint.measureText(tag) / 2, paint.measureText(tag) / 2, paint)
+                restore()
+            }
+        } else {
+            canvas.drawText(tag, paint.measureText(tag) / 2f + 8f, height - 8f, paint)
         }
     }
 

@@ -2,6 +2,7 @@ package dev.jatzuk.servocontroller.mvp.homefragment
 
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
+import android.content.res.Configuration
 import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -12,7 +13,7 @@ import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.connection.BluetoothConnection
 import dev.jatzuk.servocontroller.connection.Connection
 import dev.jatzuk.servocontroller.connection.ConnectionType
-import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT_1
+import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
 import dev.jatzuk.servocontroller.other.Servo
 import dev.jatzuk.servocontroller.ui.HomeFragment
 import dev.jatzuk.servocontroller.ui.ServoSetupDialog
@@ -43,8 +44,14 @@ class HomeFragmentPresenter @Inject constructor(
     }
 
     override fun getRecyclerViewLayoutManager(): RecyclerView.LayoutManager {
-        return if (servos.size > 2) GridLayoutManager((view as HomeFragment).requireContext(), 2)
-        else LinearLayoutManager((view as HomeFragment).requireContext())
+        val context = (view as HomeFragment).requireContext()
+        return if (context.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            if (settingsHolder.servosCount < 3) LinearLayoutManager(context)
+            else GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false)
+        } else {
+            if (settingsHolder.servosCount < 2) LinearLayoutManager(context)
+            else GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false)
+        }
     }
 
     override fun onReadyToRequestServosList() {
@@ -63,7 +70,7 @@ class HomeFragmentPresenter @Inject constructor(
     override fun requestConnectionHardware() {
         if (connection is BluetoothConnection) {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            (view as Fragment).startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT_1)
+            (view as Fragment).startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
         } else {
             // TODO: 17/08/2020 request enable wifi
         }

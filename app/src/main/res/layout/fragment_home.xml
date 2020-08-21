@@ -7,7 +7,7 @@
     <dev.jatzuk.servocontroller.utils.NoInterceptOnTouchEventRecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_margin="8dp"
         app:layout_constraintBottom_toTopOf="@+id/animation_holder"
         app:layout_constraintEnd_toEndOf="parent"

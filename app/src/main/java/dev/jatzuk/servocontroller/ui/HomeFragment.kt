@@ -3,7 +3,6 @@ package dev.jatzuk.servocontroller.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.annotation.DrawableRes
@@ -13,7 +12,7 @@ import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.adapters.ServoAdapter
 import dev.jatzuk.servocontroller.databinding.FragmentHomeBinding
 import dev.jatzuk.servocontroller.mvp.homefragment.HomeFragmentContract
-import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT_1
+import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
 import dev.jatzuk.servocontroller.other.Servo
 import dev.jatzuk.servocontroller.utils.BottomPaddingDecoration
 import javax.inject.Inject
@@ -59,7 +58,6 @@ class HomeFragment
             adapter = servoAdapter
             layoutManager = presenter.getRecyclerViewLayoutManager()
             addItemDecoration(BottomPaddingDecoration(requireContext()))
-            suppressLayout(true)
         }
         presenter.onReadyToRequestServosList() // FIXME: 18/08/2020 ???
     }
@@ -80,7 +78,7 @@ class HomeFragment
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
-                REQUEST_ENABLE_BT_1 -> presenter.onBTRequestEnableReceived()
+                REQUEST_ENABLE_BT -> presenter.onBTRequestEnableReceived()
             }
         }
     }
