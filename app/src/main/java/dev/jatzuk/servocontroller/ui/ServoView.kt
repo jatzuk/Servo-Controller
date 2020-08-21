@@ -1,12 +1,12 @@
 package dev.jatzuk.servocontroller.ui
 
 import android.content.Context
-import android.content.res.Configuration
 import android.graphics.*
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import androidx.annotation.DrawableRes
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.utils.SettingsHolder
 import kotlin.math.*
@@ -23,14 +23,18 @@ class ServoView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    // TODO: 15/08/2020 fix better servo images
-    private var servoBase = BitmapFactory.decodeResource(resources, R.drawable.servo_base)
+    private lateinit var servoBase: Bitmap
+
+    //            = BitmapFactory.decodeResource(resources, R.drawable.servo_base)
     private val servoPointerMatrix = Matrix()
-    private var servoPointer = BitmapFactory.decodeResource(resources, R.drawable.servo_pointer)
+    private lateinit var servoHead: Bitmap
+
+    //            = BitmapFactory.decodeResource(resources, R.drawable.servo_head)
     private var servoSetupRectF = RectF()
     private var lastClickTime = 0L
     private var servoBaseOffset = 170f
     private val servoPointerOffset = 50f
+    private var randomOffset = 0f
 
     private var radius = 0f
     var positionInDegrees = 90
@@ -62,13 +66,8 @@ class ServoView @JvmOverloads constructor(
         windowHeight = context.resources.displayMetrics.heightPixels
 
         desiredWidth = windowWidth
-
-        desiredHeight =
-            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-                windowHeight / 3
-            } else {
-                windowHeight / 2
-            }
+        val multiplier = 0f
+        desiredHeight = (windowHeight * 0.4).toInt()
 
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)
         val widthSize = MeasureSpec.getSize(widthMeasureSpec)
@@ -93,27 +92,26 @@ class ServoView @JvmOverloads constructor(
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         radius = 220f
 
+        servoBase = createScaledBitmap(R.drawable.servo_base, 100, 100)
+        servoHead = createScaledBitmap(R.drawable.servo_head, 50, 100)
+
         servoSetupRectF.apply {
             left = (width / 2f) - servoBase.width / 2
-            top = 250f
+            top = servoBase.height / 2f
             right = (width / 2f) + servoBase.width / 2
             bottom = height.toFloat()
         }
-
-//        val options = BitmapFactory.Options()
-//        options.inJustDecodeBounds = true
-//        options.inJustDecodeBounds = false
 
         val servosSize = settingsHolder.servosCount
         if (servosSize > 2) {
 //            servoBase = servoBase.scale(width / 2, (height / (servosSize * 1.5f)).toInt())
 
-//        servoPointer = servoPointer.scale(width / 4, height / 4)
+//        servoPointer = servoHead.scale(width / 4, height / 4)
         } else {
 //            servoBase = servoBase.scale(servoBase.width, 300)
         }
 
-        shouldRotateTagToFitSelf = paint.measureText(tag) > width / 2
+        shouldRotateTagToFitSelf = paint.measureText(tag) > width / 2 - servoBase.width / 2
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -121,24 +119,24 @@ class ServoView @JvmOverloads constructor(
 
         canvas.drawBitmap(
             servoBase,
-            (width / 2f) - servoBase.width / 2,
-            servoBaseOffset,
+            width / 2f - servoBase.width / 2,
+            height / 2f,
             paint
         )
 
         servoPointerMatrix.apply {
             reset()
             postRotate(
-                positionInDegrees.toFloat(),
-                servoPointer.width - servoPointerOffset,
-                servoPointer.height / 2f - 10f
+                positionInDegrees - 90f,
+                servoHead.height / 7f,
+                servoHead.height.toFloat() * 0.83f //290f//height / 2f
             )
             postTranslate(
-                width / 2f - servoBase.width - 70,
-                servoPointer.height / 2 + servoBaseOffset
+                width / 2f - servoHead.width / 2,
+                height / 2f - servoBase.height / 2 //servoHead.height / 6f
             )
         }
-        canvas.drawBitmap(servoPointer, servoPointerMatrix, paint)
+        canvas.drawBitmap(servoHead, servoPointerMatrix, paint)
 
         if (isAdjusting) {
             paint.textSize = ZOOM_TEXT_SIZE
@@ -242,6 +240,38 @@ class ServoView @JvmOverloads constructor(
         } else {
             canvas.drawText(tag, paint.measureText(tag) / 2f + 8f, height - 8f, paint)
         }
+    }
+
+    private fun createScaledBitmap(
+        @DrawableRes resourceId: Int,
+        targetWidth: Int,
+        targetHeight: Int
+    ) = BitmapFactory.Options().run {
+        inJustDecodeBounds = true
+        BitmapFactory.decodeResource(resources, resourceId, this)
+        inSampleSize = calculateInSampleSize(this, targetWidth, targetHeight)
+        inJustDecodeBounds = false
+        BitmapFactory.decodeResource(resources, resourceId, this)
+    }
+
+    private fun calculateInSampleSize(
+        options: BitmapFactory.Options,
+        targetWidth: Int,
+        targetHeight: Int
+    ): Int {
+        val (w, h) = options.run { outWidth to outHeight }
+        var inSampleSize = 1
+
+        if (w > targetWidth || h > targetHeight) {
+            val halfW = w / 2
+            val halfH = h / 2
+
+            while (halfW / inSampleSize >= targetWidth && halfH / inSampleSize >= targetHeight) {
+                inSampleSize *= 2
+            }
+        }
+
+        return inSampleSize
     }
 
     interface OnSetupClickListener {
