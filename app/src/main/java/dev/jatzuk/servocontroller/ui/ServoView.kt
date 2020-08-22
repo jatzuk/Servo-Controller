@@ -11,6 +11,9 @@ import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAME
 import kotlin.math.*
 
+private const val DEFAULT_ZOOM_TEXT_SIZE = 10f
+private const val DEFAULT_LABEL_TEXT_SIZE = 16f
+private const val DEFAULT_VALUE_TEXT_SIZE = 22f
 private const val SETUP_DIALOG_CLICK_LISTENER_DELAY = 1000L
 private const val TAG = "ServoView"
 
@@ -62,6 +65,11 @@ class ServoView @JvmOverloads constructor(
         false
     )
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        setDefaultTextSizes()
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val windowWidth = context.resources.displayMetrics.widthPixels
         val windowHeight = context.resources.displayMetrics.heightPixels
@@ -88,11 +96,6 @@ class ServoView @JvmOverloads constructor(
             else -> desiredHeight
         }
 
-        val density = resources.displayMetrics.density
-        labelTextSize *= density
-        zoomTextSize *= density
-        valueTextSize *= density
-
         var bitmapSizeFactor = if (servosCount < 3) 2 else 4
 
         // if tablet or smth
@@ -106,6 +109,16 @@ class ServoView @JvmOverloads constructor(
         servoHead = createScaledBitmap(R.drawable.servo_head, servoHeadSize, servoHeadSize)
 
         setMeasuredDimension(width, height)
+    }
+
+    private fun setDefaultTextSizes() {
+        labelTextSize = DEFAULT_LABEL_TEXT_SIZE
+        zoomTextSize = DEFAULT_ZOOM_TEXT_SIZE
+        valueTextSize = DEFAULT_VALUE_TEXT_SIZE
+        val density = resources.displayMetrics.density
+        labelTextSize *= density
+        zoomTextSize *= density
+        valueTextSize *= density
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -184,7 +197,9 @@ class ServoView @JvmOverloads constructor(
 
         val clickTime = System.currentTimeMillis()
         val isIntersects = servoSetupArea.intersects(event.x, event.y, event.x, event.y)
-        if (event.action == MotionEvent.ACTION_DOWN && isIntersects && clickTime - lastClickTime > SETUP_DIALOG_CLICK_LISTENER_DELAY) {
+        if (event.action == MotionEvent.ACTION_DOWN
+            && isIntersects && clickTime - lastClickTime > SETUP_DIALOG_CLICK_LISTENER_DELAY
+        ) {
             lastClickTime = clickTime
             onSetupClickListener.onSetupAreaClicked()
             return true
