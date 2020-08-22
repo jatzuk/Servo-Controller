@@ -3,4 +3,5 @@
     <string name="key_connection_type" translatable="false">key_connection_type</string>
     <string name="key_servos_count" translatable="false">key_servos_count</string>
     <string name="key_servos_textures" translatable="false">key_servos_textures</string>
+    <string name="key_is_angle_grid_should_show" translatable="false">key_is_angle_grid_should_show</string>
 </resources>

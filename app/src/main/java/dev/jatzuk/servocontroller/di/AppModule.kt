@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAME
+import dev.jatzuk.servocontroller.utils.SettingsHolder
 import javax.inject.Singleton
 
 @Module
@@ -18,4 +19,8 @@ object AppModule {
     @Provides
     fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences =
         context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+
+    @Singleton
+    @Provides
+    fun provideSettingsHolder(@ApplicationContext context: Context) = SettingsHolder(context)
 }

@@ -7,7 +7,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SeekBarPreference
 import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
-import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAMEE
+import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAME
 import dev.jatzuk.servocontroller.utils.PreferenceDropDownSummaryProvider
 import dev.jatzuk.servocontroller.utils.SettingsHolder
 import javax.inject.Inject
@@ -21,7 +21,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     lateinit var settingsHolder: SettingsHolder
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        preferenceManager.sharedPreferencesName = SHARED_PREFERENCES_NAMEE
+        preferenceManager.sharedPreferencesName = SHARED_PREFERENCES_NAME
         setPreferencesFromResource(R.xml.preferences, rootKey)
 
         preferenceScreen.findPreference<DropDownPreference>(

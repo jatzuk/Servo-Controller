@@ -80,6 +80,11 @@ class HomeFragmentPresenter @Inject constructor(
         showSetupDialog()
     }
 
+    override fun onFinalPositionDetected(position: Int) {
+        val data = "$position"
+//        connection.send(data.toByteArray())
+    }
+
     override fun buildDeviceList() {
         (connection as BluetoothConnection).buildDeviceList()
     }

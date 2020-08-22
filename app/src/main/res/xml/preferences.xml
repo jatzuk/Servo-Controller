@@ -27,6 +27,13 @@
             app:summary="textures"
             app:title="@string/servos_textures" />
 
+        <SwitchPreferenceCompat
+            android:dependency="@string/key_servos_textures"
+            android:icon="@drawable/ic_texture"
+            android:key="@string/key_is_angle_grid_should_show"
+            android:title="Angle grid "
+            app:summary="is showing" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

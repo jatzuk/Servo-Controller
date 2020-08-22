@@ -31,6 +31,8 @@ interface HomeFragmentContract {
 
         fun onServoSettingsTapped()
 
+        fun onFinalPositionDetected(position: Int)
+
         fun buildDeviceList()
 
         fun connect(): Boolean

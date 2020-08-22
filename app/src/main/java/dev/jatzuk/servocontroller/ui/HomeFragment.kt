@@ -66,8 +66,12 @@ class HomeFragment
         servoAdapter.submitList(servos)
     }
 
-    override fun onClick() {
+    override fun onSetupAreaClicked() {
         showServoSettingsDialog()
+    }
+
+    override fun onFinalPositionDetected(position: Int) {
+        presenter.onFinalPositionDetected(position)
     }
 
     override fun showServoSettingsDialog() {

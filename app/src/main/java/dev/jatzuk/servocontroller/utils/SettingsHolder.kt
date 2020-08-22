@@ -3,7 +3,7 @@ package dev.jatzuk.servocontroller.utils
 import android.content.Context
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.connection.ConnectionType
-import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAMEE
+import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAME
 import dev.jatzuk.servocontroller.other.ServoTexture
 import javax.inject.Inject
 
@@ -12,7 +12,7 @@ data class SettingsHolder @Inject constructor(
 ) {
 
     private val sharedPreferences = applicationContext.getSharedPreferences(
-        SHARED_PREFERENCES_NAMEE,
+        SHARED_PREFERENCES_NAME,
         Context.MODE_PRIVATE
     )
 
