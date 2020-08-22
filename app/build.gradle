@@ -6,7 +6,7 @@ apply plugin: 'dagger.hilt.android.plugin'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.1"
+    buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "dev.jatzuk.servocontroller"
@@ -20,6 +20,7 @@ android {
 
     buildFeatures {
         viewBinding true
+        dataBinding true
     }
 
     buildTypes {
