@@ -32,8 +32,7 @@ class ServoView @JvmOverloads constructor(
     private val servoHeadMatrix = Matrix()
 
     private var radius = 0f
-    var positionInDegrees = 90
-        private set
+    private var positionInDegrees = 90
     private val labelPosition = PointF()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
@@ -49,10 +48,9 @@ class ServoView @JvmOverloads constructor(
 
     private var radiusOffsetLabel = 30
 
-    private var labelTextSize = 5f
-
-    private var zoomTextSize = 8f
-    private var valueTextSize = 12f
+    private var labelTextSize = 0f
+    private var zoomTextSize = 0f
+    private var valueTextSize = 0f
     private var valueOffsetLabel = 0f
 
     private val sharedPreferences =
@@ -254,7 +252,7 @@ class ServoView @JvmOverloads constructor(
     }
 
     private fun drawTag(canvas: Canvas) {
-        paint.textSize = zoomTextSize
+        paint.textSize = zoomTextSize * 2
 
         if (shouldRotateTagToFitSelf) {
             canvas.run {
