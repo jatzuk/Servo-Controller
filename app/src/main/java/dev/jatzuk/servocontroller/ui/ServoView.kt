@@ -12,8 +12,8 @@ import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAME
 import kotlin.math.*
 
 private const val DEFAULT_ZOOM_TEXT_SIZE = 10f
-private const val DEFAULT_LABEL_TEXT_SIZE = 16f
-private const val DEFAULT_VALUE_TEXT_SIZE = 22f
+private const val DEFAULT_LABEL_TEXT_SIZE = 14f
+private const val DEFAULT_VALUE_TEXT_SIZE = 24f
 private const val SETUP_DIALOG_CLICK_LISTENER_DELAY = 1000L
 private const val TAG = "ServoView"
 
@@ -78,7 +78,6 @@ class ServoView @JvmOverloads constructor(
             if (windowHeight > windowWidth) (windowHeight * 0.4).toInt()
             else (windowHeight * 0.6).toInt()
 
-
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)
         val widthSize = MeasureSpec.getSize(widthMeasureSpec)
         val heightMode = MeasureSpec.getMode(heightMeasureSpec)
@@ -142,7 +141,6 @@ class ServoView @JvmOverloads constructor(
         super.onDraw(canvas)
 
         drawLabels(canvas)
-
         drawServoBase(canvas)
         drawServoHead(canvas)
         drawValue(canvas)
