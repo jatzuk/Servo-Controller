@@ -20,8 +20,7 @@ import javax.inject.Inject
 private const val TAG = "HomeFragment"
 
 @AndroidEntryPoint
-class HomeFragment
-    : Fragment(R.layout.fragment_home), ServoView.OnSetupClickListener, HomeFragmentContract.View {
+class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View {
 
     private var binding: FragmentHomeBinding? = null
     private lateinit var connectionIcon: MenuItem
@@ -64,18 +63,6 @@ class HomeFragment
 
     override fun submitServosList(servos: List<Servo>) {
         servoAdapter.submitList(servos)
-    }
-
-    override fun onSetupAreaClicked() {
-        showServoSettingsDialog()
-    }
-
-    override fun onFinalPositionDetected(position: Int) {
-        presenter.onFinalPositionDetected(position)
-    }
-
-    override fun showServoSettingsDialog() {
-        presenter.onServoSettingsTapped()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

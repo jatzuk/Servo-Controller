@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import dev.jatzuk.servocontroller.databinding.ItemServoBinding
 import dev.jatzuk.servocontroller.other.Servo
 import dev.jatzuk.servocontroller.ui.HomeFragment
+import dev.jatzuk.servocontroller.ui.ServoView
 
 class ServoAdapter : ListAdapter<Servo, ServoAdapter.ServoViewHolder>(ServoDiffCallback()) {
 
@@ -19,15 +20,27 @@ class ServoAdapter : ListAdapter<Servo, ServoAdapter.ServoViewHolder>(ServoDiffC
     }
 
     class ServoViewHolder private constructor(
-        val binding: ItemServoBinding,
-        fragment: HomeFragment
+        private val binding: ItemServoBinding,
+        private val fragment: HomeFragment
     ) : RecyclerView.ViewHolder(binding.root) {
 
         init {
-            binding.servoView.onSetupClickListener = fragment
+            binding.servoView.onSetupClickListener = ServoViewOnClickListener()
         }
 
         fun bind(item: Servo) {
+            binding.servoView.tag = (layoutPosition + 1).toString()
+        }
+
+        private inner class ServoViewOnClickListener : ServoView.OnSetupClickListener {
+
+            override fun onSetupAreaClicked() {
+                fragment.presenter.onServoSettingsTapped(layoutPosition)
+            }
+
+            override fun onFinalPositionDetected(position: Int) {
+                fragment.presenter.onFinalPositionDetected(layoutPosition, position)
+            }
         }
 
         companion object {
