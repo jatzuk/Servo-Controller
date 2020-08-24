@@ -1,4 +1,4 @@
-package dev.jatzuk.servocontroller.mvp.homefragment
+package dev.jatzuk.servocontroller.mvp.homeFragment
 
 import android.widget.Toast
 import androidx.annotation.DrawableRes
@@ -29,9 +29,9 @@ interface HomeFragmentContract {
 
         fun requestConnectionHardware()
 
-        fun onServoSettingsTapped()
+        fun onServoSettingsTapped(layoutPosition: Int)
 
-        fun onFinalPositionDetected(position: Int)
+        fun onFinalPositionDetected(layoutPosition: Int, angle: Int)
 
         fun buildDeviceList()
 
@@ -43,8 +43,6 @@ interface HomeFragmentContract {
     }
 
     interface View : BaseView<Presenter> {
-
-        fun showServoSettingsDialog()
 
         fun showToast(message: String, length: Int = Toast.LENGTH_SHORT)
 

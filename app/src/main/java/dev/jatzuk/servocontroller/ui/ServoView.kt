@@ -43,7 +43,7 @@ class ServoView @JvmOverloads constructor(
 
     private var isAdjusting = false
 
-    var tag = "test tag!!"
+    var tag = ""
     private var shouldRotateTagToFitSelf = false
 
     private var radiusOffsetLabel = 30

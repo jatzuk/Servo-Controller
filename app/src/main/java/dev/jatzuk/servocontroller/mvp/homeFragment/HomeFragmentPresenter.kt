@@ -1,4 +1,4 @@
-package dev.jatzuk.servocontroller.mvp.homefragment
+package dev.jatzuk.servocontroller.mvp.homeFragment
 
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
@@ -76,12 +76,12 @@ class HomeFragmentPresenter @Inject constructor(
         }
     }
 
-    override fun onServoSettingsTapped() {
-        showSetupDialog()
+    override fun onServoSettingsTapped(layoutPosition: Int) {
+        showSetupDialog(layoutPosition)
     }
 
-    override fun onFinalPositionDetected(position: Int) {
-        val data = "$position"
+    override fun onFinalPositionDetected(layoutPosition: Int, position: Int) {
+        val data = "#$layoutPosition$position"
 //        connection.send(data.toByteArray())
     }
 
@@ -108,8 +108,10 @@ class HomeFragmentPresenter @Inject constructor(
         view = null
     }
 
-    private fun showSetupDialog() {
-        ServoSetupDialog().show((view as Fragment).parentFragmentManager, "ServoSetupDialog")
+    private fun showSetupDialog(layoutPosition: Int) {
+        ServoSetupDialog.newInstance(
+            layoutPosition
+        ).show((view as Fragment).parentFragmentManager, "ServoSetupDialog")
     }
 
     override fun connectionIconPressed() {

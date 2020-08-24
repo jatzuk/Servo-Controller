@@ -16,6 +16,7 @@
             app:icon="@drawable/ic_amount"
             app:key="@string/key_servos_count"
             app:min="1"
+            android:defaultValue="1"
             app:showSeekBarValue="true"
             app:title="Servos count" />
 
@@ -30,6 +31,7 @@
         <SwitchPreferenceCompat
             android:dependency="@string/key_servos_textures"
             android:icon="@drawable/ic_texture"
+            android:defaultValue="true"
             android:key="@string/key_is_angle_grid_should_show"
             android:title="Angle grid "
             app:summary="is showing" />

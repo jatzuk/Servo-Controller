@@ -11,7 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.adapters.ServoAdapter
 import dev.jatzuk.servocontroller.databinding.FragmentHomeBinding
-import dev.jatzuk.servocontroller.mvp.homefragment.HomeFragmentContract
+import dev.jatzuk.servocontroller.mvp.homeFragment.HomeFragmentContract
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
 import dev.jatzuk.servocontroller.other.Servo
 import dev.jatzuk.servocontroller.utils.BottomPaddingDecoration
@@ -57,6 +57,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
             adapter = servoAdapter
             layoutManager = presenter.getRecyclerViewLayoutManager()
             addItemDecoration(BottomPaddingDecoration(requireContext()))
+            setHasFixedSize(true)
         }
         presenter.onReadyToRequestServosList() // FIXME: 18/08/2020 ???
     }

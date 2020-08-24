@@ -7,6 +7,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.FragmentComponent
 import dev.jatzuk.servocontroller.connection.ConnectionFactory
 import dev.jatzuk.servocontroller.ui.HomeFragment
+import dev.jatzuk.servocontroller.ui.ServoSetupDialog
 import dev.jatzuk.servocontroller.utils.SettingsHolder
 
 @Module
@@ -14,7 +15,10 @@ import dev.jatzuk.servocontroller.utils.SettingsHolder
 object FragmentModule {
 
     @Provides
-    fun bindFragment(fragment: Fragment): HomeFragment = fragment as HomeFragment
+    fun provideHomeFragment(fragment: Fragment) = fragment as HomeFragment
+
+    @Provides
+    fun provideServoSetupDialog(fragment: Fragment) = fragment as ServoSetupDialog
 
     @Provides
     fun provideConnection(

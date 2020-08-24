@@ -4,8 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.FragmentComponent
-import dev.jatzuk.servocontroller.mvp.homefragment.HomeFragmentContract
-import dev.jatzuk.servocontroller.mvp.homefragment.HomeFragmentPresenter
+import dev.jatzuk.servocontroller.mvp.homeFragment.HomeFragmentContract
+import dev.jatzuk.servocontroller.mvp.homeFragment.HomeFragmentPresenter
 import dev.jatzuk.servocontroller.ui.HomeFragment
 
 @Module

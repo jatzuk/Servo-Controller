@@ -1,11 +1,9 @@
 package dev.jatzuk.servocontroller.utils
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.connection.ConnectionType
-import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAMEE
+import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAME
 import dev.jatzuk.servocontroller.other.ServoTexture
 import javax.inject.Inject
 
@@ -14,35 +12,35 @@ data class SettingsHolder @Inject constructor(
 ) {
 
     private val sharedPreferences = applicationContext.getSharedPreferences(
-        SHARED_PREFERENCES_NAMEE,
+        SHARED_PREFERENCES_NAME,
         Context.MODE_PRIVATE
     )
 
-    private val _connectionType = MutableLiveData(loadConnectionTypeFromSharedPreferences())
-    val connectionType: LiveData<ConnectionType> get() = _connectionType
+    private var _connectionType: ConnectionType = loadConnectionTypeFromSharedPreferences()
+    val connectionType get() = _connectionType
 
-    private val _servosCount = MutableLiveData(loadServosCountFromSharedPreferences())
-    val servosCount: LiveData<Int> get() = _servosCount
+    private var _servosCount: Int = loadServosCountFromSharedPreferences()
+    val servosCount get() = _servosCount
 
-    private val _servosTexture = MutableLiveData(loadServosTextureTypeFromSharedPreferences())
-    val servosTexture: LiveData<ServoTexture> get() = _servosTexture
+    private var _servosTexture: ServoTexture = loadServosTextureTypeFromSharedPreferences()
+    val servosTexture get() = _servosTexture
 
     fun applyChanges(
-        connectionType: ConnectionType = this.connectionType.value!!,
-        servosCount: Int = this.servosCount.value!!,
-        servosTexture: ServoTexture = this.servosTexture.value!!
+        connectionType: ConnectionType = this.connectionType,
+        servosCount: Int = this.servosCount,
+        servosTexture: ServoTexture = this.servosTexture
     ) {
         sharedPreferences.edit().run {
-            if (connectionType != _connectionType.value!!) {
+            if (connectionType != _connectionType) {
                 putString(
                     applicationContext.getString(R.string.key_connection_type),
                     connectionType.name
                 )
             }
-            if (servosCount != _servosCount.value) {
+            if (servosCount != _servosCount) {
                 putInt(applicationContext.getString(R.string.key_servos_count), servosCount)
             }
-            if (servosTexture != _servosTexture.value!!) {
+            if (servosTexture != _servosTexture) {
                 putString(
                     applicationContext.getString(R.string.key_servos_textures),
                     servosTexture.name
@@ -51,9 +49,9 @@ data class SettingsHolder @Inject constructor(
             apply()
         }
 
-        _connectionType.value = connectionType
-        _servosCount.value = servosCount
-        _servosTexture.value = servosTexture
+        _connectionType = connectionType
+        _servosCount = servosCount
+        _servosTexture = servosTexture
     }
 
     private fun loadConnectionTypeFromSharedPreferences(): ConnectionType {
@@ -61,17 +59,22 @@ data class SettingsHolder @Inject constructor(
             applicationContext.getString(R.string.key_connection_type),
             ConnectionType.BLUETOOTH.name
         ) ?: ConnectionType.BLUETOOTH.name
-        return if (stringType.startsWith('B')) ConnectionType.BLUETOOTH else ConnectionType.WIFI
+        val type = if (stringType.startsWith('B')) ConnectionType.BLUETOOTH else ConnectionType.WIFI
+        _connectionType = type
+        return type
     }
 
     private fun loadServosCountFromSharedPreferences() =
         sharedPreferences.getInt(applicationContext.getString(R.string.key_servos_count), 1)
+            .also { _servosCount = it }
 
     private fun loadServosTextureTypeFromSharedPreferences(): ServoTexture {
         val stringType = sharedPreferences.getString(
             applicationContext.getString(R.string.key_servos_textures),
             ServoTexture.TEXTURE.name
         ) ?: ServoTexture.TEXTURE.name
-        return if (stringType.startsWith('T')) ServoTexture.TEXTURE else ServoTexture.SEEKBAR
+        val type = if (stringType.startsWith('T')) ServoTexture.TEXTURE else ServoTexture.SEEKBAR
+        _servosTexture = type
+        return type
     }
 }
