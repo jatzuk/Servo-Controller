@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -12,13 +11,14 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@drawable/dialog_background">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_command"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="24dp"
             android:text="@string/command"
             android:textSize="16sp"
@@ -32,30 +32,20 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:hint="@string/your_command_here"
-            app:updateText="@{servo.command}"
             android:textSize="16sp"
             app:layout_constraintStart_toEndOf="@+id/tv_command"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tv_send_on"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="32dp"
-            android:text="Send on"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_tag" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:updateText="@{servo.command}" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_tag"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="32dp"
             android:text="@string/tag"
             android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_command"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_command" />
 
@@ -64,25 +54,38 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:hint="@string/your_tag_here"
             android:maxLength="10"
-            app:updateText="@{servo.tag}"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="@+id/et_command"
-            app:layout_constraintTop_toBottomOf="@+id/et_command" />
+            app:layout_constraintTop_toBottomOf="@+id/et_command"
+            app:updateText="@{servo.tag}" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_send_on"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Send on"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/radio_group"
+            app:layout_constraintEnd_toEndOf="@+id/tv_tag"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <RadioGroup
             android:id="@+id/radio_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
+            android:checkedButton="@id/rb_send_on_release"
+            android:gravity="center_vertical|center_horizontal"
             android:orientation="horizontal"
             android:paddingEnd="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/tv_send_on"
+            app:layout_constraintStart_toStartOf="@+id/et_tag"
             app:layout_constraintTop_toBottomOf="@+id/et_tag">
 
-            <RadioButton
-                android:id="@+id/rb_send_on_dismiss"
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/rb_send_on_release"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -90,16 +93,26 @@
                 android:text="Release"
                 android:textSize="16sp" />
 
-
-            <RadioButton
-                android:id="@+id/rb_send_on_button"
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/rb_send_on_button_click"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
-                android:text="Button"
+                android:text="Button click"
                 android:textSize="16sp" />
         </RadioGroup>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_restore_defaults"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="32dp"
+            android:onClick="restoreDefaults"
+            android:text="@string/restore_defaults"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_send_on" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

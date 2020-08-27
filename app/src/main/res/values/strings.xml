@@ -13,4 +13,6 @@
     <string name="command">Command</string>
     <string name="your_command_here">Your command here</string>
     <string name="tag">Tag</string>
+    <string name="your_tag_here">Your tag here</string>
+    <string name="restore_defaults">Restore defaults</string>
 </resources>
