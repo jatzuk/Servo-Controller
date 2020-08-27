@@ -2,9 +2,7 @@ package dev.jatzuk.servocontroller.other
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-
-private const val DEFAULT_COMMAND_PATTERN = '#'
-private const val ADDITIONAL_COMMAND_KEY = 'A'
+import dev.jatzuk.servocontroller.R
 
 @Entity(tableName = "servos_database")
 data class Servo(
@@ -14,10 +12,22 @@ data class Servo(
     var tag: String = "${servoOrder + 1}",
     var servoRange: ServoRange = ServoRange.MICROSECONDS,
     var sendBehaviour: SendBehaviour = SendBehaviour.ON_RELEASE
-)
+) {
+
+    companion object {
+
+        const val DEFAULT_COMMAND_PATTERN = '#'
+        const val ADDITIONAL_COMMAND_KEY = 'A'
+    }
+}
 
 enum class SendBehaviour {
-    ON_RELEASE, ON_CLICK
+    ON_RELEASE, ON_BUTTON_CLICK;
+
+    fun toResourceId() = when (this) {
+        ON_BUTTON_CLICK -> R.id.rb_send_on_button_click
+        ON_RELEASE -> R.id.rb_send_on_release
+    }
 }
 
 enum class ServoRange {
