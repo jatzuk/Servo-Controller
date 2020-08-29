@@ -1,12 +1,12 @@
 package dev.jatzuk.servocontroller.mvp.servoSetupDialog
 
-import androidx.annotation.IdRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.db.ServoDAO
-import dev.jatzuk.servocontroller.other.SendBehaviour
+import dev.jatzuk.servocontroller.other.SendMode
 import dev.jatzuk.servocontroller.other.Servo
+import dev.jatzuk.servocontroller.other.WriteMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,42 +18,37 @@ class ServoSetupDialogPresenter @Inject constructor(
 
     lateinit var view: ServoSetupDialogContract.View
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
-    private val servoLivaData = MutableLiveData<Servo>()
+    private val servoLiveData = MutableLiveData<Servo>()
     private var position = 1
 
     override fun assignPositionFromArguments(position: Int) {
         this.position = position
         coroutineScope.launch {
-            servoLivaData.postValue(
+            servoLiveData.postValue(
                 servoDAO.getServoByOrder(this@ServoSetupDialogPresenter.position)
                     ?: Servo(this@ServoSetupDialogPresenter.position)
             )
         }
     }
 
-    override fun getLiveData() = servoLivaData as LiveData<Servo>
+    override fun getLiveData() = servoLiveData as LiveData<Servo>
 
     override fun processSave(array: Array<String>) {
-        servoLivaData.value!!.apply {
+        servoLiveData.value!!.apply {
             command = array[0]
             tag = array[1]
-            sendBehaviour = associateResourceIdWithEnum(array[2].toInt())
+            writeMode = WriteMode.fromResourceId(array[2].toInt())
+            sendMode = SendMode.fromResourceId(array[3].toInt())
         }
+    }
 
-        coroutineScope.launch {
-            servoDAO.insertServo(servoLivaData.value!!)
-        }
+    override fun invokeOnStopCallback(callback: () -> Unit) {
+        callback.invoke()
     }
 
     override fun onRestoreDefaultsClicked() {
-        val order = servoLivaData.value!!.servoOrder + 1
+        val order = servoLiveData.value!!.servoOrder + 1
         val command = "$order${Servo.DEFAULT_COMMAND_PATTERN}${Servo.ADDITIONAL_COMMAND_KEY}"
         view.setValues(order, command, R.id.rb_send_on_release)
-    }
-
-    private fun associateResourceIdWithEnum(@IdRes resourceId: Int) = when (resourceId) {
-        R.id.rb_send_on_release -> SendBehaviour.ON_RELEASE
-        R.id.rb_send_on_button_click -> SendBehaviour.ON_BUTTON_CLICK
-        else -> throw IllegalArgumentException("Can not find associated enum with given $resourceId")
     }
 }

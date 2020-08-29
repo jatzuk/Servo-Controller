@@ -45,6 +45,7 @@
             android:layout_marginTop="32dp"
             android:text="@string/tag"
             android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="@+id/et_tag"
             app:layout_constraintEnd_toEndOf="@+id/tv_command"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_command" />
@@ -61,28 +62,71 @@
             app:layout_constraintTop_toBottomOf="@+id/et_command"
             app:updateText="@{servo.tag}" />
 
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_write_mode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="32dp"
+            android:text="Write mode"
+            app:layout_constraintBottom_toBottomOf="@+id/radio_group_write_mode"
+            app:layout_constraintEnd_toEndOf="@+id/tv_tag"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_tag" />
+
+        <RadioGroup
+            android:id="@+id/radio_group_write_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:checkedButton="@id/rb_mode_write"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="@+id/et_tag"
+            app:layout_constraintTop_toBottomOf="@+id/et_tag">
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/rb_mode_write"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:text="Millis"
+                android:textSize="16sp" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/rb_mode_write_microseconds"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:text="Microseconds"
+                android:textSize="16sp" />
+        </RadioGroup>
+
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_send_on"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="32dp"
             android:text="Send on"
             android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="@+id/radio_group"
-            app:layout_constraintEnd_toEndOf="@+id/tv_tag"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintBottom_toBottomOf="@+id/radio_group_send_mode"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_write_mode" />
 
         <RadioGroup
-            android:id="@+id/radio_group"
+            android:id="@+id/radio_group_send_mode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:checkedButton="@id/rb_send_on_release"
             android:gravity="center_vertical|center_horizontal"
             android:orientation="horizontal"
-            android:paddingEnd="8dp"
-            app:layout_constraintStart_toStartOf="@+id/et_tag"
-            app:layout_constraintTop_toBottomOf="@+id/et_tag">
+            app:layout_constraintStart_toStartOf="@+id/radio_group_write_mode"
+            app:layout_constraintTop_toBottomOf="@+id/radio_group_write_mode">
 
             <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/rb_send_on_release"
@@ -109,7 +153,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="32dp"
-            android:onClick="restoreDefaults"
             android:text="@string/restore_defaults"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_send_on" />

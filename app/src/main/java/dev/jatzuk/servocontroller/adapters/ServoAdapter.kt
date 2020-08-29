@@ -11,6 +11,8 @@ import dev.jatzuk.servocontroller.other.Servo
 import dev.jatzuk.servocontroller.ui.HomeFragment
 import dev.jatzuk.servocontroller.ui.ServoView
 
+private const val TAG = "ServoAdapter"
+
 class ServoAdapter : ListAdapter<Servo, ServoAdapter.ServoViewHolder>(ServoDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ServoViewHolder.from(parent)
@@ -29,7 +31,7 @@ class ServoAdapter : ListAdapter<Servo, ServoAdapter.ServoViewHolder>(ServoDiffC
         }
 
         fun bind(item: Servo) {
-            binding.servoView.tag = (layoutPosition + 1).toString()
+            binding.servoView.tag = item.tag
         }
 
         private inner class ServoViewOnClickListener : ServoView.OnSetupClickListener {
@@ -58,6 +60,6 @@ class ServoAdapter : ListAdapter<Servo, ServoAdapter.ServoViewHolder>(ServoDiffC
         override fun areItemsTheSame(oldItem: Servo, newItem: Servo) = oldItem == newItem
 
         override fun areContentsTheSame(oldItem: Servo, newItem: Servo) =
-            oldItem.servoOrder == newItem.servoOrder
+            oldItem.hashCode() == newItem.hashCode()
     }
 }

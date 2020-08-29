@@ -59,7 +59,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
             addItemDecoration(BottomPaddingDecoration(requireContext()))
             setHasFixedSize(true)
         }
-        presenter.onReadyToRequestServosList() // FIXME: 18/08/2020 ???
     }
 
     override fun submitServosList(servos: List<Servo>) {

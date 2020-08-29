@@ -12,6 +12,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.databinding.DialogServoSettingsBinding
 import dev.jatzuk.servocontroller.mvp.servoSetupDialog.ServoSetupDialogContract
 import dev.jatzuk.servocontroller.mvp.servoSetupDialog.ServoSetupDialogPresenter
+import dev.jatzuk.servocontroller.other.Servo
 import javax.inject.Inject
 
 private const val TAG = "ServoSetupDialog"
@@ -21,6 +22,7 @@ private const val POSITION_ARG_KEY = "POSITION_ARG_KEY"
 class ServoSetupDialog : DialogFragment(), ServoSetupDialogContract.View {
 
     private var binding: DialogServoSettingsBinding? = null
+    private lateinit var callback: () -> Unit
 
     @Inject
     lateinit var presenter: ServoSetupDialogContract.Presenter
@@ -37,9 +39,13 @@ class ServoSetupDialog : DialogFragment(), ServoSetupDialogContract.View {
         savedInstanceState: Bundle?
     ): View? {
         binding = DialogServoSettingsBinding.inflate(inflater, container, false)
+
         presenter.getLiveData().observe(viewLifecycleOwner) {
-            binding!!.servo = it
-            binding!!.radioGroup.check(it.sendBehaviour.toResourceId())
+            binding!!.apply {
+                servo = it
+                radioGroupWriteMode.check(it.writeMode.toResourceId())
+                radioGroupSendMode.check(it.sendMode.toResourceId())
+            }
         }
 
         binding!!.buttonRestoreDefaults.setOnClickListener {
@@ -58,7 +64,7 @@ class ServoSetupDialog : DialogFragment(), ServoSetupDialogContract.View {
         binding?.apply {
             etCommand.setText(command)
             etTag.setText(order.toString())
-            radioGroup.check(resourceId)
+            radioGroupSendMode.check(resourceId)
         }
     }
 
@@ -68,10 +74,12 @@ class ServoSetupDialog : DialogFragment(), ServoSetupDialogContract.View {
                 arrayOf(
                     etCommand.text.toString(),
                     etTag.text.toString(),
-                    radioGroup.checkedRadioButtonId.toString()
+                    radioGroupWriteMode.checkedRadioButtonId.toString(),
+                    radioGroupSendMode.checkedRadioButtonId.toString()
                 )
             )
         }
+        presenter.invokeOnStopCallback(callback)
         super.onStop()
     }
 
@@ -82,6 +90,14 @@ class ServoSetupDialog : DialogFragment(), ServoSetupDialogContract.View {
 
     override fun closeDialogView() {
         dismiss()
+    }
+
+    fun onClosed(callback: () -> Unit) {
+        this.callback = callback
+    }
+
+    fun getUpdatedServo(): Servo {
+        return presenter.getLiveData().value!!
     }
 
     companion object {

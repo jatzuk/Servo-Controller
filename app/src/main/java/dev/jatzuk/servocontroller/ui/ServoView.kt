@@ -60,7 +60,7 @@ class ServoView @JvmOverloads constructor(
 
     private val isAngleGridIsShown = sharedPreferences.getBoolean(
         context.getString(R.string.key_is_angle_grid_should_show),
-        false
+        true
     )
 
     override fun onAttachedToWindow() {

@@ -17,8 +17,6 @@ interface HomeFragmentContract {
 
         fun getRecyclerViewLayoutManager(): RecyclerView.LayoutManager
 
-        fun onReadyToRequestServosList()
-
         fun onBTRequestEnableReceived()
 
         fun connectionIconPressed()

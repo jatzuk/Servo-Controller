@@ -13,11 +13,15 @@ import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.connection.BluetoothConnection
 import dev.jatzuk.servocontroller.connection.Connection
 import dev.jatzuk.servocontroller.connection.ConnectionType
+import dev.jatzuk.servocontroller.db.ServoDAO
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
 import dev.jatzuk.servocontroller.other.Servo
 import dev.jatzuk.servocontroller.ui.HomeFragment
 import dev.jatzuk.servocontroller.ui.ServoSetupDialog
 import dev.jatzuk.servocontroller.utils.SettingsHolder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val TAG = "HomeFragmentPresenter"
@@ -25,7 +29,8 @@ private const val TAG = "HomeFragmentPresenter"
 class HomeFragmentPresenter @Inject constructor(
     private var view: HomeFragmentContract.View?,
     var settingsHolder: SettingsHolder,
-    var connection: Connection
+    var connection: Connection,
+    private val servoDAO: ServoDAO
 ) : HomeFragmentContract.Presenter {
 
     private val servos = mutableListOf<Servo>()
@@ -54,12 +59,7 @@ class HomeFragmentPresenter @Inject constructor(
         }
     }
 
-    override fun onReadyToRequestServosList() {
-        (view as HomeFragment).submitServosList(servos)
-    }
-
     override fun notifyViewCreated() {
-        Log.d(TAG, "notifyViewCreated:")
         updateServoList()
     }
 
@@ -82,6 +82,7 @@ class HomeFragmentPresenter @Inject constructor(
 
     override fun onFinalPositionDetected(layoutPosition: Int, position: Int) {
         val data = "#$layoutPosition$position"
+        Log.d(TAG, "onFinalPositionDetected: ${servos[layoutPosition]}")
 //        connection.send(data.toByteArray())
     }
 
@@ -109,9 +110,19 @@ class HomeFragmentPresenter @Inject constructor(
     }
 
     private fun showSetupDialog(layoutPosition: Int) {
-        ServoSetupDialog.newInstance(
-            layoutPosition
-        ).show((view as Fragment).parentFragmentManager, "ServoSetupDialog")
+        ServoSetupDialog.newInstance(layoutPosition).apply {
+            val fragment = (this@HomeFragmentPresenter.view as HomeFragment)
+            onClosed {
+                val servo = getUpdatedServo()
+                servos[layoutPosition] = servo
+                fragment.submitServosList(servos.toList())
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    servoDAO.insertServo(servo)
+                }
+            }
+            show(fragment.parentFragmentManager, "ServoSetupDialog")
+        }
     }
 
     override fun connectionIconPressed() {
@@ -163,10 +174,16 @@ class HomeFragmentPresenter @Inject constructor(
 
     private fun updateServoList() {
         servos.clear()
-        val size = settingsHolder.servosCount
-        Log.d(TAG, "updateServoList: ${size}")
-        repeat(size) {
-            servos.add(Servo(it, "command#$it", "tag$it"))
+        CoroutineScope(Dispatchers.IO).launch {
+            repeat(settingsHolder.servosCount) { i ->
+                val servo = servoDAO.getServoByOrder(i)
+                if (servo == null) {
+                    servos.add(Servo(i))
+                    return@repeat
+                }
+                servos.add(servo)
+            }
+            (view as HomeFragment).submitServosList(servos.toList())
         }
     }
 }

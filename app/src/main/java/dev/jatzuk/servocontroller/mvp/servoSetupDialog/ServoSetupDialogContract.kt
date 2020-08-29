@@ -14,6 +14,8 @@ interface ServoSetupDialogContract {
 
         fun processSave(array: Array<String>)
 
+        fun invokeOnStopCallback(callback: () -> Unit)
+
         fun onRestoreDefaultsClicked()
     }
 
