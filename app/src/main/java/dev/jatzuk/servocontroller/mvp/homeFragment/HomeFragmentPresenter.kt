@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dev.jatzuk.servocontroller.R
+import dev.jatzuk.servocontroller.adapters.ServoAdapter
 import dev.jatzuk.servocontroller.connection.BluetoothConnection
 import dev.jatzuk.servocontroller.connection.Connection
 import dev.jatzuk.servocontroller.connection.ConnectionType
@@ -18,6 +19,7 @@ import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
 import dev.jatzuk.servocontroller.other.Servo
 import dev.jatzuk.servocontroller.ui.HomeFragment
 import dev.jatzuk.servocontroller.ui.ServoSetupDialog
+import dev.jatzuk.servocontroller.utils.BottomPaddingDecoration
 import dev.jatzuk.servocontroller.utils.SettingsHolder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +48,15 @@ class HomeFragmentPresenter @Inject constructor(
             }
         }
         view?.updateConnectionStateIcon(getIconBasedOnConnectionState())
+    }
+
+    override fun setupRecyclerView(recyclerView: RecyclerView) {
+        recyclerView.apply {
+            adapter = ServoAdapter(settingsHolder.servosTexture)
+            layoutManager = getRecyclerViewLayoutManager()
+            addItemDecoration(BottomPaddingDecoration(recyclerView.context))
+            setHasFixedSize(true)
+        }
     }
 
     override fun getRecyclerViewLayoutManager(): RecyclerView.LayoutManager {

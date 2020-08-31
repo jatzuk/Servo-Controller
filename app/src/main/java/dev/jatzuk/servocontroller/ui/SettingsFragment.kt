@@ -8,6 +8,7 @@ import androidx.preference.SeekBarPreference
 import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAME
+import dev.jatzuk.servocontroller.other.ServoTexture
 import dev.jatzuk.servocontroller.utils.PreferenceDropDownSummaryProvider
 import dev.jatzuk.servocontroller.utils.SettingsHolder
 import javax.inject.Inject
@@ -29,9 +30,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         )?.apply {
             summaryProvider = PreferenceDropDownSummaryProvider()
             updateIcon()
-            setOnPreferenceChangeListener { preference, newValue ->
+            setOnPreferenceChangeListener { _, newValue ->
                 Log.d(TAG, "changeListener: $newValue")
-                (preference as DropDownPreference).updateIcon(newValue.toString())
+                updateIcon(newValue.toString())
                 true
             }
         }
@@ -45,10 +46,23 @@ class SettingsFragment : PreferenceFragmentCompat() {
         preferenceScreen.findPreference<SeekBarPreference>(
             getString(R.string.key_servos_count)
         )?.apply {
-            setOnPreferenceChangeListener { preference, newValue ->
+            setOnPreferenceChangeListener { _, newValue ->
                 // FIXME: 18/08/2020 ???
                 settingsHolder.applyChanges(
                     servosCount = newValue as Int
+                )
+                true
+            }
+        }
+
+        preferenceScreen.findPreference<DropDownPreference>(
+            getString(R.string.key_servos_textures)
+        )?.apply {
+            setOnPreferenceChangeListener { _, newValue ->
+                val index = entryValues.indexOf(newValue)
+                val textureType = ServoTexture.values()[index]
+                settingsHolder.applyChanges(
+                    servosTexture = textureType
                 )
                 true
             }

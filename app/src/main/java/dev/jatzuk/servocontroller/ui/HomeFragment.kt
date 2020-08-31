@@ -14,7 +14,6 @@ import dev.jatzuk.servocontroller.databinding.FragmentHomeBinding
 import dev.jatzuk.servocontroller.mvp.homeFragment.HomeFragmentContract
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
 import dev.jatzuk.servocontroller.other.Servo
-import dev.jatzuk.servocontroller.utils.BottomPaddingDecoration
 import javax.inject.Inject
 
 private const val TAG = "HomeFragment"
@@ -52,13 +51,8 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
     }
 
     private fun setupRecyclerView() {
-        binding!!.recyclerView.apply {
-            servoAdapter = ServoAdapter()
-            adapter = servoAdapter
-            layoutManager = presenter.getRecyclerViewLayoutManager()
-            addItemDecoration(BottomPaddingDecoration(requireContext()))
-            setHasFixedSize(true)
-        }
+        presenter.setupRecyclerView(binding!!.recyclerView)
+        servoAdapter = binding!!.recyclerView.adapter as ServoAdapter
     }
 
     override fun submitServosList(servos: List<Servo>) {

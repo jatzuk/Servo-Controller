@@ -15,6 +15,8 @@ interface HomeFragmentContract {
 
         fun notifyViewCreated()
 
+        fun setupRecyclerView(recyclerView: RecyclerView)
+
         fun getRecyclerViewLayoutManager(): RecyclerView.LayoutManager
 
         fun onBTRequestEnableReceived()

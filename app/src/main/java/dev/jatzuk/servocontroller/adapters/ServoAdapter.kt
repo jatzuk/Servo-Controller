@@ -1,37 +1,53 @@
 package dev.jatzuk.servocontroller.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import dev.jatzuk.servocontroller.databinding.ItemSeekBarBinding
 import dev.jatzuk.servocontroller.databinding.ItemServoBinding
 import dev.jatzuk.servocontroller.other.Servo
+import dev.jatzuk.servocontroller.other.ServoTexture
 import dev.jatzuk.servocontroller.ui.HomeFragment
 import dev.jatzuk.servocontroller.ui.ServoView
 
 private const val TAG = "ServoAdapter"
 
-class ServoAdapter : ListAdapter<Servo, ServoAdapter.ServoViewHolder>(ServoDiffCallback()) {
+class ServoAdapter(
+    private val textureType: ServoTexture
+) : ListAdapter<Servo, ServoAdapter.AbstractViewHolder>(ServoDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ServoViewHolder.from(parent)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = when (textureType) {
+        ServoTexture.TEXTURE -> ServoViewHolder.from(parent)
+        ServoTexture.SEEKBAR -> SeekViewHolder.from(parent)
+    }
 
-    override fun onBindViewHolder(holder: ServoViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: AbstractViewHolder, position: Int) {
         holder.bind(getItem(position))
+    }
+
+    abstract class AbstractViewHolder(
+        protected val view: View,
+        protected val fragment: HomeFragment
+    ) : RecyclerView.ViewHolder(view) {
+
+        abstract fun bind(servo: Servo)
     }
 
     class ServoViewHolder private constructor(
         private val binding: ItemServoBinding,
-        private val fragment: HomeFragment
-    ) : RecyclerView.ViewHolder(binding.root) {
+        fragment: HomeFragment
+    ) : AbstractViewHolder(binding.root, fragment) {
 
         init {
             binding.servoView.onSetupClickListener = ServoViewOnClickListener()
         }
 
-        fun bind(item: Servo) {
-            binding.servoView.tag = item.tag
+        override fun bind(servo: Servo) {
+            binding.servoView.tag = servo.tag
         }
 
         private inner class ServoViewOnClickListener : ServoView.OnSetupClickListener {
@@ -51,6 +67,33 @@ class ServoAdapter : ListAdapter<Servo, ServoAdapter.ServoViewHolder>(ServoDiffC
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ItemServoBinding.inflate(layoutInflater, parent, false)
                 return ServoViewHolder(binding, parent.findFragment())
+            }
+        }
+    }
+
+    class SeekViewHolder private constructor(
+        private val binding: ItemSeekBarBinding,
+        fragment: HomeFragment
+    ) : AbstractViewHolder(binding.root, fragment) {
+
+        init {
+            binding.ivSetup.setOnClickListener {
+                fragment.presenter.onServoSettingsTapped(layoutPosition)
+            }
+        }
+
+        override fun bind(servo: Servo) {
+            binding.servo = servo
+            binding.tvTag.text = servo.tag
+            binding.executePendingBindings()
+        }
+
+        companion object {
+
+            fun from(parent: ViewGroup): SeekViewHolder {
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = ItemSeekBarBinding.inflate(layoutInflater, parent, false)
+                return SeekViewHolder(binding, parent.findFragment())
             }
         }
     }
