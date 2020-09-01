@@ -11,7 +11,7 @@ class WifiConnection : Connection {
         TODO("Not yet implemented")
     }
 
-    override fun connect(): Boolean {
+    override suspend fun connect(): Boolean {
         TODO("Not yet implemented")
     }
 

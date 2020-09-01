@@ -41,6 +41,10 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentHomeBinding.bind(view)
 
+        binding!!.buttonConnectionToggle.setOnClickListener {
+            presenter.connectionButtonPressed()
+        }
+
         setupRecyclerView()
 
         if (presenter.isConnectionTypeSupported() && !presenter.isConnected()) {
@@ -92,7 +96,28 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
     }
 
     override fun updateConnectionMenuIconVisibility(isVisible: Boolean) {
-        connectionIcon.isVisible = isVisible
+        if (::connectionIcon.isInitialized) {
+            connectionIcon.isVisible = isVisible
+        }
+    }
+
+    override fun showConnectionAnimation(isVisible: Boolean) {
+        binding?.apply {
+            connectionAnimationView.visibility = if (isVisible) View.VISIBLE else View.GONE
+            recyclerView.visibility = if (isVisible) View.GONE else View.VISIBLE
+        }
+    }
+
+    override fun setConnectionButtonVisibility(isVisible: Boolean) {
+        binding?.buttonConnectionToggle?.visibility = if (isVisible) View.VISIBLE else View.GONE
+    }
+
+    override fun setConnectionButtonText(text: String) {
+        binding?.buttonConnectionToggle?.text = text
+    }
+
+    override fun showConnectionFailedAnimation() {
+        showToast("Failed to connect a bt")
     }
 
     override fun onDestroyView() {

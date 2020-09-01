@@ -23,6 +23,8 @@ interface HomeFragmentContract {
 
         fun connectionIconPressed()
 
+        fun connectionButtonPressed()
+
         fun isConnectionTypeSupported(): Boolean
 
         fun isConnected(): Boolean
@@ -35,7 +37,7 @@ interface HomeFragmentContract {
 
         fun buildDeviceList()
 
-        fun connect(): Boolean
+        suspend fun connect(): Boolean
 
         fun sendData(data: ByteArray): Boolean
 
@@ -51,6 +53,14 @@ interface HomeFragmentContract {
         fun updateConnectionMenuIconVisibility(isVisible: Boolean)
 
         fun submitServosList(servos: List<Servo>)
+
+        fun showConnectionAnimation(isVisible: Boolean)
+
+        fun setConnectionButtonVisibility(isVisible: Boolean)
+
+        fun setConnectionButtonText(text: String)
+
+        fun showConnectionFailedAnimation()
 
         override fun assignPresenter(presenter: Presenter) {}
     }

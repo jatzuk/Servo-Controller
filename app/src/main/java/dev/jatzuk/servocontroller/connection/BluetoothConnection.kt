@@ -10,7 +10,7 @@ import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.util.*
 
-private const val TAG = "BTConnectionService"
+private const val TAG = "BluetoothConnection"
 private const val UUIDString = "00001101-0000-1000-8000-00805f9b34fb"
 
 class BluetoothConnection : Connection {
@@ -45,7 +45,7 @@ class BluetoothConnection : Connection {
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    override fun connect(): Boolean {
+    override suspend fun connect(): Boolean {
         socket = device!!.createInsecureRfcommSocketToServiceRecord(UUID.fromString(UUIDString))
         bluetoothAdapter?.cancelDiscovery()
 

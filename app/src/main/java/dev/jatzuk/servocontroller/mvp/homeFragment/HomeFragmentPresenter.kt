@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,9 +23,7 @@ import dev.jatzuk.servocontroller.ui.HomeFragment
 import dev.jatzuk.servocontroller.ui.ServoSetupDialog
 import dev.jatzuk.servocontroller.utils.BottomPaddingDecoration
 import dev.jatzuk.servocontroller.utils.SettingsHolder
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 private const val TAG = "HomeFragmentPresenter"
@@ -37,6 +36,7 @@ class HomeFragmentPresenter @Inject constructor(
 ) : HomeFragmentContract.Presenter {
 
     private val servos = mutableListOf<Servo>()
+    private val _isConnected = MutableLiveData(false)
 
     override fun optionsMenuCreated() {
         if (!isConnectionTypeSupported()) {
@@ -85,6 +85,11 @@ class HomeFragmentPresenter @Inject constructor(
 
     override fun notifyViewCreated() {
         updateServoList()
+        if (isConnectionTypeSupported()) {
+            connectActions()
+        } else {
+            disconnectActions()
+        }
     }
 
     override fun isConnectionTypeSupported() = connection.isConnectionTypeSupported()
@@ -116,7 +121,7 @@ class HomeFragmentPresenter @Inject constructor(
 
     override fun sendData(data: ByteArray) = connection.send(data)
 
-    override fun connect(): Boolean {
+    override suspend fun connect(): Boolean {
         // FIXME: 17/08/2020 replace with user selected device
         buildDeviceList()
         return connection.connect()
@@ -150,28 +155,56 @@ class HomeFragmentPresenter @Inject constructor(
     }
 
     override fun connectionIconPressed() {
-        if (!isConnected()) {
-            val isSuccessConnection = connect()
-            if (isSuccessConnection) {
-                val message = "Device connected"
-                Log.d(TAG, message)
-                view?.showToast(message)
-            } else {
-                if (settingsHolder.connectionType == ConnectionType.BLUETOOTH) R.drawable.ic_bluetooth_disabled
-                else R.drawable.ic_wifi_disabled
+        GlobalScope.launch(Dispatchers.Main) {
+            if (!isConnected()) {
+                view?.showConnectionAnimation(true)
+                view?.setConnectionButtonText("Disconnect")
 
-                val message = "Could not connect to a selected device"
+                var isSuccessConnection = false
+                val job = GlobalScope.async {
+                    isSuccessConnection = connect()
+                }
+                job.await()
+
+                if (isSuccessConnection) {
+                    val message = "Device connected"
+                    Log.d(TAG, message)
+                    view?.apply {
+                        showToast(message)
+                        showConnectionAnimation(false)
+                        setConnectionButtonVisibility(false)
+                        setConnectionButtonText("Disconnect")
+                    }
+                } else {
+                    if (settingsHolder.connectionType == ConnectionType.BLUETOOTH) R.drawable.ic_bluetooth_disabled
+                    else R.drawable.ic_wifi_disabled
+
+                    val message = "Could not connect to a selected device"
+                    Log.d(TAG, message)
+                    view?.apply {
+                        showToast(message, Toast.LENGTH_LONG)
+                        showConnectionAnimation(false)
+                        setConnectionButtonVisibility(true)
+                    }
+                }
+            } else {
+                disconnect()
+                val message = "Device disconnected"
                 Log.d(TAG, message)
-                view?.showToast(message, Toast.LENGTH_LONG)
+                view?.apply {
+                    showToast(message)
+                    showConnectionAnimation(false)
+                    setConnectionButtonVisibility(true)
+                    setConnectionButtonText("Connect")
+                }
             }
-        } else {
-            disconnect()
-            val message = "Device disconnected"
-            Log.d(TAG, message)
-            view?.showToast(message)
         }
 
         view?.updateConnectionStateIcon(getIconBasedOnConnectionState())
+    }
+
+    override fun connectionButtonPressed() {
+        connectionIconPressed()
     }
 
     override fun onBTRequestEnableReceived() {
@@ -208,6 +241,20 @@ class HomeFragmentPresenter @Inject constructor(
                 servos.add(servo)
             }
             (view as HomeFragment).submitServosList(servos.toList())
+        }
+    }
+
+    private fun disconnectActions() {
+        view?.apply {
+            setConnectionButtonText("Disconnect")
+            setConnectionButtonVisibility(false)
+        }
+    }
+
+    private fun connectActions() {
+        view?.apply {
+            setConnectionButtonText("Connect")
+            setConnectionButtonVisibility(true)
         }
     }
 }
