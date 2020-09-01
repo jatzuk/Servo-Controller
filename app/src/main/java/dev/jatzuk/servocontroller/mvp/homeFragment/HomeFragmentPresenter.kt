@@ -17,6 +17,7 @@ import dev.jatzuk.servocontroller.connection.ConnectionType
 import dev.jatzuk.servocontroller.db.ServoDAO
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
 import dev.jatzuk.servocontroller.other.Servo
+import dev.jatzuk.servocontroller.other.ServoTexture
 import dev.jatzuk.servocontroller.ui.HomeFragment
 import dev.jatzuk.servocontroller.ui.ServoSetupDialog
 import dev.jatzuk.servocontroller.utils.BottomPaddingDecoration
@@ -52,7 +53,7 @@ class HomeFragmentPresenter @Inject constructor(
 
     override fun setupRecyclerView(recyclerView: RecyclerView) {
         recyclerView.apply {
-            adapter = ServoAdapter(settingsHolder.servosTexture)
+            adapter = ServoAdapter(settingsHolder.texture)
             layoutManager = getRecyclerViewLayoutManager()
             addItemDecoration(BottomPaddingDecoration(recyclerView.context))
             setHasFixedSize(true)
@@ -61,12 +62,24 @@ class HomeFragmentPresenter @Inject constructor(
 
     override fun getRecyclerViewLayoutManager(): RecyclerView.LayoutManager {
         val context = (view as HomeFragment).requireContext()
-        return if (context.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            if (settingsHolder.servosCount < 3) LinearLayoutManager(context)
-            else GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false)
-        } else {
-            if (settingsHolder.servosCount < 2) LinearLayoutManager(context)
-            else GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false)
+        val orientation = context.resources.configuration.orientation
+        return when (settingsHolder.texture) {
+            ServoTexture.TEXTURE -> {
+                if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    if (settingsHolder.servosCount < 3) LinearLayoutManager(context)
+                    else GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false)
+                } else {
+                    if (settingsHolder.servosCount < 2) LinearLayoutManager(context)
+                    else GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false)
+                }
+            }
+            ServoTexture.SEEKBAR -> {
+                if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    GridLayoutManager(context, 2, GridLayoutManager.VERTICAL, false)
+                } else {
+                    LinearLayoutManager(context)
+                }
+            }
         }
     }
 

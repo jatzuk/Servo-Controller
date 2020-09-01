@@ -23,12 +23,12 @@ data class SettingsHolder @Inject constructor(
     val servosCount get() = _servosCount
 
     private var _servosTexture: ServoTexture = loadServosTextureTypeFromSharedPreferences()
-    val servosTexture get() = _servosTexture
+    val texture get() = _servosTexture
 
     fun applyChanges(
         connectionType: ConnectionType = this.connectionType,
         servosCount: Int = this.servosCount,
-        servosTexture: ServoTexture = this.servosTexture
+        servosTexture: ServoTexture = this.texture
     ) {
         sharedPreferences.edit().run {
             if (connectionType != _connectionType) {
