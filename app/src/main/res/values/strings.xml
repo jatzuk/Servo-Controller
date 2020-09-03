@@ -15,4 +15,9 @@
     <string name="tag">Tag</string>
     <string name="your_tag_here">Your tag here</string>
     <string name="restore_defaults">Restore defaults</string>
+
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="enable">Enable %s</string>
+    <string name="cancel">Cancel</string>
 </resources>

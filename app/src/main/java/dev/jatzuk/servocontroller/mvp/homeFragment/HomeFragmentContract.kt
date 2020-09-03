@@ -2,6 +2,7 @@ package dev.jatzuk.servocontroller.mvp.homeFragment
 
 import android.widget.Toast
 import androidx.annotation.DrawableRes
+import androidx.annotation.RawRes
 import androidx.recyclerview.widget.RecyclerView
 import dev.jatzuk.servocontroller.mvp.BasePresenter
 import dev.jatzuk.servocontroller.mvp.BaseView
@@ -13,19 +14,27 @@ interface HomeFragmentContract {
 
         fun optionsMenuCreated()
 
-        fun notifyViewCreated()
+        fun onViewCreated()
+
+        fun onCreateView()
+
+        fun onDestroyView()
 
         fun setupRecyclerView(recyclerView: RecyclerView)
 
         fun getRecyclerViewLayoutManager(): RecyclerView.LayoutManager
 
-        fun onBTRequestEnableReceived()
+        fun onRequestEnableHardwareReceived()
 
         fun connectionIconPressed()
 
         fun connectionButtonPressed()
 
+        fun requestConnectionHardwareButtonPressed()
+
         fun isConnectionTypeSupported(): Boolean
+
+        fun isConnectionModuleEnabled(): Boolean
 
         fun isConnected(): Boolean
 
@@ -37,11 +46,11 @@ interface HomeFragmentContract {
 
         fun buildDeviceList()
 
-        suspend fun connect(): Boolean
+        fun connect()
 
         fun sendData(data: ByteArray): Boolean
 
-        fun disconnect(): Boolean
+        fun disconnect()
     }
 
     interface View : BaseView<Presenter> {
@@ -54,13 +63,18 @@ interface HomeFragmentContract {
 
         fun submitServosList(servos: List<Servo>)
 
-        fun showConnectionAnimation(isVisible: Boolean)
+        fun setRecyclerViewVisibility(isVisible: Boolean)
 
-        fun setConnectionButtonVisibility(isVisible: Boolean)
+        fun showAnimation(
+            @RawRes resourceId: Int,
+            speed: Float = 1f,
+            timeout: Long = 0L,
+            afterTimeoutAction: (() -> Unit)? = null
+        )
 
-        fun setConnectionButtonText(text: String)
+        fun stopAnimation()
 
-        fun showConnectionFailedAnimation()
+        fun updateConnectionButton(text: String, isVisible: Boolean = true)
 
         override fun assignPresenter(presenter: Presenter) {}
     }

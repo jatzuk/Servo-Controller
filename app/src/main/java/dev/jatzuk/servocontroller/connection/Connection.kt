@@ -1,14 +1,30 @@
 package dev.jatzuk.servocontroller.connection
 
+import androidx.lifecycle.MutableLiveData
+
 interface Connection {
+
+    val connectionState: MutableLiveData<ConnectionState>
 
     suspend fun connect(): Boolean
 
     fun send(data: ByteArray): Boolean
 
-    fun disconnect(): Boolean
+    suspend fun disconnect(): Boolean
 
     fun isConnected(): Boolean
 
     fun isConnectionTypeSupported(): Boolean
+
+    fun isHardwareEnabled(): Boolean
+
+    fun getConnectionType(): ConnectionType
+}
+
+enum class ConnectionState {
+    ON, CONNECTING, CONNECTED, DISCONNECTING, DISCONNECTED, OFF
+}
+
+enum class ConnectionType {
+    BLUETOOTH, WIFI
 }
