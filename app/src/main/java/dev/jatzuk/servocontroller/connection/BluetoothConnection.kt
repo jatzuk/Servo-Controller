@@ -2,7 +2,6 @@ package dev.jatzuk.servocontroller.connection
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothProfile
 import android.bluetooth.BluetoothSocket
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -20,7 +19,7 @@ class BluetoothConnection : Connection {
     private var socket: BluetoothSocket? = null
     private var device: BluetoothDevice? = null
 
-    override var connectionState = MutableLiveData(ConnectionState.OFF)
+    override val connectionState = MutableLiveData(ConnectionState.OFF)
 
     init {
         Companion.connection = this
@@ -30,10 +29,15 @@ class BluetoothConnection : Connection {
         this.device = device
     }
 
-    override fun isConnected(): Boolean {
-        Log.d(TAG, "isConnected: ${device?.bondState == BluetoothProfile.STATE_CONNECTED}")
-        return device?.bondState == BluetoothProfile.STATE_CONNECTED
-    }
+    override fun isConnected() = try {
+        device?.let {
+            val method = it.javaClass.getMethod("isConnected")
+            method.invoke(device) as Boolean
+        }
+    } catch (e: IllegalStateException) {
+        Log.e(TAG, "isConnected: illegal state exception", e)
+        false
+    } ?: false
 
     override fun isConnectionTypeSupported() = bluetoothAdapter != null
 

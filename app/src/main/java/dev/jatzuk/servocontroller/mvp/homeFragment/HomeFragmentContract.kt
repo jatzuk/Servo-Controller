@@ -1,5 +1,6 @@
 package dev.jatzuk.servocontroller.mvp.homeFragment
 
+import android.os.Bundle
 import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
@@ -14,9 +15,9 @@ interface HomeFragmentContract {
 
         fun optionsMenuCreated()
 
-        fun onViewCreated()
+        fun onCreateView(savedInstanceState: Bundle?)
 
-        fun onCreateView()
+        fun onViewCreated()
 
         fun onDestroyView()
 
@@ -51,6 +52,8 @@ interface HomeFragmentContract {
         fun sendData(data: ByteArray): Boolean
 
         fun disconnect()
+
+        fun onSaveInstanceState(outState: Bundle)
     }
 
     interface View : BaseView<Presenter> {

@@ -3,7 +3,6 @@ package dev.jatzuk.servocontroller.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.annotation.DrawableRes
@@ -40,7 +39,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
-        presenter.onCreateView()
+        presenter.onCreateView(savedInstanceState)
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
@@ -54,6 +53,11 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
 
         setupRecyclerView()
         presenter.onViewCreated()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        presenter.onSaveInstanceState(outState)
     }
 
     private fun setupRecyclerView() {
@@ -82,7 +86,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.home_menu, menu)
         connectionIcon = menu.getItem(0)
-        Log.d(TAG, "onCreateOptionsMenu: connection icon initialized")
         presenter.optionsMenuCreated()
     }
 

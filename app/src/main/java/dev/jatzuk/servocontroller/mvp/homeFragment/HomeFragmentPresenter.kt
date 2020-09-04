@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
+import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.adapters.ServoAdapter
 import dev.jatzuk.servocontroller.connection.*
+import dev.jatzuk.servocontroller.connection.receiver.BluetoothReceiver
 import dev.jatzuk.servocontroller.db.ServoDAO
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
 import dev.jatzuk.servocontroller.other.Servo
@@ -24,18 +26,20 @@ import kotlinx.coroutines.*
 import javax.inject.Inject
 
 private const val TAG = "HomeFragmentPresenter"
+private const val IS_CONNECTION_ACTIVE_EXTRA = "IS_CONNECTION_ACTIVE_EXTRA"
 
 class HomeFragmentPresenter @Inject constructor(
     private var view: HomeFragmentContract.View?,
     var settingsHolder: SettingsHolder,
     var connection: Connection,
-    private val servoDAO: ServoDAO
+    private val servoDAO: ServoDAO,
+    private val bluetoothReceiver: BluetoothReceiver
 ) : HomeFragmentContract.Presenter {
 
     private val servos = mutableListOf<Servo>()
 
-    private val bluetoothReceiver = BluetoothReceiver()
     private lateinit var connectionJob: CompletableJob
+    private var isWasConnected = false
 
     override fun optionsMenuCreated() {
         if (!isConnectionTypeSupported()) {
@@ -105,10 +109,18 @@ class HomeFragmentPresenter @Inject constructor(
                     }
                     ConnectionState.CONNECTED -> {
                         view?.apply {
-                            updateConnectionStateIcon(getIconBasedOnConnectionType())
-                            updateConnectionButton(context.getString(R.string.disconnect), false)
-                            showAnimation(R.raw.bluetooth_connected, 1f, 1000) {
+                            if (isWasConnected) {
                                 setRecyclerViewVisibility(true)
+                                isWasConnected = false
+                            } else {
+                                updateConnectionStateIcon(getIconBasedOnConnectionType())
+                                updateConnectionButton(
+                                    context.getString(R.string.disconnect),
+                                    false
+                                )
+                                showAnimation(R.raw.bluetooth_connected, 1f, 1000) {
+                                    setRecyclerViewVisibility(true)
+                                }
                             }
                         }
                     }
@@ -119,7 +131,7 @@ class HomeFragmentPresenter @Inject constructor(
                     }
                     ConnectionState.DISCONNECTED -> {
                         view?.apply {
-                            view?.updateConnectionStateIcon(getIconBasedOnConnectionType())
+                            updateConnectionStateIcon(getIconBasedOnConnectionType())
                             setRecyclerViewVisibility(false)
                             showAnimation(R.raw.animation_failure, 0.5f, 2500)
                             updateConnectionButton(context.getString(R.string.connect))
@@ -144,8 +156,10 @@ class HomeFragmentPresenter @Inject constructor(
         }
     }
 
-    override fun onCreateView() {
+    override fun onCreateView(savedInstanceState: Bundle?) {
         registerBroadcastReceiver()
+
+        isWasConnected = savedInstanceState?.getBoolean(IS_CONNECTION_ACTIVE_EXTRA, false) ?: false
     }
 
     override fun onDestroyView() {
@@ -196,67 +210,6 @@ class HomeFragmentPresenter @Inject constructor(
             buildDeviceList()
             connection.connect()
         }
-//        CoroutineScope(Dispatchers.Main).launch {
-//            if (!isConnected()) {
-//                if (::connectionJob.isInitialized && connectionJob.isActive) {
-////                    connectionJob.cancel()
-////                    connection.disconnect()
-////                    view?.apply {
-////                        showAnimation(R.raw.animation_failure, 0.5f, 2000)
-////                        setConnectionButtonVisibility(true)
-////                        setRecyclerViewVisibility(false)
-////                        setConnectionButtonText("Connect")
-////                    }
-//                } else {
-////                    view?.apply {
-////                        showAnimation(R.raw.bluetooth_loop)
-////                        setConnectionButtonText("Disconnect")
-////                    }
-//
-//                    connectionJob = CoroutineScope(Dispatchers.IO).async {
-//                        buildDeviceList() // FIXME: 17/08/2020 replace with user selected device
-//                        connection.connect()
-//                    }
-//                }
-//
-//                val isSuccessConnection = connectionJob.await()
-//                if (isSuccessConnection) {
-//                    val message = "Device connected"
-//                    Log.d(TAG, message)
-//                    view?.apply {
-//                        showToast(message)
-//                        stopAnimationMy()
-//                        setConnectionButtonVisibility(false)
-//                        setConnectionButtonText("Disconnect")
-//                        setRecyclerViewVisibility(true)
-//                    }
-//                } else {
-//                    if (settingsHolder.connectionType == ConnectionType.BLUETOOTH) R.drawable.ic_bluetooth_disabled
-//                    else R.drawable.ic_wifi_disabled
-//
-//                    val message = "Could not connect to a selected device"
-//                    Log.d(TAG, message)
-////                    view?.apply {
-////                        showToast(message, Toast.LENGTH_LONG)
-////                        showAnimation(R.raw.animation_failure, 0.5f, 2500)
-////                        setConnectionButtonVisibility(true)
-////                        setRecyclerViewVisibility(false)
-////                        setConnectionButtonText("Connect")
-////                    }
-//                }
-//            } else {
-//                disconnect()
-//                val message = "Device disconnected"
-//                Log.d(TAG, message)
-//                view?.apply {
-//                    showToast(message)
-//                    stopAnimationMy()
-//                    setConnectionButtonVisibility(true)
-//                    setConnectionButtonText("Connect")
-//                    setRecyclerViewVisibility(false)
-//                }
-//            }
-//        }
     }
 
     override fun disconnect() {
@@ -340,6 +293,10 @@ class HomeFragmentPresenter @Inject constructor(
 
     override fun onRequestEnableHardwareReceived() {
         connection.connectionState.postValue(ConnectionState.ON)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(IS_CONNECTION_ACTIVE_EXTRA, connection.isConnected())
     }
 
     fun updateConnectionType() {
