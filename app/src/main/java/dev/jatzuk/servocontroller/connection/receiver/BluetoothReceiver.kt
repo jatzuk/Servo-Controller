@@ -1,10 +1,12 @@
-package dev.jatzuk.servocontroller.connection
+package dev.jatzuk.servocontroller.connection.receiver
 
 import android.bluetooth.BluetoothAdapter
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import dev.jatzuk.servocontroller.connection.BluetoothConnection
+import dev.jatzuk.servocontroller.connection.ConnectionState
 
 private const val TAG = "BluetoothReceiver"
 
