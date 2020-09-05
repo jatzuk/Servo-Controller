@@ -9,16 +9,19 @@ import dev.jatzuk.servocontroller.R
 data class Servo(
     @PrimaryKey(autoGenerate = false)
     var servoOrder: Int,
-    var command: String = "${servoOrder + 1}$DEFAULT_COMMAND_PATTERN$ADDITIONAL_COMMAND_KEY",
     var tag: String = "${servoOrder + 1}",
     var writeMode: WriteMode = WriteMode.WRITE,
-    var sendMode: SendMode = SendMode.ON_RELEASE
+    var sendMode: SendMode = SendMode.ON_RELEASE,
+    var command: String = "${servoOrder + 1}$DEFAULT_COMMAND_PATTERN$ADDITIONAL_COMMAND_KEY"
 ) {
+
+    fun convertRange(value: Int, from: IntRange = 0..180, to: IntRange = 1500..2500) =
+        to.first + (value - from.first) * (to.last - to.first) / (from.last - from.first)
 
     companion object {
 
         const val DEFAULT_COMMAND_PATTERN = '#'
-        const val ADDITIONAL_COMMAND_KEY = 'A'
+        const val ADDITIONAL_COMMAND_KEY = 'F' // F - fast, S - slow
     }
 }
 
