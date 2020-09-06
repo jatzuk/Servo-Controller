@@ -18,6 +18,7 @@ import dev.jatzuk.servocontroller.db.ServoDAO
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
 import dev.jatzuk.servocontroller.other.Servo
 import dev.jatzuk.servocontroller.other.ServoTexture
+import dev.jatzuk.servocontroller.other.WriteMode
 import dev.jatzuk.servocontroller.ui.HomeFragment
 import dev.jatzuk.servocontroller.ui.ServoSetupDialog
 import dev.jatzuk.servocontroller.utils.BottomPaddingDecoration
@@ -111,17 +112,14 @@ class HomeFragmentPresenter @Inject constructor(
                         view?.apply {
                             if (isWasConnected) {
                                 setRecyclerViewVisibility(true)
-                                isWasConnected = false
+                                stopAnimation()
                             } else {
                                 updateConnectionStateIcon(getIconBasedOnConnectionType())
-                                updateConnectionButton(
-                                    context.getString(R.string.disconnect),
-                                    false
-                                )
                                 showAnimation(R.raw.bluetooth_connected, 1f, 1000) {
                                     setRecyclerViewVisibility(true)
                                 }
                             }
+                            updateConnectionButton(context.getString(R.string.disconnect), false)
                         }
                     }
                     ConnectionState.DISCONNECTING -> {
@@ -158,8 +156,8 @@ class HomeFragmentPresenter @Inject constructor(
 
     override fun onCreateView(savedInstanceState: Bundle?) {
         registerBroadcastReceiver()
-
-        isWasConnected = savedInstanceState?.getBoolean(IS_CONNECTION_ACTIVE_EXTRA, false) ?: false
+        isWasConnected =
+            savedInstanceState?.getBoolean(IS_CONNECTION_ACTIVE_EXTRA, false) ?: isConnected()
     }
 
     override fun onDestroyView() {
@@ -192,9 +190,17 @@ class HomeFragmentPresenter @Inject constructor(
         showSetupDialog(layoutPosition)
     }
 
-    override fun onFinalPositionDetected(layoutPosition: Int, position: Int) {
-        val data = "#$layoutPosition$position"
-        Log.d(TAG, "onFinalPositionDetected: ${servos[layoutPosition]}")
+    override fun onFinalPositionDetected(layoutPosition: Int, angle: Int) {
+        val servo = servos[layoutPosition]
+        val command = servo.command
+
+        val finalAngle = when (servo.writeMode) {
+            WriteMode.WRITE -> angle
+            WriteMode.WRITE_MICROSECONDS -> servo.convertRange(angle)
+        }
+
+        val data = "$command$finalAngle"
+        Log.d(TAG, "onFinalPositionDetected: $data")
 //        connection.send(data.toByteArray())
     }
 
