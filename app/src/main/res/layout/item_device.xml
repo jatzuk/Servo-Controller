@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="device"
+            type="android.bluetooth.BluetoothDevice" />
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="8dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_constraint"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/iv_status"
+                android:layout_width="10dp"
+                android:layout_height="0dp"
+                android:src="@android:color/holo_green_light"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearance="@style/OvalImageView" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:textAppearance="@android:style/TextAppearance.Material.Headline"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toStartOf="@+id/iv_device_icon"
+                app:layout_constraintStart_toEndOf="@id/iv_status"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_mac_address"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:textAppearance="@android:style/TextAppearance.Material.Subhead"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toStartOf="@+id/iv_device_icon"
+                app:layout_constraintStart_toEndOf="@id/iv_status"
+                app:layout_constraintTop_toBottomOf="@id/tv_name" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_last_connected_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:textAppearance="@android:style/TextAppearance.Material.Display1"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/iv_device_icon"
+                app:layout_constraintStart_toEndOf="@id/iv_status"
+                app:layout_constraintTop_toBottomOf="@id/tv_mac_address"
+                app:setDate="@{null}" />
+
+            <ImageView
+                android:id="@+id/iv_device_icon"
+                android:layout_width="100dp"
+                android:layout_height="0dp"
+                android:layout_margin="8dp"
+                android:src="@android:drawable/stat_sys_data_bluetooth"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_last_connected_time"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_name" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</layout>

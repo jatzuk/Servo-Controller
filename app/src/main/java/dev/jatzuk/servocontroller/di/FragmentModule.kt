@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.FragmentComponent
+import dev.jatzuk.servocontroller.ui.DevicesFragment
 import dev.jatzuk.servocontroller.ui.HomeFragment
 import dev.jatzuk.servocontroller.ui.ServoSetupDialog
 
@@ -17,4 +18,7 @@ object FragmentModule {
 
     @Provides
     fun provideServoSetupDialog(fragment: Fragment) = fragment as ServoSetupDialog
+
+    @Provides
+    fun provideDevicesFragment(fragment: Fragment) = fragment as DevicesFragment
 }

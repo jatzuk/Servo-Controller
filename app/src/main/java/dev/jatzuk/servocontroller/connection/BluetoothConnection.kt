@@ -44,9 +44,7 @@ class BluetoothConnection : Connection {
     override fun isHardwareEnabled() = bluetoothAdapter?.isEnabled ?: false
 
     fun buildDeviceList() {
-        val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
-
-        pairedDevices?.forEach {
+        getBondedDevices()?.forEach {
             Log.d(TAG, "buildDeviceList: ${it.name} ${it.address} ${it.bluetoothClass}")
             if (it.address == "98:D3:41:F9:79:F6") {
                 Log.d(TAG, "device found: ${it.name} ${it.address} ${it.bluetoothClass}")
@@ -56,6 +54,8 @@ class BluetoothConnection : Connection {
             }
         }
     }
+
+    fun getBondedDevices() = bluetoothAdapter?.bondedDevices?.toList()
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun connect() = withContext(Dispatchers.IO) {
