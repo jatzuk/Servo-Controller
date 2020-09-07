@@ -83,9 +83,11 @@ class ServoAdapter(
         }
 
         override fun bind(servo: Servo) {
-            binding.servo = servo
-            binding.tvTag.text = servo.tag
-            binding.executePendingBindings()
+            binding.run {
+                this.servo = servo
+                tvTag.text = servo.tag
+                executePendingBindings()
+            }
         }
 
         companion object {
