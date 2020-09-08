@@ -26,7 +26,7 @@
                 android:id="@+id/iv_status"
                 android:layout_width="10dp"
                 android:layout_height="0dp"
-                android:src="@android:color/holo_green_light"
+                android:src="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:textAppearance="@android:style/TextAppearance.Material.Headline"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 app:layout_constraintEnd_toStartOf="@+id/iv_device_icon"
                 app:layout_constraintStart_toEndOf="@id/iv_status"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -49,22 +49,21 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:textAppearance="@android:style/TextAppearance.Material.Subhead"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 app:layout_constraintEnd_toStartOf="@+id/iv_device_icon"
                 app:layout_constraintStart_toEndOf="@id/iv_status"
                 app:layout_constraintTop_toBottomOf="@id/tv_name" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/tv_last_connected_time"
+                android:id="@+id/tv_status"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:textAppearance="@android:style/TextAppearance.Material.Display1"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 app:layout_constraintEnd_toStartOf="@+id/iv_device_icon"
                 app:layout_constraintStart_toEndOf="@id/iv_status"
-                app:layout_constraintTop_toBottomOf="@id/tv_mac_address"
-                app:setDate="@{null}" />
+                app:layout_constraintTop_toBottomOf="@id/tv_mac_address" />
 
             <ImageView
                 android:id="@+id/iv_device_icon"
@@ -72,7 +71,7 @@
                 android:layout_height="0dp"
                 android:layout_margin="8dp"
                 android:src="@android:drawable/stat_sys_data_bluetooth"
-                app:layout_constraintBottom_toBottomOf="@+id/tv_last_connected_time"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_status"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/tv_name" />
 
