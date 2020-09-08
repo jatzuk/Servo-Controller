@@ -52,6 +52,6 @@ class DevicesAdapter :
         override fun areContentsTheSame(
             oldItem: BluetoothDevice,
             newItem: BluetoothDevice
-        ) = oldItem.name == newItem.name
+        ) = oldItem.address == newItem.address
     }
 }
