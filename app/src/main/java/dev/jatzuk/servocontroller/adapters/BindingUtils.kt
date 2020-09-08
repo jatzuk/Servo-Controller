@@ -3,11 +3,8 @@ package dev.jatzuk.servocontroller.adapters
 import androidx.databinding.BindingAdapter
 import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textview.MaterialTextView
 import dev.jatzuk.servocontroller.other.Servo
 import dev.jatzuk.servocontroller.other.WriteMode
-import java.text.SimpleDateFormat
-import java.util.*
 
 @BindingAdapter("updateText")
 fun TextInputEditText.updateText(text: String?) {
@@ -26,12 +23,4 @@ fun Slider.setupSlider(servo: Servo?) {
         valueTo = range.endInclusive
         value = (range.start + range.endInclusive) / 2f
     }
-}
-
-@BindingAdapter("setDate")
-fun MaterialTextView.setDate(date: Date?) {
-    text = date?.let {
-        val dateFormat = SimpleDateFormat("dd/MM/yy", Locale.getDefault())
-        dateFormat.format(date)
-    } ?: "No last connection info"
 }
