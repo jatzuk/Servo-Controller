@@ -1,6 +1,7 @@
 package dev.jatzuk.servocontroller.connection.receiver
 
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -53,6 +54,16 @@ class BluetoothReceiver : BroadcastReceiver() {
             }
             BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED -> {
                 Log.d(TAG, "onReceive: connecting")
+            }
+            BluetoothDevice.ACTION_FOUND -> {
+                val device =
+                    intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                device?.let {
+//                    DevicesFragmentPresenter.availableDevicesList.add(it)
+//                    DevicesFragmentPresenter.availableDevicesAdapter.submitList(DevicesFragmentPresenter.availableDevicesList)
+                    Log.d("DevicesFragmentPretr", "onReceive: $it")
+                }
+//                    availableDevicesAdapter.submitList(listOf(device))
             }
             else -> {
                 Log.d(TAG, "onReceive: ffffffffffffffff")

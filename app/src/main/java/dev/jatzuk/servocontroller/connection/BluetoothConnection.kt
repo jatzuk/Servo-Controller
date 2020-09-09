@@ -57,6 +57,13 @@ class BluetoothConnection : Connection {
 
     fun getBondedDevices() = bluetoothAdapter?.bondedDevices?.toList()
 
+    fun getAvailableDevices(): List<BluetoothDevice>? {
+        bluetoothAdapter?.cancelDiscovery()
+        val discoveryResult = bluetoothAdapter?.startDiscovery()
+        Log.d("DevicesFragmentPretr", "getAvailableDevices: $discoveryResult")
+        return listOf()
+    }
+
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun connect() = withContext(Dispatchers.IO) {
         socket = device!!.createInsecureRfcommSocketToServiceRecord(UUID.fromString(UUIDString))

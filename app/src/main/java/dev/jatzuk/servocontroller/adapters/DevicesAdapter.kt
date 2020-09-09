@@ -26,6 +26,7 @@ class DevicesAdapter :
                 this.device = device
                 tvName.text = device.name
                 tvMacAddress.text = device.address
+//                tvStatus.text = device.
 //                ivStatus =
 //                ivDeviceIcon =
                 executePendingBindings()
