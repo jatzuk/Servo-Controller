@@ -1,10 +1,9 @@
 package dev.jatzuk.servocontroller.ui
 
-import android.app.Activity
+import android.Manifest
 import android.bluetooth.BluetoothDevice
-import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -13,7 +12,6 @@ import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.adapters.DevicesAdapter
 import dev.jatzuk.servocontroller.databinding.FragmentDevicesBinding
 import dev.jatzuk.servocontroller.mvp.devicesFragment.DevicesFragmentContract
-import dev.jatzuk.servocontroller.other.ACCESS_FINE_LOCATION_REQUEST_CODE
 import javax.inject.Inject
 
 private const val TAG = "DevicesFragment"
@@ -54,16 +52,18 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
     }
 
     override fun updateAvailableDevicesList(devices: List<BluetoothDevice>) {
-        Log.d(TAG, "updateAvailableDevicesList: $devices")
         devicesAdapter.submitList(devices)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                ACCESS_FINE_LOCATION_REQUEST_CODE -> presenter.permissionGranted()
-            }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION
+            && grantResults[0] == PackageManager.PERMISSION_GRANTED
+        ) {
+            presenter.permissionGranted()
         } else {
             presenter.permissionDenied()
         }

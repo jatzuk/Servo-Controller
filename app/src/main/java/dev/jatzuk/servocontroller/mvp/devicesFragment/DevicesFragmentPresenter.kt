@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
@@ -61,9 +60,8 @@ class DevicesFragmentPresenter @Inject constructor(
         (connection as BluetoothConnection).getAvailableDevices()
 
     override fun scanAvailableDevicesPressed() {
-//        availableDevicesAdapter.submitList()
         Log.d(TAG, "scanAvailableDevicesPressed: ")
-        requestPermissions()
+        checkPermission()
     }
 
     override fun onDestroy() {
@@ -71,19 +69,18 @@ class DevicesFragmentPresenter @Inject constructor(
         view = null
     }
 
-    private fun requestPermissions() {
+    private fun checkPermission() {
         val fragment = view as Fragment
         if (ContextCompat.checkSelfPermission(
                 fragment.requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            ActivityCompat.requestPermissions(
-                fragment.requireActivity(),
+            fragment.requestPermissions(
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 ACCESS_FINE_LOCATION_REQUEST_CODE
             )
         } else {
-            getAvailableBluetoothDevices()
+            permissionGranted()
         }
     }
 
