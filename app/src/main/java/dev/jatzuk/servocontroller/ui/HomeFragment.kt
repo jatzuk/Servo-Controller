@@ -166,7 +166,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
 
     override fun onDestroyView() {
         binding = null
-        presenter.onDestroyView()
         super.onDestroyView()
     }
 }
