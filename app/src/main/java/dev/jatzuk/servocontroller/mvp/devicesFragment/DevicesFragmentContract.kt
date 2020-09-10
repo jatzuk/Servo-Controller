@@ -27,8 +27,6 @@ interface DevicesFragmentContract {
 
     interface View : BaseView<Presenter> {
 
-        fun updateAvailableDevicesList(devices: List<BluetoothDevice>)
-
         fun showToast(message: String, length: Int = Toast.LENGTH_SHORT)
 
         override fun assignPresenter(presenter: Presenter) {}

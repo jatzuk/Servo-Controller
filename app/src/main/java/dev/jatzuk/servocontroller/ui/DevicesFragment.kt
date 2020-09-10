@@ -7,11 +7,13 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.adapters.DevicesAdapter
 import dev.jatzuk.servocontroller.databinding.FragmentDevicesBinding
 import dev.jatzuk.servocontroller.mvp.devicesFragment.DevicesFragmentContract
+import dev.jatzuk.servocontroller.mvp.devicesFragment.DevicesFragmentPresenter
 import javax.inject.Inject
 
 private const val TAG = "DevicesFragment"
@@ -24,20 +26,21 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
     @Inject
     lateinit var presenter: DevicesFragmentContract.Presenter
 
-    private val devicesAdapter: DevicesAdapter = DevicesAdapter()
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentDevicesBinding.bind(view)
         setupRecyclerViews()
         setupOnClickListeners()
+
+        DevicesFragmentPresenter.availableDevices.observe(viewLifecycleOwner) {
+            binding!!.recyclerViewAvailableDevices.updateAdapterDataSet(it)
+        }
     }
 
     private fun setupRecyclerViews() {
         with(presenter) {
             binding?.apply {
                 setupPairedDevicesRecyclerView(this.recyclerViewPairedDevices)
-                this.recyclerViewAvailableDevices.adapter = devicesAdapter
                 setupAvailableDevicesRecyclerView(this.recyclerViewAvailableDevices)
             }
         }
@@ -51,8 +54,11 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
         }
     }
 
-    override fun updateAvailableDevicesList(devices: List<BluetoothDevice>) {
-        devicesAdapter.submitList(devices)
+    private fun RecyclerView.updateAdapterDataSet(devices: List<BluetoothDevice>) {
+        (adapter as DevicesAdapter).apply {
+            submitList(devices)
+            notifyDataSetChanged()
+        }
     }
 
     override fun onRequestPermissionsResult(

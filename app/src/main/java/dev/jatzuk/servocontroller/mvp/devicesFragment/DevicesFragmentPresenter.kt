@@ -35,7 +35,7 @@ class DevicesFragmentPresenter @Inject constructor(
                 it.submitList(getPairedDevices()) // TODO: 08/09/2020 empty list info
             }
             addItemDecoration(BottomPaddingDecoration(recyclerView.context))
-            setHasFixedSize(true)
+//            setHasFixedSize(true)
         }
     }
 
@@ -44,8 +44,8 @@ class DevicesFragmentPresenter @Inject constructor(
     override fun setupAvailableDevicesRecyclerView(
         recyclerView: RecyclerView,
     ) {
-        Companion.view = view
         recyclerView.apply {
+            adapter = DevicesAdapter()
             addItemDecoration(BottomPaddingDecoration(recyclerView.context))
 //            setHasFixedSize(true)
         }
@@ -60,7 +60,6 @@ class DevicesFragmentPresenter @Inject constructor(
         (connection as BluetoothConnection).getAvailableDevices()
 
     override fun scanAvailableDevicesPressed() {
-        Log.d(TAG, "scanAvailableDevicesPressed: ")
         checkPermission()
     }
 
@@ -95,7 +94,10 @@ class DevicesFragmentPresenter @Inject constructor(
     companion object {
 
         val availableDevices = MutableLiveData<ArrayList<BluetoothDevice>>(ArrayList())
-        var view: DevicesFragmentContract.View? = null
+
+        fun <T> MutableLiveData<T>.notifyDataSetChanged() {
+            this.value = value
+        }
     }
 
     class Receiver : BroadcastReceiver() {
@@ -107,8 +109,10 @@ class DevicesFragmentPresenter @Inject constructor(
                         intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
                     device?.let {
                         Log.d(TAG, "onReceive: $it")
-                        availableDevices.value!!.add(it)
-                        view!!.updateAvailableDevicesList(availableDevices.value!!)
+                        if (!availableDevices.value!!.contains(it)) {
+                            availableDevices.value!!.add(it)
+                            availableDevices.notifyDataSetChanged()
+                        }
                     }
                 }
             }
