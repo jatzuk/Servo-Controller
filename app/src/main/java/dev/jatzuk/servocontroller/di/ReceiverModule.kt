@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.hilt.android.scopes.ActivityRetainedScoped
 import dev.jatzuk.servocontroller.connection.receiver.BluetoothReceiver
+import dev.jatzuk.servocontroller.connection.receiver.BluetoothScanningReceiver
 
 @Module
 @InstallIn(ActivityRetainedComponent::class)
@@ -16,4 +17,8 @@ object ReceiverModule {
     @ActivityRetainedScoped
     @Provides
     fun provideBluetoothReceiver() = BluetoothReceiver()
+
+    @ActivityRetainedScoped
+    @Provides
+    fun provideBluetoothScanningReceiver() = BluetoothScanningReceiver()
 }

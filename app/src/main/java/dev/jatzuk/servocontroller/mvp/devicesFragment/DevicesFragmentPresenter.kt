@@ -3,15 +3,11 @@ package dev.jatzuk.servocontroller.mvp.devicesFragment
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.adapters.DevicesAdapter
@@ -19,6 +15,7 @@ import dev.jatzuk.servocontroller.connection.BluetoothConnection
 import dev.jatzuk.servocontroller.connection.Connection
 import dev.jatzuk.servocontroller.connection.ConnectionState
 import dev.jatzuk.servocontroller.connection.WifiConnection
+import dev.jatzuk.servocontroller.connection.receiver.BluetoothScanningReceiver
 import dev.jatzuk.servocontroller.other.ACCESS_FINE_LOCATION_REQUEST_CODE
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
 import dev.jatzuk.servocontroller.utils.BottomPaddingDecoration
@@ -29,10 +26,9 @@ private const val TAG = "DevicesFragmentPretr"
 class DevicesFragmentPresenter @Inject constructor(
     private var view: DevicesFragmentContract.View?,
     private val connection: Connection,
-//    private val bluetoothReceiver: BluetoothReceiver
+    private val bluetoothScanningReceiver: BluetoothScanningReceiver
 ) : DevicesFragmentContract.Presenter {
 
-    private val receiver = Receiver()
     private lateinit var pairedDevicesAdapter: DevicesAdapter
     private lateinit var availableDevicesAdapter: DevicesAdapter
 
@@ -60,6 +56,8 @@ class DevicesFragmentPresenter @Inject constructor(
             }
         }
     }
+
+    override fun getConnectionType() = connection.getConnectionType()
 
     override fun onEnableHardwareButtonPressed() {
         val fragment = view as Fragment
@@ -94,18 +92,23 @@ class DevicesFragmentPresenter @Inject constructor(
 
     override fun getPairedDevices() = (connection as BluetoothConnection).getBondedDevices()
 
-    override fun setupAvailableDevicesRecyclerView(
-        recyclerView: RecyclerView,
-    ) {
+    override fun setupAvailableDevicesRecyclerView(recyclerView: RecyclerView) {
         recyclerView.apply {
             adapter = DevicesAdapter().also { availableDevicesAdapter = it }
             addItemDecoration(BottomPaddingDecoration(recyclerView.context))
 //            setHasFixedSize(true)
         }
 
-        val intentFilter = IntentFilter(BluetoothDevice.ACTION_FOUND)
-        (view as Fragment).requireContext().registerReceiver(receiver, intentFilter)
+        registerReceiver()
     }
+
+    private fun registerReceiver() {
+        val intentFilter = IntentFilter(BluetoothDevice.ACTION_FOUND)
+        (view as Fragment).requireContext()
+            .registerReceiver(bluetoothScanningReceiver, intentFilter)
+    }
+
+    override fun getAvailableDevices() = bluetoothScanningReceiver.availableDevices
 
     override fun getAvailableBluetoothDevices() =
         (connection as BluetoothConnection).getAvailableDevices()
@@ -140,35 +143,7 @@ class DevicesFragmentPresenter @Inject constructor(
     }
 
     override fun onDestroy() {
-        (view as Fragment).requireContext().unregisterReceiver(receiver)
+        (view as Fragment).requireContext().unregisterReceiver(bluetoothScanningReceiver)
         view = null
-    }
-
-    companion object {
-
-        val availableDevices = MutableLiveData<ArrayList<BluetoothDevice>>(ArrayList())
-
-        fun <T> MutableLiveData<T>.notifyDataSetChanged() {
-            this.value = value
-        }
-    }
-
-    class Receiver : BroadcastReceiver() {
-
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                BluetoothDevice.ACTION_FOUND -> {
-                    val device =
-                        intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-                    device?.let {
-                        Log.d(TAG, "onReceive: $it")
-                        if (!availableDevices.value!!.contains(it)) {
-                            availableDevices.value!!.add(it)
-                            availableDevices.notifyDataSetChanged()
-                        }
-                    }
-                }
-            }
-        }
     }
 }

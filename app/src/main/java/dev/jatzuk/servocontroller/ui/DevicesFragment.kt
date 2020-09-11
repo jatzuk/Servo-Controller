@@ -16,7 +16,6 @@ import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.adapters.DevicesAdapter
 import dev.jatzuk.servocontroller.databinding.FragmentDevicesBinding
 import dev.jatzuk.servocontroller.mvp.devicesFragment.DevicesFragmentContract
-import dev.jatzuk.servocontroller.mvp.devicesFragment.DevicesFragmentPresenter
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_WIFI
 import kotlinx.coroutines.*
@@ -40,12 +39,15 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
         setupRecyclerViews()
         setupOnClickListeners()
 
-        DevicesFragmentPresenter.availableDevices.observe(viewLifecycleOwner) {
+        presenter.getAvailableDevices().observe(viewLifecycleOwner) {
             binding!!.recyclerViewAvailableDevices.updateAdapterDataSet(it)
         }
 
-        binding?.buttonConnectionToggle?.setOnClickListener {
-            presenter.onEnableHardwareButtonPressed()
+        binding?.buttonConnectionToggle?.apply {
+            text = getString(R.string.enable, presenter.getConnectionType().name)
+            setOnClickListener {
+                presenter.onEnableHardwareButtonPressed()
+            }
         }
 
         presenter.onViewCreated()

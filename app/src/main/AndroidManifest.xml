@@ -33,7 +33,7 @@
         </receiver>
 
         <receiver
-            android:name=".mvp.devicesFragment.DevicesFragmentPresenter$Receiver"
+            android:name=".connection.receiver.BluetoothScanningReceiver"
             android:enabled="false"
             android:exported="false">
             <intent-filter>
