@@ -1,19 +1,25 @@
 package dev.jatzuk.servocontroller.ui
 
 import android.Manifest
+import android.app.Activity
 import android.bluetooth.BluetoothDevice
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.lottie.LottieDrawable
 import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.adapters.DevicesAdapter
 import dev.jatzuk.servocontroller.databinding.FragmentDevicesBinding
 import dev.jatzuk.servocontroller.mvp.devicesFragment.DevicesFragmentContract
 import dev.jatzuk.servocontroller.mvp.devicesFragment.DevicesFragmentPresenter
+import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
+import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_WIFI
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 private const val TAG = "DevicesFragment"
@@ -26,6 +32,8 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
     @Inject
     lateinit var presenter: DevicesFragmentContract.Presenter
 
+    private lateinit var animationJob: CompletableJob
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentDevicesBinding.bind(view)
@@ -35,6 +43,12 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
         DevicesFragmentPresenter.availableDevices.observe(viewLifecycleOwner) {
             binding!!.recyclerViewAvailableDevices.updateAdapterDataSet(it)
         }
+
+        binding?.buttonConnectionToggle?.setOnClickListener {
+            presenter.onEnableHardwareButtonPressed()
+        }
+
+        presenter.onViewCreated()
     }
 
     private fun setupRecyclerViews() {
@@ -61,6 +75,52 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
         }
     }
 
+    override fun updateRecyclerViewsVisibility(isVisible: Boolean) {
+        val recyclerViewVisibility = if (isVisible) View.VISIBLE else View.GONE
+        val dependencyViewVisibility = if (isVisible) View.GONE else View.VISIBLE
+
+        binding?.apply {
+            nestedScrollView.visibility = recyclerViewVisibility
+            buttonConnectionToggle.visibility = dependencyViewVisibility
+        }
+    }
+
+    override fun showAnimation(
+        resourceId: Int,
+        speed: Float,
+        timeout: Long,
+        afterAnimationAction: (() -> Unit)?
+    ) {
+        if (::animationJob.isInitialized && animationJob.isActive) {
+            animationJob.cancel()
+        }
+
+        binding?.connectionAnimationView?.apply {
+            visibility = View.VISIBLE
+            setAnimation(resourceId)
+            this.speed = speed
+            repeatCount = LottieDrawable.INFINITE
+            enableMergePathsForKitKatAndAbove(true)
+            playAnimation()
+
+            if (timeout > 0) {
+                animationJob = Job()
+                CoroutineScope(Dispatchers.Main + animationJob).launch {
+                    delay(timeout)
+                    stopAnimation()
+                    afterAnimationAction?.invoke()
+                }
+            }
+        }
+    }
+
+    override fun stopAnimation() {
+        binding?.connectionAnimationView?.apply {
+            visibility = View.GONE
+            cancelAnimation()
+        }
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -72,6 +132,19 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
             presenter.permissionGranted()
         } else {
             presenter.permissionDenied()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQUEST_ENABLE_BT, REQUEST_ENABLE_WIFI -> presenter.onRequestEnableHardwareReceived()
+//                REQUEST_ENABLE_WIFI -> presenter.onWIFIRequestEnableReceived()
+            }
+        } else {
+            // FIXME: 02/09/2020 replace with animation?
+            showToast(getString(R.string.enable_connection_module_info))
         }
     }
 
