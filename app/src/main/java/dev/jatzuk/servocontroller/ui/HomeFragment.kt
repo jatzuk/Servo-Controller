@@ -47,7 +47,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentHomeBinding.bind(view)
 
-        binding?.buttonConnectionToggle?.setOnClickListener {
+        binding?.layoutIncludedEnableHardwareRequest?.buttonConnectionToggle?.setOnClickListener {
             presenter.connectionButtonPressed()
         }
 
@@ -118,7 +118,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
     }
 
     override fun updateConnectionButton(text: String, isVisible: Boolean) {
-        binding?.buttonConnectionToggle?.apply {
+        binding?.layoutIncludedEnableHardwareRequest?.buttonConnectionToggle?.apply {
             this.text = text
             updateVisibility(isVisible)
         }
@@ -134,7 +134,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
             animationJob.cancel()
         }
 
-        binding?.connectionAnimationView?.apply {
+        binding?.layoutIncludedEnableHardwareRequest?.connectionAnimationView?.apply {
             visibility = View.VISIBLE
             setAnimation(resourceId)
             this.speed = speed
@@ -154,7 +154,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
     }
 
     override fun stopAnimation() {
-        binding?.connectionAnimationView?.apply {
+        binding?.layoutIncludedEnableHardwareRequest?.connectionAnimationView?.apply {
             visibility = View.GONE
             cancelAnimation()
         }

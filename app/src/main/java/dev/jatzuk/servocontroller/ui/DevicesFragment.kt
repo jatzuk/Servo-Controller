@@ -43,7 +43,7 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
             binding!!.recyclerViewAvailableDevices.updateAdapterDataSet(it)
         }
 
-        binding?.buttonConnectionToggle?.apply {
+        binding?.layoutIncludedEnableHardwareRequest?.buttonConnectionToggle?.apply {
             text = getString(R.string.enable, presenter.getConnectionType().name)
             setOnClickListener {
                 presenter.onEnableHardwareButtonPressed()
@@ -78,12 +78,16 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
     }
 
     override fun updateRecyclerViewsVisibility(isVisible: Boolean) {
-        val recyclerViewVisibility = if (isVisible) View.VISIBLE else View.GONE
-        val dependencyViewVisibility = if (isVisible) View.GONE else View.VISIBLE
+        val contentVisibility = if (isVisible) View.VISIBLE else View.GONE
+        val hardwareRequestVisibility = if (isVisible) View.GONE else View.VISIBLE
 
         binding?.apply {
-            nestedScrollView.visibility = recyclerViewVisibility
-            buttonConnectionToggle.visibility = dependencyViewVisibility
+            layoutMotion.visibility = contentVisibility
+
+            layoutIncludedEnableHardwareRequest.apply {
+                connectionAnimationView.visibility = hardwareRequestVisibility
+                buttonConnectionToggle.visibility = hardwareRequestVisibility
+            }
         }
     }
 
@@ -97,7 +101,7 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
             animationJob.cancel()
         }
 
-        binding?.connectionAnimationView?.apply {
+        binding?.layoutIncludedEnableHardwareRequest?.connectionAnimationView?.apply {
             visibility = View.VISIBLE
             setAnimation(resourceId)
             this.speed = speed
@@ -117,7 +121,7 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
     }
 
     override fun stopAnimation() {
-        binding?.connectionAnimationView?.apply {
+        binding?.layoutIncludedEnableHardwareRequest?.connectionAnimationView?.apply {
             visibility = View.GONE
             cancelAnimation()
         }
