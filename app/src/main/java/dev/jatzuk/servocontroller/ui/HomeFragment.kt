@@ -31,7 +31,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
     @Inject
     lateinit var presenter: HomeFragmentContract.Presenter
 
-    private lateinit var job: CompletableJob
+    private lateinit var animationJob: CompletableJob
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,7 +78,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
             }
         } else {
             // FIXME: 02/09/2020
-            showToast("You need to enable module first")
+            showToast(getString(R.string.enable_connection_module_info))
         }
     }
 
@@ -130,8 +130,8 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
         timeout: Long,
         afterTimeoutAction: (() -> Unit)?
     ) {
-        if (::job.isInitialized) {
-            job.cancel()
+        if (::animationJob.isInitialized && animationJob.isActive) {
+            animationJob.cancel()
         }
 
         binding?.connectionAnimationView?.apply {
@@ -143,8 +143,8 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
             playAnimation()
 
             if (timeout > 0) {
-                job = Job()
-                CoroutineScope(Dispatchers.Main + job).launch {
+                animationJob = Job()
+                CoroutineScope(Dispatchers.Main + animationJob).launch {
                     delay(timeout)
                     stopAnimation()
                     afterTimeoutAction?.invoke()

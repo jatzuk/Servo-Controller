@@ -23,4 +23,5 @@
     <string name="paired_devices">Paired devices</string>
     <string name="available_devices">Available devices</string>
     <string name="scan_for_available_devices">Scan for available devices</string>
+    <string name="enable_connection_module_info">You need to enable connection module first</string>
 </resources>

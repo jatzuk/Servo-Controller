@@ -174,8 +174,8 @@ class HomeFragmentPresenter @Inject constructor(
         val fragment = view as Fragment
         when (connection) {
             is BluetoothConnection -> {
-                val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                fragment.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
+                val enableBTIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                fragment.startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT)
 
             }
             is WifiConnection -> {
