@@ -40,7 +40,7 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
         setupOnClickListeners()
 
         presenter.getAvailableDevices().observe(viewLifecycleOwner) {
-            binding!!.recyclerViewAvailableDevices.updateAdapterDataSet(it)
+            binding!!.layoutAvailableDevices.recyclerViewAvailableDevices.updateAdapterDataSet(it)
         }
 
         binding?.layoutIncludedEnableHardwareRequest?.buttonConnectionToggle?.apply {
@@ -56,15 +56,15 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
     private fun setupRecyclerViews() {
         with(presenter) {
             binding?.apply {
-                setupPairedDevicesRecyclerView(this.recyclerViewPairedDevices)
-                setupAvailableDevicesRecyclerView(this.recyclerViewAvailableDevices)
+                setupPairedDevicesRecyclerView(layoutPairedDevices.recyclerViewPairedDevices)
+                setupAvailableDevicesRecyclerView(layoutAvailableDevices.recyclerViewAvailableDevices)
             }
         }
     }
 
     private fun setupOnClickListeners() {
         binding?.apply {
-            ivScanDevices.setOnClickListener {
+            layoutAvailableDevices.ivScanDevices.setOnClickListener {
                 presenter.scanAvailableDevicesPressed()
             }
         }
