@@ -65,7 +65,8 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
     private fun setupOnClickListeners() {
         binding?.apply {
             layoutAvailableDevices.ivScanDevices.setOnClickListener {
-                presenter.scanAvailableDevicesPressed()
+//                presenter.scanAvailableDevicesPressed()
+                presenter.onFoldButtonPressedAtAvailableDevicesLayout(layoutMotion)
             }
         }
     }

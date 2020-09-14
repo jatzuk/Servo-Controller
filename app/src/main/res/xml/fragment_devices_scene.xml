@@ -5,21 +5,22 @@
     <Transition
         motion:constraintSetEnd="@id/end"
         motion:constraintSetStart="@id/start"
-        motion:duration="1000"
-        motion:motionInterpolator="bounce">
-        <OnSwipe
-            motion:dragDirection="dragUp"
-            motion:touchRegionId="@+id/layout_available_devices" />
-    </Transition>
+        motion:duration="1500"
+        motion:motionInterpolator="easeOut"></Transition>
 
     <ConstraintSet android:id="@+id/start">
-        <Constraint>
+        <Constraint android:id="@+id/card_view_available_devices">
             <PropertySet />
         </Constraint>
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/end">
-        <Constraint>
+        <Constraint android:id="@+id/card_view_available_devices">
+            <Layout
+                motion:layout_constraintBottom_toBottomOf="@+id/card_view_paired_devices"
+                motion:layout_constraintEnd_toEndOf="parent"
+                motion:layout_constraintStart_toStartOf="parent"
+                motion:layout_constraintTop_toTopOf="parent" />
             <PropertySet android:layout_margin="8dp" />
         </Constraint>
     </ConstraintSet>

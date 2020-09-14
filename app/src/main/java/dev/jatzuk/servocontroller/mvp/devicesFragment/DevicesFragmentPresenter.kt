@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
@@ -140,6 +141,19 @@ class DevicesFragmentPresenter @Inject constructor(
         view?.showToast(
             (view as Fragment).requireContext().getString(R.string.enable_connection_module_info)
         )
+    }
+
+    override fun onFoldButtonPressedAtAvailableDevicesLayout(motionLayout: MotionLayout) {
+        motionLayout.apply {
+            when (progress) {
+                0f -> {
+                    transitionToEnd()
+                }
+                1f -> {
+                    transitionToStart()
+                }
+            }
+        }
     }
 
     override fun onDestroy() {
