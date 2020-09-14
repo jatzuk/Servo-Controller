@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.widget.ImageView
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -143,14 +144,19 @@ class DevicesFragmentPresenter @Inject constructor(
         )
     }
 
-    override fun onFoldButtonPressedAtAvailableDevicesLayout(motionLayout: MotionLayout) {
+    override fun onFoldButtonPressedAtAvailableDevicesLayout(
+        motionLayout: MotionLayout,
+        imageView: ImageView
+    ) {
         motionLayout.apply {
             when (progress) {
                 0f -> {
                     transitionToEnd()
+                    imageView.setImageResource(R.drawable.ic_unfold_less)
                 }
                 1f -> {
                     transitionToStart()
+                    imageView.setImageResource(R.drawable.ic_unfold_more)
                 }
             }
         }

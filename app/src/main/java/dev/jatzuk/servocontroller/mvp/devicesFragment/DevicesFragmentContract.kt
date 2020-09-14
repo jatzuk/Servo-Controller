@@ -1,6 +1,7 @@
 package dev.jatzuk.servocontroller.mvp.devicesFragment
 
 import android.bluetooth.BluetoothDevice
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.RawRes
 import androidx.constraintlayout.motion.widget.MotionLayout
@@ -38,7 +39,10 @@ interface DevicesFragmentContract {
 
         fun permissionDenied()
 
-        fun onFoldButtonPressedAtAvailableDevicesLayout(motionLayout: MotionLayout)
+        fun onFoldButtonPressedAtAvailableDevicesLayout(
+            motionLayout: MotionLayout,
+            imageView: ImageView
+        )
     }
 
     interface View : BaseView<Presenter> {
