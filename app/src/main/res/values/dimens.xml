@@ -2,4 +2,5 @@
 <resources>
     <dimen name="drawer_width_offset">220dp</dimen>
     <dimen name="item_decoration_padding_offset">8dp</dimen>
+    <dimen name="lottie_animation_size">150dp</dimen>
 </resources>

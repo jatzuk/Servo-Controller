@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <merge xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+    <merge>
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/connection_animation_view"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="@dimen/lottie_animation_size"
+            android:layout_height="@dimen/lottie_animation_size"
             android:layout_gravity="center_horizontal"
             android:layout_margin="8dp"
-            android:src="@android:drawable/stat_sys_data_bluetooth"
             app:layout_constraintBottom_toTopOf="@+id/button_connection_toggle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
