@@ -3,6 +3,7 @@ package dev.jatzuk.servocontroller.adapters
 import android.bluetooth.BluetoothDevice
 import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -11,41 +12,25 @@ import androidx.recyclerview.widget.RecyclerView
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.databinding.ItemDeviceBinding
 
-class DevicesAdapter :
-    ListAdapter<BluetoothDevice, DevicesAdapter.ViewHolder>(DevicesDiffCallback()) {
+class DevicesAdapter(
+    private val onSelectedDeviceClickListener: OnSelectedDeviceClickListener? = null
+) : ListAdapter<BluetoothDevice, DevicesAdapter.ViewHolder>(DevicesDiffCallback()) {
 
-    private var previouslySelectedPosition = -1
-    private var selectedItem = 0
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = ViewHolder.from(parent)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+        ViewHolder.from(parent, onSelectedDeviceClickListener)
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = getItem(position)
-
-        holder.apply {
-            bind(item)
-            itemView.setOnClickListener {
-                val prevItem = (itemView.parent as RecyclerView).findViewHolderForAdapterPosition(
-                    previouslySelectedPosition
-                )
-                prevItem?.let {
-                    if (previouslySelectedPosition != position && previouslySelectedPosition > -1) {
-                        (it as ViewHolder).reset()
-                    }
-                }
-
-                selectedItem = position
-                holder.onClicked(item)
-                previouslySelectedPosition = position
-            }
-        }
+        holder.bind(getItem(position))
     }
 
-    fun getSelectedItem() = currentList[selectedItem]
-
     class ViewHolder private constructor(
-        private val binding: ItemDeviceBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
+        private val binding: ItemDeviceBinding,
+        private val onSelectedDeviceClickListener: OnSelectedDeviceClickListener? = null
+    ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
+
+        init {
+            itemView.setOnClickListener(this)
+        }
 
         fun bind(device: BluetoothDevice) {
             binding.run {
@@ -59,11 +44,12 @@ class DevicesAdapter :
             }
         }
 
-        fun onClicked(device: BluetoothDevice) {
-            binding.apply {
-                this.device = device
-                ivStatus.setColorFilter(Color.GREEN)
-            }
+        override fun onClick(view: View) {
+            onSelectedDeviceClickListener?.onClick(layoutPosition)
+        }
+
+        fun setSelectedColor() {
+            binding.ivStatus.setColorFilter(Color.GREEN)
         }
 
         fun reset() {
@@ -73,10 +59,13 @@ class DevicesAdapter :
 
         companion object {
 
-            fun from(parent: ViewGroup): ViewHolder {
+            fun from(
+                parent: ViewGroup,
+                onSelectedDeviceClickListener: OnSelectedDeviceClickListener? = null
+            ): ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ItemDeviceBinding.inflate(layoutInflater, parent, false)
-                return ViewHolder(binding)
+                return ViewHolder(binding, onSelectedDeviceClickListener)
             }
         }
     }
@@ -92,5 +81,10 @@ class DevicesAdapter :
             oldItem: BluetoothDevice,
             newItem: BluetoothDevice
         ) = oldItem.address == newItem.address
+    }
+
+    interface OnSelectedDeviceClickListener {
+
+        fun onClick(position: Int)
     }
 }

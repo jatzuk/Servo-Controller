@@ -12,6 +12,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.button.MaterialButton
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.adapters.DevicesAdapter
+import dev.jatzuk.servocontroller.connection.BluetoothConnection
 import dev.jatzuk.servocontroller.connection.Connection
 import dev.jatzuk.servocontroller.connection.ConnectionType
 import dev.jatzuk.servocontroller.connection.receiver.BluetoothScanningReceiver
@@ -24,12 +25,16 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
     private var view: AvailableDevicesFragmentContract.View?,
     private val connection: Connection,
     private val bluetoothScanningReceiver: BluetoothScanningReceiver
-) : AvailableDevicesFragmentContract.Presenter {
+) : AvailableDevicesFragmentContract.Presenter, DevicesAdapter.OnSelectedDeviceClickListener {
 
+    private lateinit var recyclerView: RecyclerView
     private lateinit var availableDevicesAdapter: DevicesAdapter
     private lateinit var lav: LottieAnimationView
     private lateinit var button: MaterialButton
     private var isSearching: Boolean = false
+
+    private var previouslySelectedPosition = -1
+    private var selectedItem = 0
 
     override fun onViewCreated(layoutScanAvailableDevices: LayoutLottieAnimationViewButtonBinding) {
         layoutScanAvailableDevices.apply {
@@ -42,12 +47,30 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
     }
 
     override fun setupRecyclerView(recyclerView: RecyclerView) {
+        this.recyclerView = recyclerView
+        val devicesAdapter = DevicesAdapter(this).also {
+            availableDevicesAdapter = it
+        }
         recyclerView.apply {
-            adapter = DevicesAdapter().also { availableDevicesAdapter = it }
+            adapter = devicesAdapter
             addItemDecoration(BottomPaddingDecoration(recyclerView.context))
         }
 
         registerReceiver()
+    }
+
+    override fun onClick(position: Int) {
+        val prevItem = recyclerView.findViewHolderForAdapterPosition(previouslySelectedPosition)
+        prevItem?.let {
+            if (previouslySelectedPosition != position && previouslySelectedPosition > -1) {
+                (it as DevicesAdapter.ViewHolder).reset()
+            }
+        }
+
+        selectedItem = position
+        (recyclerView.findViewHolderForAdapterPosition(position) as DevicesAdapter.ViewHolder).setSelectedColor()
+        (connection as BluetoothConnection).setDevice(availableDevicesAdapter.currentList[position])
+        previouslySelectedPosition = position
     }
 
     private fun registerReceiver() {

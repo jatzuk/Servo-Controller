@@ -28,8 +28,6 @@ interface AvailableDevicesFragmentContract {
 
     interface View : BaseView<Presenter> {
 
-        fun updateRecyclerViewItem(position: Int)
-
         fun showAnimation(
             @RawRes resourceId: Int,
             speed: Float = 1f,

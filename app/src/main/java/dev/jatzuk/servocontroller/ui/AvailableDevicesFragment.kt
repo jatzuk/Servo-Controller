@@ -110,10 +110,6 @@ class AvailableDevicesFragment : Fragment(R.layout.fragment_available_devices),
         }
     }
 
-    override fun updateRecyclerViewItem(position: Int) {
-
-    }
-
     override fun onDestroy() {
         presenter.onDestroy()
         super.onDestroy()
