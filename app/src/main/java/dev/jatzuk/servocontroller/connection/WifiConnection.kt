@@ -1,5 +1,6 @@
 package dev.jatzuk.servocontroller.connection
 
+import android.bluetooth.BluetoothDevice
 import androidx.lifecycle.MutableLiveData
 
 // TODO: 17/08/2020 class to represent a wifi connection manager
@@ -32,4 +33,14 @@ class WifiConnection : Connection {
     }
 
     override fun getConnectionType() = ConnectionType.WIFI
+
+    fun getBondedDevices() = MutableList<BluetoothDevice?>(0) { null } // fixme
+
+    override fun startScan() {
+        TODO("Not yet implemented")
+    }
+
+    override fun stopScan() {
+        TODO("Not yet implemented")
+    }
 }

@@ -27,4 +27,8 @@ class BluetoothScanningReceiver : BroadcastReceiver() {
             }
         }
     }
+
+    fun clearList() {
+        _availableDevices.value!!.clear()
+    }
 }

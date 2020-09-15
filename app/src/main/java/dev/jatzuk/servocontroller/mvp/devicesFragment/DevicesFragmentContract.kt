@@ -1,12 +1,7 @@
 package dev.jatzuk.servocontroller.mvp.devicesFragment
 
-import android.bluetooth.BluetoothDevice
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.RawRes
-import androidx.constraintlayout.motion.widget.MotionLayout
-import androidx.lifecycle.LiveData
-import androidx.recyclerview.widget.RecyclerView
 import dev.jatzuk.servocontroller.connection.ConnectionType
 import dev.jatzuk.servocontroller.mvp.BasePresenter
 import dev.jatzuk.servocontroller.mvp.BaseView
@@ -22,39 +17,29 @@ interface DevicesFragmentContract {
         fun onEnableHardwareButtonPressed()
 
         fun onRequestEnableHardwareReceived()
+//
+//        fun setupPairedDevicesRecyclerView(recyclerView: RecyclerView)
+//
+//        fun setupAvailableDevicesRecyclerView(recyclerView: RecyclerView)
+//
+//        fun getPairedDevices(): List<BluetoothDevice>?
+//
+//        fun getAvailableBluetoothDevices(): List<BluetoothDevice>?
 
-        fun setupPairedDevicesRecyclerView(recyclerView: RecyclerView)
+//        fun getAvailableDevices(): LiveData<ArrayList<BluetoothDevice>>
 
-        fun setupAvailableDevicesRecyclerView(recyclerView: RecyclerView)
+//        fun scanAvailableDevicesPressed()
 
-        fun getPairedDevices(): List<BluetoothDevice>?
+//        fun permissionGranted()
 
-        fun getAvailableBluetoothDevices(): List<BluetoothDevice>?
-
-        fun getAvailableDevices(): LiveData<ArrayList<BluetoothDevice>>
-
-        fun scanAvailableDevicesPressed()
-
-        fun permissionGranted()
-
-        fun permissionDenied()
-
-        fun onFoldButtonPressedAtAvailableDevicesLayout(
-            motionLayout: MotionLayout,
-            imageView: ImageView
-        )
+//        fun permissionDenied()
     }
 
     interface View : BaseView<Presenter> {
 
-        fun updateRecyclerViewsVisibility(isVisible: Boolean)
+        fun updateTabLayoutVisibility(isVisible: Boolean)
 
-        fun showAnimation(
-            @RawRes resourceId: Int,
-            speed: Float = 1f,
-            timeout: Long = 0L,
-            afterAnimationAction: (() -> Unit)? = null
-        )
+        fun showAnimation(@RawRes resourceId: Int, speed: Float = 1f, timeout: Long = 0L)
 
         fun stopAnimation()
 

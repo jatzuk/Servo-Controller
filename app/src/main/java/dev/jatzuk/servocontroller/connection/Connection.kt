@@ -19,6 +19,10 @@ interface Connection {
     fun isHardwareEnabled(): Boolean
 
     fun getConnectionType(): ConnectionType
+
+    fun startScan()
+
+    fun stopScan()
 }
 
 enum class ConnectionState {

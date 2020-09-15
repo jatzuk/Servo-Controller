@@ -5,17 +5,17 @@
     <merge>
 
         <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/connection_animation_view"
+            android:id="@+id/lav"
             android:layout_width="@dimen/lottie_animation_size"
             android:layout_height="@dimen/lottie_animation_size"
             android:layout_gravity="center_horizontal"
             android:layout_margin="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/button_connection_toggle"
+            app:layout_constraintBottom_toTopOf="@+id/button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_connection_toggle"
+            android:id="@+id/button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"

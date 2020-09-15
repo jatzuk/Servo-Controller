@@ -77,4 +77,7 @@ dependencies {
 
     def lottie_version = "3.4.2"
     implementation "com.airbnb.android:lottie:$lottie_version"
+
+    def view_pager2_version = "1.0.0"
+    implementation "androidx.viewpager2:viewpager2:$view_pager2_version"
 }

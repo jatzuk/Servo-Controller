@@ -57,11 +57,14 @@ class BluetoothConnection : Connection {
 
     fun getBondedDevices() = bluetoothAdapter?.bondedDevices?.toList()
 
-    fun getAvailableDevices(): List<BluetoothDevice>? {
+    override fun startScan() {
         bluetoothAdapter?.cancelDiscovery()
         val discoveryResult = bluetoothAdapter?.startDiscovery()
         Log.d("DevicesFragmentPretr", "getAvailableDevices: $discoveryResult")
-        return listOf()
+    }
+
+    override fun stopScan() {
+        bluetoothAdapter?.cancelDiscovery()
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")

@@ -1,36 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_constraint"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.constraintlayout.motion.widget.MotionLayout
-            android:id="@+id/layout_motion"
+        <LinearLayout
+            android:id="@+id/layout_linear"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layoutDescription="@xml/fragment_devices_scene">
+            android:orientation="vertical">
 
-            <include
-                android:id="@+id/layout_paired_devices"
-                layout="@layout/layout_paired_devices"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/layout_tab"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-            <include
-                android:id="@+id/layout_available_devices"
-                layout="@layout/layout_available_devices"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/card_view_paired_devices" />
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
-        </androidx.constraintlayout.motion.widget.MotionLayout>
+        </LinearLayout>
 
         <include
-            android:id="@+id/layout_included_enable_hardware_request"
-            layout="@layout/enable_hardware_request" />
+            android:id="@+id/layout_enable_hardware_request"
+            layout="@layout/layout_lottie_animation_view_button" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
