@@ -42,11 +42,10 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
             adapter = FragmentAdapter(this@DevicesFragment)
         }
         TabLayoutMediator(binding!!.layoutTab, viewPager) { tab, position ->
-            val name = when (position) {
-                0 -> "Paired"
-                else -> "Available"
+            tab.text = when (position) {
+                0 -> getString(R.string.paired_devices)
+                else -> getString(R.string.available_devices)
             }
-            tab.text = "$name devices"
         }.attach()
 
         presenter.onViewCreated()
