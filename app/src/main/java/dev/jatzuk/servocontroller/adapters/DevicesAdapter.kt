@@ -1,5 +1,6 @@
 package dev.jatzuk.servocontroller.adapters
 
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.graphics.Color
 import android.view.LayoutInflater
@@ -28,6 +29,9 @@ class DevicesAdapter(
         private val onSelectedDeviceClickListener: OnSelectedDeviceClickListener? = null
     ) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
+        private var defaultColor = 0
+        private var isPaired = false
+
         init {
             itemView.setOnClickListener(this)
         }
@@ -37,8 +41,15 @@ class DevicesAdapter(
                 this.device = device
                 tvName.text = device.name
                 tvMacAddress.text = device.address
-//                tvStatus.text = device.
-//                ivStatus =
+
+                updatePairedInfo(device)
+
+                val stringResource = if (isPaired) R.string.paired else R.string.unpaired
+                tvStatus.text = itemView.context.getString(stringResource)
+
+                setDefaultColor()
+                ivStatus.setColorFilter(defaultColor)
+
 //                ivDeviceIcon =
                 executePendingBindings()
             }
@@ -49,12 +60,26 @@ class DevicesAdapter(
         }
 
         fun setSelectedColor() {
-            binding.ivStatus.setColorFilter(Color.GREEN)
+            binding.apply {
+                ivStatus.setColorFilter(Color.GREEN)
+                tvStatus.text = itemView.context.getString(R.string.selected)
+            }
         }
 
         fun reset() {
-            val color = ContextCompat.getColor(itemView.context, R.color.colorPrimary)
-            binding.ivStatus.setColorFilter(color)
+            binding.apply {
+                ivStatus.setColorFilter(defaultColor)
+                tvStatus.text = itemView.context.getString(R.string.paired)
+            }
+        }
+
+        private fun setDefaultColor() {
+            val colorRes = if (isPaired) R.color.colorPrimary else R.color.colorGrey
+            defaultColor = ContextCompat.getColor(itemView.context, colorRes)
+        }
+
+        private fun updatePairedInfo(device: BluetoothDevice) {
+            isPaired = BluetoothAdapter.getDefaultAdapter().bondedDevices.contains(device)
         }
 
         companion object {
