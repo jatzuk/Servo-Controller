@@ -24,4 +24,10 @@
     <string name="available_devices">Available devices</string>
     <string name="scan_devices">Scan devices</string>
     <string name="enable_connection_module_info">You need to enable connection module first</string>
+
+    <string name="paired">Paired</string>
+    <string name="unpaired">Unpaired</string>
+    <string name="selected">Selected</string>
+    <string name="no_device_selected">No Device Selected</string>
+
 </resources>
