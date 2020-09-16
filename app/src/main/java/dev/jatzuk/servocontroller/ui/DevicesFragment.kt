@@ -43,8 +43,8 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
         }
         TabLayoutMediator(binding!!.layoutTab, viewPager) { tab, position ->
             tab.text = when (position) {
-                0 -> getString(R.string.paired_devices)
-                else -> getString(R.string.available_devices)
+                0 -> getString(R.string.available_devices)
+                else -> getString(R.string.paired_devices)
             }
         }.attach()
 
@@ -113,8 +113,8 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
         override fun getItemCount() = 2
 
         override fun createFragment(position: Int): Fragment = when (position) {
-            0 -> PairedDevicesFragment()
-            else -> AvailableDevicesFragment()
+            0 -> AvailableDevicesFragment()
+            else -> PairedDevicesFragment()
         }
     }
 }
