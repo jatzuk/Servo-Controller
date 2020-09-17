@@ -6,7 +6,9 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.annotation.DrawableRes
+import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.airbnb.lottie.LottieDrawable
 import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
@@ -124,6 +126,16 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
         }
     }
 
+    override fun updateSelectedDeviceHint(isVisible: Boolean, pair: Pair<String, String>?) {
+        binding?.apply {
+            pair?.let {
+                tvSelectedDeviceName.text = it.first
+                tvSelectedDeviceMacAddress.text = it.second
+            }
+            layoutLinear.updateVisibility(isVisible)
+        }
+    }
+
     override fun showAnimation(
         resourceId: Int,
         speed: Float,
@@ -158,6 +170,10 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
             visibility = View.GONE
             cancelAnimation()
         }
+    }
+
+    override fun navigateTo(@IdRes id: Int) {
+        findNavController().navigate(id)
     }
 
     private fun View.updateVisibility(isVisible: Boolean) {

@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 class WifiConnection : Connection {
 
     override val connectionState = MutableLiveData(ConnectionState.OFF)
+    override var selectedDevice: Any? = null
 
     override fun isConnected(): Boolean {
         TODO("Not yet implemented")

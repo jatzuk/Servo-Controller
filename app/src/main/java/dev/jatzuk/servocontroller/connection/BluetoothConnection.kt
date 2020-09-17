@@ -20,6 +20,7 @@ class BluetoothConnection : Connection {
     private var device: BluetoothDevice? = null
 
     override val connectionState = MutableLiveData(ConnectionState.OFF)
+    override var selectedDevice: Any? = null
 
     init {
         Companion.connection = this
@@ -27,6 +28,7 @@ class BluetoothConnection : Connection {
 
     fun setDevice(device: BluetoothDevice) {
         this.device = device
+        selectedDevice = device
     }
 
     override fun isConnected() = try {
@@ -107,6 +109,9 @@ class BluetoothConnection : Connection {
     }
 
     override fun getConnectionType() = ConnectionType.BLUETOOTH
+
+    fun isSelectedDevicePaired() =
+        getBondedDevices()?.contains(selectedDevice as BluetoothDevice?) ?: false
 
     companion object {
 

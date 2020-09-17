@@ -92,12 +92,30 @@ class HomeFragmentPresenter @Inject constructor(
 
         if (isConnectionTypeSupported()) {
             val context = (view as HomeFragment).requireContext()
+
+            var deviceInfo: Pair<String, String>? = connection.retrieveSelectedDeviceInfo()
+            if (deviceInfo == null) {
+                connection.retrieveSelectedDeviceInfoFromSharedPreferences(context)?.let { pair ->
+                    deviceInfo = pair.first to pair.second
+                    (connection as BluetoothConnection).getBondedDevices()?.forEach { device ->
+                        if (device.address == pair.second) {
+                            (connection as BluetoothConnection).setDevice(device)
+                            return@forEach
+                        }
+                    }
+                }
+            }
+
+            deviceInfo?.let {
+                view?.updateSelectedDeviceHint(true, it)
+            }
+
             connection.connectionState.observe((view as HomeFragment).viewLifecycleOwner) {
-                Log.d(TAG, "notifyViewCreated: connection state: $it")
                 when (it!!) {
                     ConnectionState.ON -> {
                         view?.apply {
                             updateConnectionMenuIconVisibility(true)
+                            updateSelectedDeviceHint(true)
                             stopAnimation()
                             updateConnectionButton(context.getString(R.string.connect))
                         }
@@ -106,6 +124,7 @@ class HomeFragmentPresenter @Inject constructor(
                         view?.apply {
                             showAnimation(R.raw.bluetooth_loop)
                             updateConnectionButton(context.getString(R.string.cancel))
+                            updateSelectedDeviceHint(true)
                         }
                     }
                     ConnectionState.CONNECTED -> {
@@ -120,11 +139,14 @@ class HomeFragmentPresenter @Inject constructor(
                                 }
                             }
                             updateConnectionButton(context.getString(R.string.disconnect), false)
+                            updateSelectedDeviceHint(false)
                         }
                     }
                     ConnectionState.DISCONNECTING -> {
                         view?.apply {
                             setRecyclerViewVisibility(false)
+                            updateConnectionButton(context.getString(R.string.connect))
+                            updateSelectedDeviceHint(true)
                         }
                     }
                     ConnectionState.DISCONNECTED -> {
@@ -133,6 +155,7 @@ class HomeFragmentPresenter @Inject constructor(
                             setRecyclerViewVisibility(false)
                             showAnimation(R.raw.animation_failure, 0.5f, 2500)
                             updateConnectionButton(context.getString(R.string.connect))
+                            updateSelectedDeviceHint(true)
                         }
                     }
                     ConnectionState.OFF -> {
@@ -144,6 +167,7 @@ class HomeFragmentPresenter @Inject constructor(
                                     connection.getConnectionType().name
                                 )
                             )
+                            updateSelectedDeviceHint(false)
                             showAnimation(R.raw.bluetooth_enable)
                         }
                     }
@@ -211,10 +235,13 @@ class HomeFragmentPresenter @Inject constructor(
     override fun sendData(data: ByteArray) = connection.send(data)
 
     override fun connect() {
-        connectionJob = Job()
-        CoroutineScope(Dispatchers.IO + connectionJob).launch {
-            buildDeviceList()
-            connection.connect()
+        if (connection.selectedDevice == null) {
+            view?.navigateTo(R.id.devicesFragment)
+        } else {
+            connectionJob = Job()
+            CoroutineScope(Dispatchers.IO + connectionJob).launch {
+                connection.connect()
+            }
         }
     }
 

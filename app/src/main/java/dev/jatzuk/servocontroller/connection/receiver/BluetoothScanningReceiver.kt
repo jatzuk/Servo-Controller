@@ -31,7 +31,11 @@ class BluetoothScanningReceiver : BroadcastReceiver() {
             }
             BluetoothDevice.ACTION_BOND_STATE_CHANGED -> {
                 device?.let {
-                    isPairingProcess.value = isPairingProcess.value == null
+                    isPairingProcess.value = when (it.bondState) {
+                        BluetoothDevice.BOND_BONDING -> true
+                        BluetoothDevice.BOND_BONDED -> false
+                        else -> null
+                    }
                 }
             }
         }

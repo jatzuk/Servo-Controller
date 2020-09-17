@@ -64,6 +64,8 @@ interface HomeFragmentContract {
 
         fun updateConnectionMenuIconVisibility(isVisible: Boolean)
 
+        fun updateSelectedDeviceHint(isVisible: Boolean = true, pair: Pair<String, String>? = null)
+
         fun submitServosList(servos: List<Servo>)
 
         fun setRecyclerViewVisibility(isVisible: Boolean)
@@ -78,6 +80,8 @@ interface HomeFragmentContract {
         fun stopAnimation()
 
         fun updateConnectionButton(text: String, isVisible: Boolean = true)
+
+        fun navigateTo(id: Int)
 
         override fun assignPresenter(presenter: Presenter) {}
     }
