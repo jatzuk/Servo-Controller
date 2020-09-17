@@ -7,7 +7,11 @@
     <fragment
         android:id="@id/homeFragment"
         android:name="dev.jatzuk.servocontroller.ui.HomeFragment"
-        android:label="@string/app_name" />
+        android:label="@string/app_name">
+        <action
+            android:id="@+id/action_homeFragment_to_devicesFragment"
+            app:destination="@id/devicesFragment" />
+    </fragment>
     <fragment
         android:id="@id/devicesFragment"
         android:name="dev.jatzuk.servocontroller.ui.DevicesFragment"
