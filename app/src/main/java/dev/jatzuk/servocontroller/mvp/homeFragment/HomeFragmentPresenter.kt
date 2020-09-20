@@ -2,7 +2,6 @@ package dev.jatzuk.servocontroller.mvp.homeFragment
 
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -13,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.adapters.ServoAdapter
 import dev.jatzuk.servocontroller.connection.*
-import dev.jatzuk.servocontroller.connection.receiver.BluetoothReceiver
 import dev.jatzuk.servocontroller.db.ServoDAO
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
 import dev.jatzuk.servocontroller.other.Servo
@@ -32,28 +30,14 @@ private const val IS_CONNECTION_ACTIVE_EXTRA = "IS_CONNECTION_ACTIVE_EXTRA"
 class HomeFragmentPresenter @Inject constructor(
     private var view: HomeFragmentContract.View?,
     var settingsHolder: SettingsHolder,
-    var connection: Connection,
     private val servoDAO: ServoDAO,
-    private val bluetoothReceiver: BluetoothReceiver
 ) : HomeFragmentContract.Presenter {
 
+    lateinit var connection: Connection
     private val servos = mutableListOf<Servo>()
 
     private lateinit var connectionJob: CompletableJob
     private var isWasConnected = false
-
-    override fun optionsMenuCreated() {
-        if (!isConnectionTypeSupported()) {
-            // TODO: 16/08/20 disable bluetooth views and functionality
-            val message = "${settingsHolder.connectionType} module is not found on this device"
-            Log.d(TAG, message)
-            view?.apply {
-                showToast(message)
-                updateConnectionMenuIconVisibility(false)
-            }
-        }
-        view?.updateConnectionStateIcon(getIconBasedOnConnectionType())
-    }
 
     override fun setupRecyclerView(recyclerView: RecyclerView) {
         recyclerView.apply {
@@ -87,37 +71,71 @@ class HomeFragmentPresenter @Inject constructor(
         }
     }
 
-    override fun onViewCreated() {
-        updateServoList()
+    override fun onViewCreated(savedInstanceState: Bundle?) {
+        connection = ConnectionFactory.getConnection(
+            (view as Fragment).requireContext(),
+            settingsHolder.connectionType
+        )
 
         if (isConnectionTypeSupported()) {
-            val context = (view as HomeFragment).requireContext()
+            updateServoList()
 
-            var deviceInfo: Pair<String, String>? = connection.retrieveSelectedDeviceInfo()
-            if (deviceInfo == null) {
-                connection.retrieveSelectedDeviceInfoFromSharedPreferences(context)?.let { pair ->
-                    deviceInfo = pair.first to pair.second
-                    (connection as BluetoothConnection).getBondedDevices()?.forEach { device ->
-                        if (device.address == pair.second) {
-                            (connection as BluetoothConnection).setDevice(device)
-                            return@forEach
-                        }
-                    }
-                }
+            registerBroadcastReceiver()
+            isWasConnected =
+                savedInstanceState?.getBoolean(IS_CONNECTION_ACTIVE_EXTRA, false) ?: isConnected()
+
+            // TODO: 20/09/2020 repalce with abstraction level?
+//            var deviceInfo: Pair<String, String>? = connection.retrieveSelectedDeviceInfo()
+//            if (deviceInfo == null) {
+//                connection.retrieveSelectedDeviceInfoFromSharedPreferences(
+//                    (view as HomeFragment).requireContext()
+//                )?.let { pair ->
+//                    deviceInfo = pair.first to pair.second
+//                    (connection as BluetoothConnection).getBondedDevices()?.forEach { device ->
+//                        if (device.address == pair.second) {
+//                            (connection as BluetoothConnection).setDevice(device)
+//                            return@forEach
+//                        }
+//                    }
+//                }
+//            }
+//
+//            deviceInfo?.let {
+//                view?.updateSelectedDeviceHint(true, it)
+//            }
+        }
+    }
+
+    override fun optionsMenuCreated() {
+        if (!isConnectionTypeSupported()) {
+            // TODO: 16/08/20 disable bluetooth views and functionality
+            val message = "${settingsHolder.connectionType} module is not found on this device"
+            Log.d(TAG, message)
+            view?.apply {
+                showToast(message)
+                updateConnectionMenuIconVisibility(false)
             }
+        }
+        view?.updateConnectionStateIcon(getIconBasedOnConnectionType())
+    }
 
-            deviceInfo?.let {
-                view?.updateSelectedDeviceHint(true, it)
-            }
+    override fun onStart() {
+        val context = (view as Fragment).requireContext()
 
+        if (isConnectionTypeSupported()) {
             connection.connectionState.observe((view as HomeFragment).viewLifecycleOwner) {
                 when (it!!) {
                     ConnectionState.ON -> {
                         view?.apply {
-                            updateConnectionMenuIconVisibility(true)
-                            updateSelectedDeviceHint(true)
+                            if (connection.selectedDevice == null) {
+                                updateConnectionButton(context.getString(R.string.select_device))
+                            } else {
+                                updateConnectionMenuIconVisibility(true)
+                                updateSelectedDeviceHint(true)
+                                updateConnectionButton(context.getString(R.string.connect))
+                            }
+
                             stopAnimation()
-                            updateConnectionButton(context.getString(R.string.connect))
                         }
                     }
                     ConnectionState.CONNECTING -> {
@@ -174,14 +192,16 @@ class HomeFragmentPresenter @Inject constructor(
                 }
             }
         } else {
-            // TODO: 03/09/2020 module not supported
+            val connectionTypeString = context.getString(R.string.connection_type)
+            val unsupportedString = context.getString(R.string.unsupported)
+            view?.apply {
+                showAnimation(R.raw.animation_connection_type_unsupported)
+                updateSelectedDeviceHint(true, connectionTypeString to unsupportedString)
+                updateConnectionButton(
+                    (this as Fragment).requireContext().getString(R.string.change_connection_type)
+                )
+            }
         }
-    }
-
-    override fun onCreateView(savedInstanceState: Bundle?) {
-        registerBroadcastReceiver()
-        isWasConnected =
-            savedInstanceState?.getBoolean(IS_CONNECTION_ACTIVE_EXTRA, false) ?: isConnected()
     }
 
     override fun onDestroyView() {
@@ -300,22 +320,26 @@ class HomeFragmentPresenter @Inject constructor(
     }
 
     override fun connectionButtonPressed() {
-        when (connection.connectionState.value) {
-            ConnectionState.ON, ConnectionState.DISCONNECTED -> {
-                connect()
-            }
-            ConnectionState.CONNECTING -> {
-                disconnect()
-            }
-            ConnectionState.OFF -> {
-                val context = (view as HomeFragment).requireContext()
-                val enableString =
-                    context.getString(R.string.enable, connection.getConnectionType().name)
-                view?.updateConnectionButton(enableString)
-                requestConnectionHardware()
-            }
-            else -> {
-                Log.d(TAG, "connectionButtonPressed: nothing to do")
+        if (!isConnectionTypeSupported()) {
+            view?.navigateTo(R.id.action_homeFragment_to_settingsFragment)
+        } else {
+            when (connection.connectionState.value) {
+                ConnectionState.ON, ConnectionState.DISCONNECTED -> {
+                    connect()
+                }
+                ConnectionState.CONNECTING -> {
+                    disconnect()
+                }
+                ConnectionState.OFF -> {
+                    val context = (view as HomeFragment).requireContext()
+                    val enableString =
+                        context.getString(R.string.enable, connection.getConnectionType().name)
+                    view?.updateConnectionButton(enableString)
+                    requestConnectionHardware()
+                }
+                else -> {
+                    Log.d(TAG, "connectionButtonPressed: nothing to do")
+                }
             }
         }
     }
@@ -330,10 +354,6 @@ class HomeFragmentPresenter @Inject constructor(
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putBoolean(IS_CONNECTION_ACTIVE_EXTRA, connection.isConnected())
-    }
-
-    fun updateConnectionType() {
-
     }
 
     private fun getIconBasedOnConnectionType() = when (connection.getConnectionType()) {
@@ -363,26 +383,10 @@ class HomeFragmentPresenter @Inject constructor(
     }
 
     private fun registerBroadcastReceiver() {
-        Log.d(TAG, "registerBroadcastReceiver: registered")
-        val context = (view as HomeFragment).requireContext()
-        val intentFilter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
-        context.registerReceiver(bluetoothReceiver, intentFilter)
-
-
-        // notify that hardware already turned on to synchronize state
-        if (connection.isHardwareEnabled()
-            && connection.connectionState.value != ConnectionState.CONNECTED
-        ) {
-            val intent = Intent().apply {
-                action = BluetoothAdapter.ACTION_STATE_CHANGED
-                putExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.STATE_ON)
-            }
-            bluetoothReceiver.onReceive(context, intent)
-        }
+        connection.registerReceiver((view as HomeFragment).requireContext())
     }
 
     private fun unregisterBroadcastReceiver() {
-        Log.d(TAG, "unregisterBroadcastReceiver: unregistered")
-        (view as HomeFragment).requireContext().unregisterReceiver(bluetoothReceiver)
+        connection.unregisterReceiver((view as HomeFragment).requireContext())
     }
 }

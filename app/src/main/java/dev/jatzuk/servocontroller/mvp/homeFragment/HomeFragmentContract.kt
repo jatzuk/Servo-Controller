@@ -15,9 +15,9 @@ interface HomeFragmentContract {
 
         fun optionsMenuCreated()
 
-        fun onCreateView(savedInstanceState: Bundle?)
+        fun onViewCreated(savedInstanceState: Bundle?)
 
-        fun onViewCreated()
+        fun onStart()
 
         fun onDestroyView()
 

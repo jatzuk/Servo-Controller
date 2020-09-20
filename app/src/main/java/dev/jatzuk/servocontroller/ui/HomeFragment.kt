@@ -41,7 +41,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
-        presenter.onCreateView(savedInstanceState)
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
@@ -54,7 +53,12 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
         }
 
         setupRecyclerView()
-        presenter.onViewCreated()
+        presenter.onViewCreated(savedInstanceState)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        presenter.onStart()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
