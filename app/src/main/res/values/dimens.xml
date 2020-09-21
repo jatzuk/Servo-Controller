@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="drawer_width_offset">220dp</dimen>
+    <dimen name="side_nav_bar_corner_radius">128dp</dimen>
     <dimen name="item_decoration_padding_offset">8dp</dimen>
     <dimen name="lottie_animation_size">150dp</dimen>
 </resources>
