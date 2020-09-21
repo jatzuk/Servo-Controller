@@ -1,9 +1,11 @@
 package dev.jatzuk.servocontroller.connection
 
+import android.content.Context
+
 object ConnectionFactory {
 
-    fun getConnection(connectionType: ConnectionType): Connection = when (connectionType) {
+    fun getConnection(context: Context, connectionType: ConnectionType) = when (connectionType) {
         ConnectionType.BLUETOOTH -> BluetoothConnection()
-        ConnectionType.WIFI -> WifiConnection()
+        ConnectionType.WIFI -> WifiConnection(context)
     }
 }

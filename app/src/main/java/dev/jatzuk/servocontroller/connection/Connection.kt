@@ -1,15 +1,17 @@
 package dev.jatzuk.servocontroller.connection
 
-import android.bluetooth.BluetoothDevice
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.os.Parcelable
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import dev.jatzuk.servocontroller.other.SELECTED_DEVICE_DATA_EXTRA
-import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAME
 
 interface Connection {
 
+    var receiver: BroadcastReceiver?
+
     val connectionState: MutableLiveData<ConnectionState>
-    var selectedDevice: Any?
+    val selectedDevice: Parcelable?
 
     suspend fun connect(): Boolean
 
@@ -29,26 +31,15 @@ interface Connection {
 
     fun stopScan()
 
-    fun retrieveSelectedDeviceInfo(): Pair<String, String>? {
-        val selectedDevice = when (getConnectionType()) {
-            ConnectionType.BLUETOOTH -> ((this as BluetoothConnection?)?.selectedDevice as BluetoothDevice?)
-            ConnectionType.WIFI -> null
-        }
+    fun registerReceiver(context: Context)
 
-        return selectedDevice?.let {
-            it.name to it.address
-        }
-    }
+    fun unregisterReceiver(context: Context)
 
-    fun retrieveSelectedDeviceInfoFromSharedPreferences(context: Context): Pair<String, String>? {
-        val sharedPreferences =
-            context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
-        val deviceString = sharedPreferences.getString(SELECTED_DEVICE_DATA_EXTRA, null)
-        return deviceString?.let {
-            val list = it.split('~')
-            list[0] to list[1]
-        }
-    }
+    fun <T> getAvailableDevices(): LiveData<ArrayList<T>>
+
+    fun checkIfPreviousDeviceStored(context: Context)
+
+    fun getSelectedDeviceCredentials(): Pair<String, String>?
 }
 
 enum class ConnectionState {
