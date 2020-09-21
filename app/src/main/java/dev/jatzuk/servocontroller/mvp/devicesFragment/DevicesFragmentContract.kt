@@ -17,22 +17,6 @@ interface DevicesFragmentContract {
         fun onEnableHardwareButtonPressed()
 
         fun onRequestEnableHardwareReceived()
-//
-//        fun setupPairedDevicesRecyclerView(recyclerView: RecyclerView)
-//
-//        fun setupAvailableDevicesRecyclerView(recyclerView: RecyclerView)
-//
-//        fun getPairedDevices(): List<BluetoothDevice>?
-//
-//        fun getAvailableBluetoothDevices(): List<BluetoothDevice>?
-
-//        fun getAvailableDevices(): LiveData<ArrayList<BluetoothDevice>>
-
-//        fun scanAvailableDevicesPressed()
-
-//        fun permissionGranted()
-
-//        fun permissionDenied()
     }
 
     interface View : BaseView<Presenter> {
