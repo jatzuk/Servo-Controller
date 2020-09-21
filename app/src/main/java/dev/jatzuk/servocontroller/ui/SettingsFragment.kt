@@ -1,12 +1,12 @@
 package dev.jatzuk.servocontroller.ui
 
 import android.os.Bundle
-import android.util.Log
 import androidx.preference.DropDownPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SeekBarPreference
 import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
+import dev.jatzuk.servocontroller.connection.ConnectionType
 import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAME
 import dev.jatzuk.servocontroller.other.ServoTexture
 import dev.jatzuk.servocontroller.utils.PreferenceDropDownSummaryProvider
@@ -31,7 +31,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
             summaryProvider = PreferenceDropDownSummaryProvider()
             updateIcon()
             setOnPreferenceChangeListener { _, newValue ->
-                Log.d(TAG, "changeListener: $newValue")
+                val index = entries.indexOf(newValue)
+                val connectionType = ConnectionType.values()[index]
+                settingsHolder.applyChanges(
+                    connectionType = connectionType
+                )
                 updateIcon(newValue.toString())
                 true
             }

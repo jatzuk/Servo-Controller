@@ -46,6 +46,11 @@ class AvailableDevicesFragment : Fragment(R.layout.fragment_available_devices),
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        presenter.onStop()
+    }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,

@@ -83,26 +83,6 @@ class HomeFragmentPresenter @Inject constructor(
             registerBroadcastReceiver()
             isWasConnected =
                 savedInstanceState?.getBoolean(IS_CONNECTION_ACTIVE_EXTRA, false) ?: isConnected()
-
-            // TODO: 20/09/2020 repalce with abstraction level?
-//            var deviceInfo: Pair<String, String>? = connection.retrieveSelectedDeviceInfo()
-//            if (deviceInfo == null) {
-//                connection.retrieveSelectedDeviceInfoFromSharedPreferences(
-//                    (view as HomeFragment).requireContext()
-//                )?.let { pair ->
-//                    deviceInfo = pair.first to pair.second
-//                    (connection as BluetoothConnection).getBondedDevices()?.forEach { device ->
-//                        if (device.address == pair.second) {
-//                            (connection as BluetoothConnection).setDevice(device)
-//                            return@forEach
-//                        }
-//                    }
-//                }
-//            }
-//
-//            deviceInfo?.let {
-//                view?.updateSelectedDeviceHint(true, it)
-//            }
         }
     }
 
@@ -123,15 +103,24 @@ class HomeFragmentPresenter @Inject constructor(
         val context = (view as Fragment).requireContext()
 
         if (isConnectionTypeSupported()) {
+            connection.checkIfPreviousDeviceStored(context)
+
             connection.connectionState.observe((view as HomeFragment).viewLifecycleOwner) {
                 when (it!!) {
                     ConnectionState.ON -> {
                         view?.apply {
                             if (connection.selectedDevice == null) {
                                 updateConnectionButton(context.getString(R.string.select_device))
+                                updateSelectedDeviceHint(
+                                    true,
+                                    context.getString(R.string.no_device_selected) to ""
+                                )
                             } else {
                                 updateConnectionMenuIconVisibility(true)
-                                updateSelectedDeviceHint(true)
+                                updateSelectedDeviceHint(
+                                    true,
+                                    connection.getSelectedDeviceCredentials()
+                                )
                                 updateConnectionButton(context.getString(R.string.connect))
                             }
 
