@@ -24,6 +24,8 @@ interface AvailableDevicesFragmentContract {
         fun permissionGranted()
 
         fun permissionDenied()
+
+        fun onStop()
     }
 
     interface View : BaseView<Presenter> {
