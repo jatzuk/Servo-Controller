@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dev.jatzuk.servocontroller.connection.BluetoothConnection
@@ -23,19 +22,12 @@ class BluetoothReceiver(
 
     val isPairingProcess = MutableLiveData<Boolean>()
 
-    init {
-        Log.d(TAG, "$TAG: init")
-    }
-
     override fun onReceive(context: Context, intent: Intent) {
         var state = intent.getIntExtra(BluetoothAdapter.EXTRA_CONNECTION_STATE, -1)
 
         if (state == -1) {
             state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)
         }
-
-        Log.d(TAG, "onReceive: state: $state")
-        Log.d(TAG, "onReceive: action ${intent.action}")
 
         val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
 
@@ -46,7 +38,6 @@ class BluetoothReceiver(
                         connection.connectionState.postValue(ConnectionState.ON)
                     }
                     BluetoothAdapter.STATE_CONNECTING -> {
-                        Log.d(TAG, "onReceive: connecting")
                         connection.connectionState.postValue(ConnectionState.CONNECTING)
                     }
                     BluetoothAdapter.STATE_CONNECTED -> {
@@ -63,20 +54,11 @@ class BluetoothReceiver(
                     BluetoothAdapter.STATE_OFF -> {
                         connection.connectionState.postValue(ConnectionState.OFF)
                     }
-//                    BluetoothAdapter.STATE_TURNING_ON -> {
-//                        Log.d(TAG, "onReceive: turning on")
-//                    }
-//                    BluetoothAdapter.STATE_TURNING_OFF -> {
-//                        Log.d(TAG, "onReceive: turning off")
-//                    }
                     else -> {
-                        Log.d(TAG, "onReceive: state - $state")
+                        /* no-op */
                     }
                 }
             }
-//            BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED -> {
-//                Log.d(TAG, "onReceive: connecting")
-//            }
             BluetoothDevice.ACTION_FOUND -> {
                 device?.let {
                     if (!_availableDevices.value!!.contains(it)) {
@@ -95,7 +77,7 @@ class BluetoothReceiver(
                 }
             }
             else -> {
-                Log.d(TAG, "onReceive: else branch")
+                /* no-op */
             }
         }
     }
