@@ -6,5 +6,5 @@
         android:width="1dp"
         android:color="@color/colorPrimary" />
 
-    <corners android:topRightRadius="128dp" />
+    <corners android:topRightRadius="@dimen/side_nav_bar_corner_radius" />
 </shape>
