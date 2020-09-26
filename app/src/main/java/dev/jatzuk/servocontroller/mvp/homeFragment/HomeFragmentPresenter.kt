@@ -28,7 +28,7 @@ private const val TAG = "HomeFragmentPresenter"
 private const val IS_CONNECTION_ACTIVE_EXTRA = "IS_CONNECTION_ACTIVE_EXTRA"
 
 class HomeFragmentPresenter @Inject constructor(
-    private var view: HomeFragmentContract.View?,
+    var view: HomeFragmentContract.View?,
     var settingsHolder: SettingsHolder,
     private val servoDAO: ServoDAO,
 ) : HomeFragmentContract.Presenter {
@@ -38,6 +38,8 @@ class HomeFragmentPresenter @Inject constructor(
 
     private lateinit var connectionJob: CompletableJob
     private var isWasConnected = false
+
+    private lateinit var connectionStrategy: HomeFragmentContract.ConnectionStrategy
 
     override fun setupRecyclerView(recyclerView: RecyclerView) {
         recyclerView.apply {
@@ -83,6 +85,8 @@ class HomeFragmentPresenter @Inject constructor(
             registerBroadcastReceiver()
             isWasConnected =
                 savedInstanceState?.getBoolean(IS_CONNECTION_ACTIVE_EXTRA, false) ?: isConnected()
+
+            connectionStrategy = HomeFragmentContract.ConnectionStrategy(this)
         }
     }
 
@@ -100,96 +104,116 @@ class HomeFragmentPresenter @Inject constructor(
     }
 
     override fun onStart() {
-        val context = (view as Fragment).requireContext()
 
         if (isConnectionTypeSupported()) {
-            connection.checkIfPreviousDeviceStored(context)
+            connection.checkIfPreviousDeviceStored((view as Fragment).requireContext())
 
             connection.connectionState.observe((view as HomeFragment).viewLifecycleOwner) {
-                when (it!!) {
-                    ConnectionState.ON -> {
-                        view?.apply {
-                            if (connection.selectedDevice == null) {
-                                updateConnectionButton(context.getString(R.string.select_device))
-                                updateSelectedDeviceHint(
-                                    true,
-                                    context.getString(R.string.no_device_selected) to ""
-                                )
-                            } else {
-                                updateConnectionMenuIconVisibility(true)
-                                updateSelectedDeviceHint(
-                                    true,
-                                    connection.getSelectedDeviceCredentials()
-                                )
-                                updateConnectionButton(context.getString(R.string.connect))
-                            }
 
-                            stopAnimation()
-                        }
-                    }
-                    ConnectionState.CONNECTING -> {
-                        view?.apply {
-                            showAnimation(R.raw.bluetooth_loop)
-                            updateConnectionButton(context.getString(R.string.cancel))
-                            updateSelectedDeviceHint(true)
-                        }
-                    }
-                    ConnectionState.CONNECTED -> {
-                        view?.apply {
-                            if (isWasConnected) {
-                                setRecyclerViewVisibility(true)
-                                stopAnimation()
-                            } else {
-                                updateConnectionStateIcon(getIconBasedOnConnectionType())
-                                showAnimation(R.raw.bluetooth_connected, 1f, 1000) {
-                                    setRecyclerViewVisibility(true)
-                                }
-                            }
-                            updateConnectionButton(context.getString(R.string.disconnect), false)
-                            updateSelectedDeviceHint(false)
-                        }
-                    }
-                    ConnectionState.DISCONNECTING -> {
-                        view?.apply {
-                            setRecyclerViewVisibility(false)
-                            updateConnectionButton(context.getString(R.string.connect))
-                            updateSelectedDeviceHint(true)
-                        }
-                    }
-                    ConnectionState.DISCONNECTED -> {
-                        view?.apply {
-                            updateConnectionStateIcon(getIconBasedOnConnectionType())
-                            setRecyclerViewVisibility(false)
-                            showAnimation(R.raw.animation_failure, 0.5f, 2500)
-                            updateConnectionButton(context.getString(R.string.connect))
-                            updateSelectedDeviceHint(true)
-                        }
-                    }
-                    ConnectionState.OFF -> {
-                        view?.apply {
-                            setRecyclerViewVisibility(false)
-                            updateConnectionButton(
-                                context.getString(
-                                    R.string.enable,
-                                    connection.getConnectionType().name
-                                )
+                connectionStrategy.currentStrategy =
+                    when (it!!) {
+                        ConnectionState.ON -> {
+//                        view?.apply {
+//                            if (connection.selectedDevice == null) {
+//                                updateConnectionButton(context.getString(R.string.select_device))
+//                                updateSelectedDeviceHint(
+//                                    true,
+//                                    context.getString(R.string.no_device_selected) to ""
+//                                )
+//                            } else {
+//                                updateConnectionMenuIconVisibility(true)
+//                                updateSelectedDeviceHint(
+//                                    true,
+//                                    connection.getSelectedDeviceCredentials()
+//                                )
+//                                updateConnectionButton(context.getString(R.string.connect))
+//                            }
+//
+//                            stopAnimation()
+//                        }
+//                        connectionStrategy.currentStrategy =
+                            HomeFragmentContract.OnStrategy(
+                                this,
+                                connection.selectedDevice == null
                             )
-                            updateSelectedDeviceHint(false)
-                            showAnimation(R.raw.bluetooth_enable)
+                        }
+                        ConnectionState.CONNECTING -> {
+//                        view?.apply {
+//                            showAnimation(R.raw.bluetooth_loop)
+//                            updateConnectionButton(context.getString(R.string.cancel))
+//                            updateSelectedDeviceHint(true)
+//                        }
+//                        connectionStrategy.currentStrategy =
+                            HomeFragmentContract.ConnectingStrategy(this)
+                        }
+                        ConnectionState.CONNECTED -> {
+//                        view?.apply {
+//                            if (isWasConnected) {
+//                                setRecyclerViewVisibility(true)
+//                                stopAnimation()
+//                            } else {
+//                                updateConnectionStateIcon(getIconBasedOnConnectionType())
+//                                showAnimation(R.raw.bluetooth_connected, 1f, 1000) {
+//                                    setRecyclerViewVisibility(true)
+//                                }
+//                            }
+//                            updateConnectionButton(context.getString(R.string.disconnect), false)
+//                            updateSelectedDeviceHint(false)
+//                        }
+//                        connectionStrategy.currentStrategy =
+                            HomeFragmentContract.ConnectedStrategy(this, isWasConnected)
+                        }
+                        ConnectionState.DISCONNECTING -> {
+//                        view?.apply {
+//                            setRecyclerViewVisibility(false)
+//                            updateConnectionButton(context.getString(R.string.connect))
+//                            updateSelectedDeviceHint(true)
+//                        }
+
+//                        connectionStrategy.currentStrategy =
+                            HomeFragmentContract.DisconnectingStrategy(this)
+                        }
+                        ConnectionState.DISCONNECTED -> {
+//                        view?.apply {
+//                            updateConnectionStateIcon(getIconBasedOnConnectionType())
+//                            setRecyclerViewVisibility(false)
+//                            showAnimation(R.raw.animation_failure, 0.5f, 2500)
+//                            updateConnectionButton(context.getString(R.string.connect))
+//                            updateSelectedDeviceHint(true)
+//                        }
+//                        connectionStrategy.currentStrategy =
+                            HomeFragmentContract.DisconnectedStrategy(this)
+                        }
+                        ConnectionState.OFF -> {
+//                        view?.apply {
+//                            setRecyclerViewVisibility(false)
+//                            updateConnectionButton(
+//                                context.getString(
+//                                    R.string.enable,
+//                                    connection.getConnectionType().name
+//                                )
+//                            )
+//                            updateSelectedDeviceHint(false)
+//                            showAnimation(R.raw.bluetooth_enable)
+//                        }
+
+//                        connectionStrategy.currentStrategy =
+                            HomeFragmentContract.OffStrategy(this)
                         }
                     }
-                }
             }
         } else {
-            val connectionTypeString = context.getString(R.string.connection_type)
-            val unsupportedString = context.getString(R.string.unsupported)
-            view?.apply {
-                showAnimation(R.raw.animation_connection_type_unsupported)
-                updateSelectedDeviceHint(true, connectionTypeString to unsupportedString)
-                updateConnectionButton(
-                    (this as Fragment).requireContext().getString(R.string.change_connection_type)
-                )
-            }
+//            val connectionTypeString = context.getString(R.string.connection_type)
+//            val unsupportedString = context.getString(R.string.unsupported)
+//            view?.apply {
+//                showAnimation(R.raw.animation_connection_type_unsupported)
+//                updateSelectedDeviceHint(true, connectionTypeString to unsupportedString)
+//                updateConnectionButton(
+//                    (this as Fragment).requireContext().getString(R.string.change_connection_type)
+//                )
+//            }
+            connectionStrategy.currentStrategy =
+                HomeFragmentContract.UnsupportedConnectionTypeStrategy(this)
         }
     }
 
@@ -345,7 +369,7 @@ class HomeFragmentPresenter @Inject constructor(
         outState.putBoolean(IS_CONNECTION_ACTIVE_EXTRA, connection.isConnected())
     }
 
-    private fun getIconBasedOnConnectionType() = when (connection.getConnectionType()) {
+    fun getIconBasedOnConnectionType() = when (connection.getConnectionType()) {
         ConnectionType.BLUETOOTH -> {
             if (connection.connectionState.value == ConnectionState.CONNECTED) R.drawable.ic_bluetooth_connected
             else R.drawable.ic_bluetooth_disabled
