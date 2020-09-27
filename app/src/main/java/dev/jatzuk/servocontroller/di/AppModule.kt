@@ -8,7 +8,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dev.jatzuk.servocontroller.connection.ConnectionFactory
 import dev.jatzuk.servocontroller.db.ServoDatabase
 import dev.jatzuk.servocontroller.other.SERVOS_DATABASE_NAME
 import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAME
@@ -39,10 +38,4 @@ object AppModule {
     @Singleton
     @Provides
     fun provideServoDao(db: ServoDatabase) = db.getServoDao()
-
-    @Singleton
-    @Provides
-    fun provideConnection(
-        settingsHolder: SettingsHolder
-    ) = ConnectionFactory.getConnection(settingsHolder.connectionType)
 }
