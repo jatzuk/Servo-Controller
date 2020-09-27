@@ -3,7 +3,6 @@ package dev.jatzuk.servocontroller.mvp.homeFragment
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.res.Configuration
-import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -25,21 +24,17 @@ import kotlinx.coroutines.*
 import javax.inject.Inject
 
 private const val TAG = "HomeFragmentPresenter"
-private const val IS_CONNECTION_ACTIVE_EXTRA = "IS_CONNECTION_ACTIVE_EXTRA"
 
 class HomeFragmentPresenter @Inject constructor(
     var view: HomeFragmentContract.View?,
     var settingsHolder: SettingsHolder,
     private val servoDAO: ServoDAO,
+    var connection: Connection
 ) : HomeFragmentContract.Presenter {
 
-    lateinit var connection: Connection
     private val servos = mutableListOf<Servo>()
 
     private lateinit var connectionJob: CompletableJob
-    private var isWasConnected = false
-
-    private lateinit var connectionStrategy: HomeFragmentContract.ConnectionStrategy
 
     override fun setupRecyclerView(recyclerView: RecyclerView) {
         recyclerView.apply {
@@ -73,20 +68,18 @@ class HomeFragmentPresenter @Inject constructor(
         }
     }
 
-    override fun onViewCreated(savedInstanceState: Bundle?) {
-        connection = ConnectionFactory.getConnection(
-            (view as Fragment).requireContext(),
-            settingsHolder.connectionType
-        )
+    override fun onViewCreated() {
+        val context = (view as Fragment).requireContext()
+
+        val settingsSavedConnectionType = settingsHolder.connectionType
+        if (connection.getConnectionType().name != settingsSavedConnectionType.name) {
+            connection = ConnectionFactory.getConnection(context, settingsSavedConnectionType)
+        }
 
         if (isConnectionTypeSupported()) {
             updateServoList()
-
             registerBroadcastReceiver()
-            isWasConnected =
-                savedInstanceState?.getBoolean(IS_CONNECTION_ACTIVE_EXTRA, false) ?: isConnected()
-
-            connectionStrategy = HomeFragmentContract.ConnectionStrategy(this)
+            connection.checkIfPreviousDeviceStored(context)
         }
     }
 
@@ -104,116 +97,31 @@ class HomeFragmentPresenter @Inject constructor(
     }
 
     override fun onStart() {
-
         if (isConnectionTypeSupported()) {
-            connection.checkIfPreviousDeviceStored((view as Fragment).requireContext())
-
             connection.connectionState.observe((view as HomeFragment).viewLifecycleOwner) {
-
-                connectionStrategy.currentStrategy =
-                    when (it!!) {
-                        ConnectionState.ON -> {
-//                        view?.apply {
-//                            if (connection.selectedDevice == null) {
-//                                updateConnectionButton(context.getString(R.string.select_device))
-//                                updateSelectedDeviceHint(
-//                                    true,
-//                                    context.getString(R.string.no_device_selected) to ""
-//                                )
-//                            } else {
-//                                updateConnectionMenuIconVisibility(true)
-//                                updateSelectedDeviceHint(
-//                                    true,
-//                                    connection.getSelectedDeviceCredentials()
-//                                )
-//                                updateConnectionButton(context.getString(R.string.connect))
-//                            }
-//
-//                            stopAnimation()
-//                        }
-//                        connectionStrategy.currentStrategy =
-                            HomeFragmentContract.OnStrategy(
-                                this,
-                                connection.selectedDevice == null
-                            )
-                        }
-                        ConnectionState.CONNECTING -> {
-//                        view?.apply {
-//                            showAnimation(R.raw.bluetooth_loop)
-//                            updateConnectionButton(context.getString(R.string.cancel))
-//                            updateSelectedDeviceHint(true)
-//                        }
-//                        connectionStrategy.currentStrategy =
-                            HomeFragmentContract.ConnectingStrategy(this)
-                        }
-                        ConnectionState.CONNECTED -> {
-//                        view?.apply {
-//                            if (isWasConnected) {
-//                                setRecyclerViewVisibility(true)
-//                                stopAnimation()
-//                            } else {
-//                                updateConnectionStateIcon(getIconBasedOnConnectionType())
-//                                showAnimation(R.raw.bluetooth_connected, 1f, 1000) {
-//                                    setRecyclerViewVisibility(true)
-//                                }
-//                            }
-//                            updateConnectionButton(context.getString(R.string.disconnect), false)
-//                            updateSelectedDeviceHint(false)
-//                        }
-//                        connectionStrategy.currentStrategy =
-                            HomeFragmentContract.ConnectedStrategy(this, isWasConnected)
-                        }
-                        ConnectionState.DISCONNECTING -> {
-//                        view?.apply {
-//                            setRecyclerViewVisibility(false)
-//                            updateConnectionButton(context.getString(R.string.connect))
-//                            updateSelectedDeviceHint(true)
-//                        }
-
-//                        connectionStrategy.currentStrategy =
-                            HomeFragmentContract.DisconnectingStrategy(this)
-                        }
-                        ConnectionState.DISCONNECTED -> {
-//                        view?.apply {
-//                            updateConnectionStateIcon(getIconBasedOnConnectionType())
-//                            setRecyclerViewVisibility(false)
-//                            showAnimation(R.raw.animation_failure, 0.5f, 2500)
-//                            updateConnectionButton(context.getString(R.string.connect))
-//                            updateSelectedDeviceHint(true)
-//                        }
-//                        connectionStrategy.currentStrategy =
-                            HomeFragmentContract.DisconnectedStrategy(this)
-                        }
-                        ConnectionState.OFF -> {
-//                        view?.apply {
-//                            setRecyclerViewVisibility(false)
-//                            updateConnectionButton(
-//                                context.getString(
-//                                    R.string.enable,
-//                                    connection.getConnectionType().name
-//                                )
-//                            )
-//                            updateSelectedDeviceHint(false)
-//                            showAnimation(R.raw.bluetooth_enable)
-//                        }
-
-//                        connectionStrategy.currentStrategy =
-                            HomeFragmentContract.OffStrategy(this)
-                        }
+                connection.connectionStrategy.currentStrategy = when (it!!) {
+                    ConnectionState.ON -> {
+                        OnStrategy(this, connection.selectedDevice == null)
                     }
+                    ConnectionState.CONNECTING -> {
+                        ConnectingStrategy(this)
+                    }
+                    ConnectionState.CONNECTED -> {
+                        ConnectedStrategy(this, !connection.isConnected())
+                    }
+                    ConnectionState.DISCONNECTING -> {
+                        DisconnectingStrategy(this)
+                    }
+                    ConnectionState.DISCONNECTED -> {
+                        DisconnectedStrategy(this)
+                    }
+                    ConnectionState.OFF -> {
+                        OffStrategy(this)
+                    }
+                }
             }
         } else {
-//            val connectionTypeString = context.getString(R.string.connection_type)
-//            val unsupportedString = context.getString(R.string.unsupported)
-//            view?.apply {
-//                showAnimation(R.raw.animation_connection_type_unsupported)
-//                updateSelectedDeviceHint(true, connectionTypeString to unsupportedString)
-//                updateConnectionButton(
-//                    (this as Fragment).requireContext().getString(R.string.change_connection_type)
-//                )
-//            }
-            connectionStrategy.currentStrategy =
-                HomeFragmentContract.UnsupportedConnectionTypeStrategy(this)
+            connection.connectionStrategy.currentStrategy = UnsupportedConnectionTypeStrategy(this)
         }
     }
 
@@ -233,7 +141,6 @@ class HomeFragmentPresenter @Inject constructor(
             is BluetoothConnection -> {
                 val enableBTIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
                 fragment.startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT)
-
             }
             is WifiConnection -> {
                 // TODO: 03/09/2020 handle wifi connection request enable
@@ -258,7 +165,7 @@ class HomeFragmentPresenter @Inject constructor(
 
         val data = "$command$finalAngle"
         Log.d(TAG, "onFinalPositionDetected: $data")
-//        connection.send(data.toByteArray())
+        connection.send(data.toByteArray())
     }
 
     override fun buildDeviceList() {
@@ -313,7 +220,7 @@ class HomeFragmentPresenter @Inject constructor(
             ConnectionState.ON, ConnectionState.DISCONNECTED -> {
                 connect()
             }
-            ConnectionState.CONNECTING -> {
+            ConnectionState.CONNECTING, ConnectionState.CONNECTED -> {
                 disconnect()
             }
             ConnectionState.OFF -> {
@@ -322,9 +229,6 @@ class HomeFragmentPresenter @Inject constructor(
                     context.getString(R.string.enable, connection.getConnectionType().name)
                 view?.updateConnectionButton(enableString)
                 requestConnectionHardware()
-            }
-            ConnectionState.CONNECTED -> {
-                disconnect()
             }
             else -> {
                 Log.d(TAG, "connectionIconPressed: nothing to do")
@@ -363,10 +267,6 @@ class HomeFragmentPresenter @Inject constructor(
 
     override fun onRequestEnableHardwareReceived() {
         connection.connectionState.postValue(ConnectionState.ON)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean(IS_CONNECTION_ACTIVE_EXTRA, connection.isConnected())
     }
 
     fun getIconBasedOnConnectionType() = when (connection.getConnectionType()) {

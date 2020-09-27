@@ -11,6 +11,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dev.jatzuk.servocontroller.connection.receiver.BluetoothReceiver
+import dev.jatzuk.servocontroller.mvp.homeFragment.ConnectionStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -27,6 +28,7 @@ class BluetoothConnection : Connection {
 
     override var receiver: BroadcastReceiver? = BluetoothReceiver(this)
     override val selectedDevice: Parcelable? get() = ServerDevice.device as BluetoothDevice?
+    override val connectionStrategy = ConnectionStrategy()
 
     override val connectionState = MutableLiveData(
         when (bluetoothAdapter?.state) {
@@ -34,13 +36,6 @@ class BluetoothConnection : Connection {
             else -> ConnectionState.OFF
         }
     )
-
-    init {
-        val saved = (selectedDevice as BluetoothDevice?)
-        saved?.let {
-            setDevice(it)
-        }
-    }
 
     override fun checkIfPreviousDeviceStored(context: Context) {
         val pair = ServerDevice.loadFromSharedPreferences(context)
@@ -71,7 +66,7 @@ class BluetoothConnection : Connection {
     override fun isConnected() = try {
         device?.let {
             val method = it.javaClass.getMethod("isConnected")
-            method.invoke(device) as Boolean
+            method.invoke(it) as Boolean
         }
     } catch (e: IllegalStateException) {
         Log.e(TAG, "isConnected: illegal state exception", e)
@@ -150,6 +145,7 @@ class BluetoothConnection : Connection {
     fun isSelectedDevicePaired() =
         getBondedDevices()?.contains(ServerDevice.device as BluetoothDevice?) ?: false
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T> getAvailableDevices(): LiveData<ArrayList<T>> {
         val devices = (receiver as BluetoothReceiver).availableDevices
         return devices as LiveData<ArrayList<T>>

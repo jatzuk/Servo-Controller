@@ -1,12 +1,9 @@
 package dev.jatzuk.servocontroller.mvp.homeFragment
 
-import android.os.Bundle
 import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.mvp.BasePresenter
 import dev.jatzuk.servocontroller.mvp.BaseView
 import dev.jatzuk.servocontroller.other.Servo
@@ -17,7 +14,7 @@ interface HomeFragmentContract {
 
         fun optionsMenuCreated()
 
-        fun onViewCreated(savedInstanceState: Bundle?)
+        fun onViewCreated()
 
         fun onStart()
 
@@ -54,8 +51,6 @@ interface HomeFragmentContract {
         fun sendData(data: ByteArray): Boolean
 
         fun disconnect()
-
-        fun onSaveInstanceState(outState: Bundle)
     }
 
     interface View : BaseView<Presenter> {

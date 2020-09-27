@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import dev.jatzuk.servocontroller.mvp.homeFragment.ConnectionStrategy
 
 interface Connection {
 
@@ -12,6 +13,7 @@ interface Connection {
 
     val connectionState: MutableLiveData<ConnectionState>
     val selectedDevice: Parcelable?
+    val connectionStrategy: ConnectionStrategy
 
     suspend fun connect(): Boolean
 

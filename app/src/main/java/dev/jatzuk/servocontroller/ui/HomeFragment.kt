@@ -53,17 +53,12 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
         }
 
         setupRecyclerView()
-        presenter.onViewCreated(savedInstanceState)
+        presenter.onViewCreated()
     }
 
     override fun onStart() {
         super.onStart()
         presenter.onStart()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        presenter.onSaveInstanceState(outState)
     }
 
     private fun setupRecyclerView() {

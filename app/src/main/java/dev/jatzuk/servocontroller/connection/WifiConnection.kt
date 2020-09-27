@@ -10,12 +10,14 @@ import android.os.Parcelable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dev.jatzuk.servocontroller.connection.receiver.WifiReceiver
+import dev.jatzuk.servocontroller.mvp.homeFragment.ConnectionStrategy
 
 // TODO: 17/08/2020 class to represent a wifi connection manager
 class WifiConnection(context: Context) : Connection {
 
     override val connectionState = MutableLiveData(ConnectionState.OFF)
     override val selectedDevice: Parcelable? get() = ServerDevice.device as WifiP2pDevice?
+    override val connectionStrategy = ConnectionStrategy()
 
     val manager:
             WifiP2pManager? by lazy(LazyThreadSafetyMode.NONE) {
