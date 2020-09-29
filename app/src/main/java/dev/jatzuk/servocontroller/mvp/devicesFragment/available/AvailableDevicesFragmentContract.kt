@@ -1,6 +1,8 @@
 package dev.jatzuk.servocontroller.mvp.devicesFragment.available
 
 import android.bluetooth.BluetoothDevice
+import android.view.Menu
+import android.view.MenuInflater
 import android.widget.Toast
 import androidx.annotation.RawRes
 import androidx.lifecycle.LiveData
@@ -20,6 +22,10 @@ interface AvailableDevicesFragmentContract {
         fun getAvailableDevices(): LiveData<ArrayList<BluetoothDevice>>?
 
         fun onScanAvailableDevicesPressed()
+
+        fun onConnectionIconPressed()
+
+        fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater)
 
         fun permissionGranted()
 

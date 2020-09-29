@@ -3,6 +3,8 @@ package dev.jatzuk.servocontroller.mvp.devicesFragment.available
 import android.Manifest
 import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -32,7 +34,6 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
     private lateinit var availableDevicesAdapter: DevicesAdapter
     private lateinit var lav: LottieAnimationView
     private lateinit var button: MaterialButton
-    private var isSearching: Boolean = false
 
     override fun onViewCreated(layoutScanAvailableDevices: LayoutLottieAnimationViewButtonBinding) {
         layoutScanAvailableDevices.apply {
@@ -41,6 +42,23 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
 
             button.text = (view as Fragment).requireContext().getString(R.string.scan_devices)
             this@AvailableDevicesFragmentPresenter.button = button
+        }
+
+        (connection as BluetoothConnection).isScanning.observe((view as Fragment).viewLifecycleOwner) {
+            val context = (view as Fragment).requireContext()
+            if (it) {
+                view?.apply {
+                    showAnimation(R.raw.bluetooth_scan)
+                    updateButton(context.getString(R.string.cancel))
+                }
+            } else {
+                view?.apply {
+                    stopAnimation()
+                    updateButton(
+                        context.getString(R.string.scan_devices)
+                    )
+                }
+            }
         }
     }
 
@@ -62,6 +80,17 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
         }
 
         registerReceiver()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        when (connection.getConnectionType()) {
+            ConnectionType.BLUETOOTH -> {
+                if ((connection as BluetoothConnection).isBluetoothLEModeAvailable()) {
+                    inflater.inflate(R.menu.bluetooth_scan_menu, menu)
+                }
+            }
+            ConnectionType.WIFI -> Unit
+        }
     }
 
     override fun onClick(position: Int) {
@@ -121,25 +150,18 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
         connection.registerReceiver((view as Fragment).requireContext())
     }
 
-    override fun onScanAvailableDevicesPressed() {
-        isSearching = if (!isSearching) {
-            checkPermission()
-            true
-        } else {
-            view?.apply {
-                stopAnimation()
-                updateButton((view as Fragment).requireContext().getString(R.string.scan_devices))
-            }
-            connection.stopScan()
-            false
+    override fun onConnectionIconPressed() {
+        when (connection.getConnectionType()) {
+            ConnectionType.BLUETOOTH -> (connection as BluetoothConnection).changeBluetoothMode()
+            ConnectionType.WIFI -> Unit /* no-op */
         }
     }
 
+    override fun onScanAvailableDevicesPressed() {
+        checkPermission()
+    }
+
     override fun permissionGranted() {
-        view?.apply {
-            showAnimation(R.raw.bluetooth_scan)
-            updateButton((view as Fragment).requireContext().getString(R.string.cancel))
-        }
         when (connection.getConnectionType()) {
             ConnectionType.BLUETOOTH -> connection.startScan()
             ConnectionType.WIFI -> Unit //(connection as WifiConnection).getAvailableDevices() // TODO: 15/09/2020 wifi

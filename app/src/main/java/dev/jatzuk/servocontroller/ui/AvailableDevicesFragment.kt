@@ -4,7 +4,7 @@ import android.Manifest
 import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.View
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +28,15 @@ class AvailableDevicesFragment : Fragment(R.layout.fragment_available_devices),
 
     private lateinit var animationJob: CompletableJob
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        setHasOptionsMenu(true)
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentAvailableDevicesBinding.bind(view)
@@ -43,6 +52,21 @@ class AvailableDevicesFragment : Fragment(R.layout.fragment_available_devices),
 
         binding?.layoutScanAvailableDevices?.button?.setOnClickListener {
             presenter.onScanAvailableDevicesPressed()
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        presenter.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.ic_scan_type -> {
+                presenter.onConnectionIconPressed()
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

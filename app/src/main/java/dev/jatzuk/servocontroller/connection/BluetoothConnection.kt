@@ -3,6 +3,8 @@ package dev.jatzuk.servocontroller.connection
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanResult
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
@@ -12,23 +14,40 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dev.jatzuk.servocontroller.connection.receiver.BluetoothReceiver
 import dev.jatzuk.servocontroller.mvp.homeFragment.ConnectionStrategy
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.IOException
 import java.util.*
 
 private const val TAG = "BluetoothConnection"
 private const val UUIDString = "00001101-0000-1000-8000-00805f9b34fb"
+private const val SCAN_TIMEOUT = 10_000L
 
 class BluetoothConnection : Connection {
 
     private val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
+    private val bluetoothLEScanner = bluetoothAdapter?.bluetoothLeScanner
+    private val leScanCallback: ScanCallback = object : ScanCallback() {
+        override fun onScanResult(callbackType: Int, result: ScanResult?) {
+            super.onScanResult(callbackType, result)
+            Log.d(TAG, "onScanResult: $result")
+            result?.let {
+                (receiver as BluetoothReceiver).availableDevices.value!!.add(it.device)
+            }
+        }
+    }
+    private var isBluetoothLEMode = false
+
     private var socket: BluetoothSocket? = null
     private var device: BluetoothDevice? = null
 
     override var receiver: BroadcastReceiver? = BluetoothReceiver(this)
     override val selectedDevice: Parcelable? get() = ServerDevice.device as BluetoothDevice?
     override val connectionStrategy = ConnectionStrategy()
+
+    private val _isScanning = MutableLiveData(false)
+    val isScanning: LiveData<Boolean> get() = _isScanning
+
+    private var connectionTimeoutJob: CompletableJob? = null
 
     override val connectionState = MutableLiveData(
         when (bluetoothAdapter?.state) {
@@ -92,13 +111,54 @@ class BluetoothConnection : Connection {
     fun getBondedDevices() = bluetoothAdapter?.bondedDevices?.toList()
 
     override fun startScan() {
-        stopScan()
-        (receiver as BluetoothReceiver?)?.clearAvailableDevices()
-        bluetoothAdapter?.startDiscovery()
+        if (bluetoothLEScanner != null && isBluetoothLEMode) startLEScan()
+        else startDefaultScan()
+    }
+
+    private fun startDefaultScan() {
+        if (!isScanning.value!!) {
+            connectionTimeoutJob = Job()
+            CoroutineScope(Dispatchers.IO + connectionTimeoutJob!!).launch {
+                delay(SCAN_TIMEOUT)
+                stopScan()
+            }
+            (receiver as BluetoothReceiver?)?.clearAvailableDevices()
+            bluetoothAdapter?.startDiscovery()
+            _isScanning.postValue(true)
+        } else {
+            stopScan()
+        }
+    }
+
+    private fun startLEScan() {
+        if (!_isScanning.value!!) {
+            connectionTimeoutJob = Job()
+            CoroutineScope(Dispatchers.IO + connectionTimeoutJob!!).launch {
+                delay(SCAN_TIMEOUT)
+                stopLEScan()
+            }
+            (receiver as BluetoothReceiver?)?.clearAvailableDevices()
+            bluetoothLEScanner!!.startScan(leScanCallback)
+            _isScanning.postValue(true)
+        } else {
+            stopLEScan()
+        }
+    }
+
+    private fun stopLEScan() {
+        bluetoothLEScanner?.stopScan(leScanCallback)
+        _isScanning.postValue(false)
+        connectionTimeoutJob?.let {
+            if (it.isActive) it.cancel()
+        }
     }
 
     override fun stopScan() {
         bluetoothAdapter?.cancelDiscovery()
+        _isScanning.postValue(false)
+        connectionTimeoutJob?.let {
+            if (it.isActive) it.cancel()
+        }
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
@@ -144,6 +204,12 @@ class BluetoothConnection : Connection {
 
     fun isSelectedDevicePaired() =
         getBondedDevices()?.contains(ServerDevice.device as BluetoothDevice?) ?: false
+
+    fun changeBluetoothMode() {
+        isBluetoothLEMode = !isBluetoothLEMode
+    }
+
+    fun isBluetoothLEModeAvailable() = bluetoothLEScanner != null
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> getAvailableDevices(): LiveData<ArrayList<T>> {

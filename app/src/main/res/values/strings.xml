@@ -32,5 +32,6 @@
     <string name="change_connection_type">Change connection type</string>
     <string name="select_device">Select Device</string>
     <string name="unsupported">Unsupported</string>
+    <string name="bluetooth_scan_mode">Bluetooth scan mode</string>
 
 </resources>
