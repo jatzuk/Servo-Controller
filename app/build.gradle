@@ -81,13 +81,24 @@ dependencies {
 
     def truth_version = "1.0.1"
     testImplementation "com.google.truth:truth:$truth_version"
+
+    // android testing section
     androidTestImplementation "com.google.truth:truth:$truth_version"
 
-    def junit_ext_version="1.1.2"
+    def junit_ext_version = "1.1.2"
     androidTestImplementation "androidx.test.ext:junit:$junit_ext_version"
 
-    def espresso_version="3.3.0"
+    def espresso_version = "3.3.0"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:$espresso_version"
+
+    def mockito_version = "2.1.0"
+    androidTestImplementation "org.mockito:mockito-core:$mockito_version"
+
+    def androidx_test_version = "1.1.2"
+    androidTestImplementation "androidx.test:runner:$androidx_test_version"
+    androidTestImplementation "androidx.test:core:$androidx_test_version"
+    androidTestImplementation "androidx.test.ext:junit-ktx:$androidx_test_version"
 
 //    def leak_canary_version = "2.4"
 //    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leak_canary_version"
