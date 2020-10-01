@@ -33,5 +33,6 @@
     <string name="select_device">Select Device</string>
     <string name="unsupported">Unsupported</string>
     <string name="bluetooth_scan_mode">Bluetooth scan mode</string>
+    <string name="transmission_mode">Transmission mode</string>
 
 </resources>
