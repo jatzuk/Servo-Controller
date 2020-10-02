@@ -11,9 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.adapters.ServoAdapter
 import dev.jatzuk.servocontroller.connection.*
-import dev.jatzuk.servocontroller.db.ServoDAO
+import dev.jatzuk.servocontroller.model.ServosModel
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
-import dev.jatzuk.servocontroller.other.Servo
 import dev.jatzuk.servocontroller.other.ServoTexture
 import dev.jatzuk.servocontroller.other.WriteMode
 import dev.jatzuk.servocontroller.ui.HomeFragment
@@ -28,11 +27,9 @@ private const val TAG = "HomeFragmentPresenter"
 class HomeFragmentPresenter @Inject constructor(
     var view: HomeFragmentContract.View?,
     var settingsHolder: SettingsHolder,
-    private val servoDAO: ServoDAO,
+    private val servosModel: ServosModel,
     var connection: Connection
 ) : HomeFragmentContract.Presenter {
-
-    private val servos = mutableListOf<Servo>()
 
     private lateinit var connectionJob: CompletableJob
 
@@ -77,7 +74,10 @@ class HomeFragmentPresenter @Inject constructor(
         }
 
         if (isConnectionTypeSupported()) {
-            updateServoList()
+            servosModel.servos.observe((view as HomeFragment).viewLifecycleOwner) {
+                view?.submitServosList(it)
+            }
+            servosModel.loadServosFromDB(settingsHolder.servosCount)
             registerBroadcastReceiver()
             connection.checkIfPreviousDeviceStored(context)
         }
@@ -107,7 +107,10 @@ class HomeFragmentPresenter @Inject constructor(
                         ConnectingStrategy(this)
                     }
                     ConnectionState.CONNECTED -> {
-                        ConnectedStrategy(this, !connection.isConnected())
+                        ConnectedStrategy(
+                            this,
+                            !isConnected()
+                        ) // FIXME: 02/10/20 no animation on first connection, viw invisible after recreation
                     }
                     ConnectionState.DISCONNECTING -> {
                         DisconnectingStrategy(this)
@@ -155,7 +158,7 @@ class HomeFragmentPresenter @Inject constructor(
     }
 
     override fun onFinalPositionDetected(layoutPosition: Int, angle: Int) {
-        val servo = servos[layoutPosition]
+        val servo = servosModel.getServoAt(layoutPosition)
         val command = servo.command
 
         val finalAngle = when (servo.writeMode) {
@@ -204,12 +207,8 @@ class HomeFragmentPresenter @Inject constructor(
             val fragment = (this@HomeFragmentPresenter.view as HomeFragment)
             onClosed {
                 val servo = getUpdatedServo()
-                servos[layoutPosition] = servo
-                fragment.submitServosList(servos.toList())
-
-                CoroutineScope(Dispatchers.IO).launch {
-                    servoDAO.insertServo(servo)
-                }
+                servosModel.saveServoAt(layoutPosition, servo)
+                this@HomeFragmentPresenter.view?.updateDataSetAt(layoutPosition)
             }
             show(fragment.parentFragmentManager, "ServoSetupDialog")
         }
@@ -277,21 +276,6 @@ class HomeFragmentPresenter @Inject constructor(
         ConnectionType.WIFI -> {
             if (connection.connectionState.value == ConnectionState.CONNECTED) R.drawable.ic_wifi_connected
             else R.drawable.ic_wifi_disabled
-        }
-    }
-
-    private fun updateServoList() {
-        servos.clear()
-        CoroutineScope(Dispatchers.IO).launch {
-            repeat(settingsHolder.servosCount) { i ->
-                val servo = servoDAO.getServoByOrder(i)
-                if (servo == null) {
-                    servos.add(Servo(i))
-                    return@repeat
-                }
-                servos.add(servo)
-            }
-            (view as HomeFragment).submitServosList(servos.toList())
         }
     }
 

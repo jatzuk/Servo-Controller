@@ -70,6 +70,10 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
         servoAdapter.submitList(servos)
     }
 
+    override fun updateDataSetAt(index: Int) {
+        servoAdapter.notifyItemChanged(index)
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {

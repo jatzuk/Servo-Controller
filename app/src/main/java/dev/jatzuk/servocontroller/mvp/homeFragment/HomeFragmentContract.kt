@@ -65,6 +65,8 @@ interface HomeFragmentContract {
 
         fun submitServosList(servos: List<Servo>)
 
+        fun updateDataSetAt(index: Int)
+
         fun setRecyclerViewVisibility(isVisible: Boolean)
 
         fun showAnimation(
