@@ -38,7 +38,6 @@ class HomeFragmentPresenter @Inject constructor(
             adapter = ServoAdapter(settingsHolder.texture)
             layoutManager = getRecyclerViewLayoutManager()
             addItemDecoration(BottomPaddingDecoration(recyclerView.context))
-            setHasFixedSize(true)
         }
     }
 
@@ -107,10 +106,9 @@ class HomeFragmentPresenter @Inject constructor(
                         ConnectingStrategy(this)
                     }
                     ConnectionState.CONNECTED -> {
-                        ConnectedStrategy(
-                            this,
-                            !isConnected()
-                        ) // FIXME: 02/10/20 no animation on first connection, viw invisible after recreation
+                        val shouldShowConnectedAnimation =
+                            connection.connectionStrategy.currentStrategy !is ConnectedStrategy
+                        ConnectedStrategy(this, shouldShowConnectedAnimation)
                     }
                     ConnectionState.DISCONNECTING -> {
                         DisconnectingStrategy(this)
