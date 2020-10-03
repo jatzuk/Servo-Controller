@@ -34,6 +34,13 @@ class DevicesFragmentPresenter @Inject constructor(
                             showAnimation(R.raw.bluetooth_enable)
                         }
                     }
+                    ConnectionState.CONNECTED -> {
+                        // TODO: 03/10/20 show button to disconnect first, then scan
+                        view?.apply {
+                            updateTabLayoutVisibility(true)
+                            stopAnimation()
+                        }
+                    }
                     else -> {
                         // TODO: 11/09/2020 handle other stuff
                     }
