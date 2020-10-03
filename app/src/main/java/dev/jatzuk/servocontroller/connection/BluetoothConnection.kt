@@ -37,7 +37,6 @@ class BluetoothConnection : Connection {
     }
     private var isBluetoothLEMode = false
 
-    private var socket: BluetoothSocket? = null
     private var device: BluetoothDevice? = null
 
     override var receiver: BroadcastReceiver? = BluetoothReceiver(this)
@@ -70,6 +69,10 @@ class BluetoothConnection : Connection {
                     }
                 }
             }
+        } else {
+            device = selectedDevice as BluetoothDevice
+            // we have active connection socket -> notify observer(presenter) for ui sync update
+            if (isConnected()) connectionState.postValue(ConnectionState.CONNECTED)
         }
     }
 
@@ -85,7 +88,7 @@ class BluetoothConnection : Connection {
     override fun isConnected() = try {
         device?.let {
             val method = it.javaClass.getMethod("isConnected")
-            method.invoke(it) as Boolean
+            method.invoke(it) as Boolean && socket != null
         }
     } catch (e: IllegalStateException) {
         Log.e(TAG, "isConnected: illegal state exception", e)
@@ -191,6 +194,7 @@ class BluetoothConnection : Connection {
         try {
             connectionState.postValue(ConnectionState.DISCONNECTING)
             socket?.close()
+            socket = null
             true
         } catch (e: IOException) {
             Log.e(TAG, "Could not close the client socket", e)
@@ -228,5 +232,10 @@ class BluetoothConnection : Connection {
 
     override fun unregisterReceiver(context: Context) {
         context.unregisterReceiver(receiver)
+    }
+
+    companion object {
+
+        private var socket: BluetoothSocket? = null
     }
 }
