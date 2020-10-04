@@ -15,7 +15,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "dev.jatzuk.servocontroller.HiltTestRunner"
     }
 
     buildFeatures {
@@ -100,6 +100,15 @@ dependencies {
     androidTestImplementation "androidx.test:runner:$androidx_test_version"
     androidTestImplementation "androidx.test:core:$androidx_test_version"
     androidTestImplementation "androidx.test.ext:junit-ktx:$androidx_test_version"
+
+    // androidx.fragment
+    def fragment_version = "1.2.0-rc01" // must use for new factory stuff
+    debugImplementation "androidx.fragment:fragment-testing:$fragment_version"
+    implementation "androidx.fragment:fragment:$fragment_version"
+
+    // hilt
+    androidTestImplementation  "com.google.dagger:hilt-android-testing:$hilt_version"
+    kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hilt_version"
 
 //    def leak_canary_version = "2.4"
 //    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leak_canary_version"

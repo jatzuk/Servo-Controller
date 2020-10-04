@@ -1,26 +1,35 @@
 package dev.jatzuk.servocontroller.db
 
-import android.content.Context
-import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
+import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import dev.jatzuk.servocontroller.other.Servo
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.io.IOException
+import javax.inject.Inject
+import javax.inject.Named
 
-class ServoDatabaseTest {
+@SmallTest
+@HiltAndroidTest
+class ServoDAOTest {
+
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
+
+    @Inject
+    @Named("test_db")
+    lateinit var db: ServoDatabase
 
     private lateinit var servosDao: ServoDAO
-    private lateinit var db: ServoDatabase
 
     @Before
     fun setUp() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
-        db = Room.inMemoryDatabaseBuilder(context, ServoDatabase::class.java).build()
+        hiltRule.inject()
         servosDao = db.getServoDao()
-
         servosDao.insertServo(Servo(0))
     }
 
