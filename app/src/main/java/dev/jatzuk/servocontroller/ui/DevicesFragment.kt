@@ -1,7 +1,5 @@
 package dev.jatzuk.servocontroller.ui
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -13,8 +11,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.databinding.FragmentDevicesBinding
 import dev.jatzuk.servocontroller.mvp.devicesFragment.DevicesFragmentContract
-import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
-import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_WIFI
 import javax.inject.Inject
 
 private const val TAG = "DevicesFragment"
@@ -78,19 +74,6 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
         binding?.layoutEnableHardwareRequest?.lav?.apply {
             visibility = View.GONE
             cancelAnimation()
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                REQUEST_ENABLE_BT, REQUEST_ENABLE_WIFI -> presenter.onRequestEnableHardwareReceived()
-//                REQUEST_ENABLE_WIFI -> presenter.onWIFIRequestEnableReceived()
-            }
-        } else {
-            // FIXME: 02/09/2020 replace with animation?
-            showToast(getString(R.string.enable_connection_module_info))
         }
     }
 

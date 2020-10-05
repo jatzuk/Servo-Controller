@@ -1,7 +1,5 @@
 package dev.jatzuk.servocontroller.mvp.homeFragment
 
-import android.bluetooth.BluetoothAdapter
-import android.content.Intent
 import android.content.res.Configuration
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,9 +11,11 @@ import dev.jatzuk.servocontroller.adapters.ServoAdapter
 import dev.jatzuk.servocontroller.connection.*
 import dev.jatzuk.servocontroller.model.ServosModel
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
+import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_WIFI
 import dev.jatzuk.servocontroller.other.ServoTexture
 import dev.jatzuk.servocontroller.other.WriteMode
 import dev.jatzuk.servocontroller.ui.HomeFragment
+import dev.jatzuk.servocontroller.ui.MainActivity
 import dev.jatzuk.servocontroller.ui.ServoSetupDialog
 import dev.jatzuk.servocontroller.utils.BottomPaddingDecoration
 import dev.jatzuk.servocontroller.utils.SettingsHolder
@@ -137,18 +137,13 @@ class HomeFragmentPresenter @Inject constructor(
     override fun isConnected() = connection.isConnected()
 
     override fun requestConnectionHardware() {
-        val fragment = view as Fragment
-        when (connection) {
-            is BluetoothConnection -> {
-                val enableBTIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                fragment.startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT)
-            }
-            is WifiConnection -> {
-                // TODO: 03/09/2020 handle wifi connection request enable
-//                val enableWifiIntent = Intent()
-//                fragment.startActivityForResult(enableWifiIntent, REQUEST_ENABLE_WIFI)
-            }
+        val requestCode = when (connection) {
+            is BluetoothConnection -> REQUEST_ENABLE_BT
+            is WifiConnection -> REQUEST_ENABLE_WIFI
+            else -> -1
         }
+        ((view as Fragment).requireActivity() as MainActivity)
+            .enableHardwareContractLauncher.launch(requestCode)
     }
 
     override fun onServoSettingsTapped(layoutPosition: Int) {

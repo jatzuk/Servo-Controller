@@ -1,7 +1,5 @@
 package dev.jatzuk.servocontroller.ui
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -15,8 +13,6 @@ import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.adapters.ServoAdapter
 import dev.jatzuk.servocontroller.databinding.FragmentHomeBinding
 import dev.jatzuk.servocontroller.mvp.homeFragment.HomeFragmentContract
-import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
-import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_WIFI
 import dev.jatzuk.servocontroller.other.Servo
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -72,19 +68,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
 
     override fun updateDataSetAt(index: Int) {
         servoAdapter.notifyItemChanged(index)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                REQUEST_ENABLE_BT, REQUEST_ENABLE_WIFI -> presenter.onRequestEnableHardwareReceived()
-//                REQUEST_ENABLE_WIFI -> presenter.onWIFIRequestEnableReceived()
-            }
-        } else {
-            // FIXME: 02/09/2020
-            showToast(getString(R.string.enable_connection_module_info))
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
