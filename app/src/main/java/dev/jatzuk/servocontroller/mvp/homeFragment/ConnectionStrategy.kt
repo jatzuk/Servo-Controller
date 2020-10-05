@@ -88,7 +88,7 @@ class OnStrategy(
     }
 
     override fun provideButtonText(): String {
-        val resourceId = if (isSelectedDeviceNull) R.string.no_device_selected else R.string.connect
+        val resourceId = if (isSelectedDeviceNull) R.string.select_device else R.string.connect
         return getContext().getString(resourceId)
     }
 }
