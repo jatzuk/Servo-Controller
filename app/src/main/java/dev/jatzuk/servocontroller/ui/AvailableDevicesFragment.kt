@@ -1,17 +1,14 @@
 package dev.jatzuk.servocontroller.ui
 
 import android.Manifest
-import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieDrawable
 import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
-import dev.jatzuk.servocontroller.adapters.DevicesAdapter
 import dev.jatzuk.servocontroller.databinding.FragmentAvailableDevicesBinding
 import dev.jatzuk.servocontroller.mvp.devicesFragment.available.AvailableDevicesFragmentContract
 import kotlinx.coroutines.*
@@ -44,10 +41,6 @@ class AvailableDevicesFragment : Fragment(R.layout.fragment_available_devices),
         presenter.apply {
             onViewCreated(binding!!.layoutScanAvailableDevices)
             setupRecyclerView(binding!!.recyclerView)
-
-            getAvailableDevices()!!.observe(viewLifecycleOwner) {
-                binding!!.recyclerView.updateAdapterDataSet(it)
-            }
         }
 
         binding?.layoutScanAvailableDevices?.button?.setOnClickListener {
@@ -129,13 +122,6 @@ class AvailableDevicesFragment : Fragment(R.layout.fragment_available_devices),
         binding?.layoutScanAvailableDevices?.button?.apply {
             this.text = text
             visibility = if (isVisible) View.VISIBLE else View.GONE
-        }
-    }
-
-    private fun RecyclerView.updateAdapterDataSet(devices: List<BluetoothDevice>) {
-        (adapter as DevicesAdapter).apply {
-            submitList(devices)
-            notifyDataSetChanged()
         }
     }
 

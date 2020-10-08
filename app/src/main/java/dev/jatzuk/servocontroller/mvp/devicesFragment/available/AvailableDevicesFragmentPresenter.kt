@@ -3,6 +3,8 @@ package dev.jatzuk.servocontroller.mvp.devicesFragment.available
 import android.Manifest
 import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
+import android.net.wifi.p2p.WifiP2pDevice
+import android.os.Parcelable
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
@@ -14,24 +16,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.button.MaterialButton
 import dev.jatzuk.servocontroller.R
-import dev.jatzuk.servocontroller.adapters.DevicesAdapter
-import dev.jatzuk.servocontroller.connection.BluetoothConnection
-import dev.jatzuk.servocontroller.connection.Connection
-import dev.jatzuk.servocontroller.connection.ConnectionType
-import dev.jatzuk.servocontroller.connection.ServerDevice
+import dev.jatzuk.servocontroller.adapters.AbstractAdapter
+import dev.jatzuk.servocontroller.adapters.BluetoothDeviceAdapter
+import dev.jatzuk.servocontroller.adapters.WifiDeviceAdapter
+import dev.jatzuk.servocontroller.connection.*
 import dev.jatzuk.servocontroller.connection.receiver.BluetoothReceiver
 import dev.jatzuk.servocontroller.databinding.LayoutLottieAnimationViewButtonBinding
 import dev.jatzuk.servocontroller.other.ACCESS_FINE_LOCATION_REQUEST_CODE
 import dev.jatzuk.servocontroller.utils.BottomPaddingDecoration
 import javax.inject.Inject
 
+private const val TAG = "AvailableDevicesFragmen"
+
 class AvailableDevicesFragmentPresenter @Inject constructor(
     private var view: AvailableDevicesFragmentContract.View?,
     private val connection: Connection,
-) : AvailableDevicesFragmentContract.Presenter, DevicesAdapter.OnSelectedDeviceClickListener {
+) : AvailableDevicesFragmentContract.Presenter, AbstractAdapter.OnSelectedDeviceClickListener {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var availableDevicesAdapter: DevicesAdapter
+    private lateinit var availableDevicesAdapter: AbstractAdapter<out Parcelable>//DevicesAdapter
     private lateinit var lav: LottieAnimationView
     private lateinit var button: MaterialButton
 
@@ -44,18 +47,60 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
             this@AvailableDevicesFragmentPresenter.button = button
         }
 
-        (connection as BluetoothConnection).isScanning.observe((view as Fragment).viewLifecycleOwner) {
-            val context = (view as Fragment).requireContext()
+        val availableDevices = when (connection.getConnectionType()) {
+            ConnectionType.BLUETOOTH -> getAvailableDevices<BluetoothDevice>()
+            ConnectionType.WIFI -> getAvailableDevices<WifiP2pDevice>()
+        }
+
+        availableDevices.observe((view as Fragment).viewLifecycleOwner) {
+            recyclerView.updateAdapterDataSet(it)
+        }
+
+        when (connection) {
+            is BluetoothConnection -> observeBluetoothConnection()
+            is WifiConnection -> observeWifiConnection()
+        }
+    }
+
+    private fun <T> RecyclerView.updateAdapterDataSet(devices: List<T>) {
+        (adapter as AbstractAdapter<*>).apply {
+            submitList(devices as List<Nothing>?)
+            notifyDataSetChanged()
+        }
+    }
+
+    private fun observeBluetoothConnection() {
+        val fragment = (view as Fragment)
+        (connection as BluetoothConnection).isScanning.observe(fragment.viewLifecycleOwner) {
             if (it) {
                 view?.apply {
                     showAnimation(R.raw.bluetooth_scan)
-                    updateButton(context.getString(R.string.cancel))
+                    updateButton(fragment.requireContext().getString(R.string.cancel))
                 }
             } else {
                 view?.apply {
                     stopAnimation()
                     updateButton(
-                        context.getString(R.string.scan_devices)
+                        fragment.requireContext().getString(R.string.scan_devices)
+                    )
+                }
+            }
+        }
+    }
+
+    private fun observeWifiConnection() {
+        val fragment = (view as Fragment)
+        (connection as WifiConnection).isScanning.observe(fragment.viewLifecycleOwner) {
+            if (it) {
+                view?.apply {
+                    showAnimation(R.raw.bluetooth_scan) // TODO: 07/10/2020 wifi
+                    updateButton(fragment.requireContext().getString(R.string.cancel))
+                }
+            } else {
+                view?.apply {
+                    stopAnimation()
+                    updateButton(
+                        fragment.requireContext().getString(R.string.scan_devices)
                     )
                 }
             }
@@ -64,9 +109,12 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
 
     override fun setupRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
-        val devicesAdapter = DevicesAdapter(this).also {
-            availableDevicesAdapter = it
+
+        val devicesAdapter = when (connection.getConnectionType()) {
+            ConnectionType.BLUETOOTH -> BluetoothDeviceAdapter(this)
+            ConnectionType.WIFI -> WifiDeviceAdapter(this)
         }
+        availableDevicesAdapter = devicesAdapter
         recyclerView.apply {
             adapter = devicesAdapter
             addItemDecoration(BottomPaddingDecoration(recyclerView.context))
@@ -74,7 +122,7 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
             selectedItemPosition.value?.let {
                 post {
                     val viewHolder = recyclerView.findViewHolderForAdapterPosition(it)
-                    (viewHolder as DevicesAdapter.ViewHolder?)?.setSelectedColor()
+                    (viewHolder as AbstractAdapter.AbstractDeviceViewHolder<*>?)?.setSelectedColor()
                 }
             }
         }
@@ -89,45 +137,58 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
                     inflater.inflate(R.menu.bluetooth_scan_menu, menu)
                 }
             }
-            ConnectionType.WIFI -> Unit
+            ConnectionType.WIFI -> {
+                // TODO: 07/10/2020 wifi direct or smth else?
+            }
         }
     }
 
     override fun onClick(position: Int) {
-        val device = availableDevicesAdapter.currentList[position]
-        if (device.bondState == BluetoothDevice.BOND_NONE) {
-            (connection.receiver as BluetoothReceiver).isPairingProcess.observe((view as Fragment).viewLifecycleOwner) {
-                it?.let {
-                    if (it) {
-                        previouslySelectedItemPosition.value?.let { prevIndex ->
-                            rebindItemAt(prevIndex)
-                        }
-                        view?.showAnimation(R.raw.bluetooth_pairing)
-                    } else {
-                        val itemView = recyclerView.findViewHolderForAdapterPosition(position)
-                        (itemView as DevicesAdapter.ViewHolder).bind(device)
-                        updateSelectedItem(position)
-                        view?.stopAnimation()
+        when (connection) {
+            is BluetoothConnection -> {
+                val device = availableDevicesAdapter.currentList[position] as BluetoothDevice
+                val bluetoothReceiver = connection.receiver as BluetoothReceiver
 
-                        (connection.receiver as BluetoothReceiver).isPairingProcess.removeObservers(
-                            (view as Fragment).viewLifecycleOwner
-                        )
-                        (connection.receiver as BluetoothReceiver).isPairingProcess.postValue(null)
+                if (device.bondState == BluetoothDevice.BOND_NONE) {
+                    bluetoothReceiver.isPairingProcess.observe((view as Fragment).viewLifecycleOwner) {
+                        it?.let {
+                            if (it) {
+                                previouslySelectedItemPosition.value?.let { prevIndex ->
+                                    rebindItemAt(prevIndex)
+                                }
+                                view?.showAnimation(R.raw.bluetooth_pairing)
+                            } else {
+                                val itemView =
+                                    recyclerView.findViewHolderForAdapterPosition(position)
+                                (itemView as BluetoothDeviceAdapter.BluetoothDeviceViewHolder).bind(
+                                    device
+                                )
+                                updateSelectedItem(position)
+                                view?.stopAnimation()
+
+                                bluetoothReceiver.isPairingProcess
+                                    .removeObservers((view as Fragment).viewLifecycleOwner)
+                                bluetoothReceiver.isPairingProcess.postValue(null)
+                            }
+                        } ?: view?.stopAnimation()
                     }
-                } ?: view?.stopAnimation()
-            }
-            device.createBond()
-        } else {
-            previouslySelectedItemPosition.value?.let {
-                val prevItem = recyclerView.findViewHolderForAdapterPosition(it)
-                prevItem?.let { viewHolder ->
-                    if (previouslySelectedItemPosition.value!! != position) {
-                        (viewHolder as DevicesAdapter.ViewHolder).reset()
+                    device.createBond()
+                } else {
+                    previouslySelectedItemPosition.value?.let {
+                        val prevItem = recyclerView.findViewHolderForAdapterPosition(it)
+                        prevItem?.let { viewHolder ->
+                            if (previouslySelectedItemPosition.value!! != position) {
+                                (viewHolder as BluetoothDeviceAdapter.BluetoothDeviceViewHolder).reset()
+                            }
+                        }
                     }
+
+                    updateSelectedItem(position)
                 }
             }
+            is WifiConnection -> {
 
-            updateSelectedItem(position)
+            }
         }
     }
 
@@ -162,13 +223,10 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
     }
 
     override fun permissionGranted() {
-        when (connection.getConnectionType()) {
-            ConnectionType.BLUETOOTH -> connection.startScan()
-            ConnectionType.WIFI -> Unit //(connection as WifiConnection).getAvailableDevices() // TODO: 15/09/2020 wifi
-        }
+        connection.startScan()
     }
 
-    override fun getAvailableDevices(): LiveData<ArrayList<BluetoothDevice>> =
+    override fun <T> getAvailableDevices(): LiveData<ArrayList<T>> =
         connection.getAvailableDevices()
 
     override fun permissionDenied() {
@@ -197,7 +255,7 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
     }
 
     override fun onStop() {
-        ServerDevice.writeToSharedPreferences((view as Fragment).requireContext(), connection)
+        RemoteDevice.writeToSharedPreferences((view as Fragment).requireContext(), connection)
     }
 
     override fun onDestroy() {

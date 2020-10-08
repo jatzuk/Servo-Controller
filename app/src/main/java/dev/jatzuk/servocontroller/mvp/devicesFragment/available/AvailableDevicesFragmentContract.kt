@@ -1,6 +1,5 @@
 package dev.jatzuk.servocontroller.mvp.devicesFragment.available
 
-import android.bluetooth.BluetoothDevice
 import android.view.Menu
 import android.view.MenuInflater
 import android.widget.Toast
@@ -19,7 +18,7 @@ interface AvailableDevicesFragmentContract {
 
         fun setupRecyclerView(recyclerView: RecyclerView)
 
-        fun getAvailableDevices(): LiveData<ArrayList<BluetoothDevice>>?
+        fun <T> getAvailableDevices(): LiveData<ArrayList<T>>?
 
         fun onScanAvailableDevicesPressed()
 
