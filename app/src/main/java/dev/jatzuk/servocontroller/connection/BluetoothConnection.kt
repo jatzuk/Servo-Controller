@@ -40,7 +40,7 @@ class BluetoothConnection : Connection {
     private var device: BluetoothDevice? = null
 
     override var receiver: BroadcastReceiver? = BluetoothReceiver(this)
-    override val selectedDevice: Parcelable? get() = ServerDevice.device as BluetoothDevice?
+    override val selectedDevice: Parcelable? get() = RemoteDevice.device as BluetoothDevice?
     override val connectionStrategy = ConnectionStrategy()
 
     private val _isScanning = MutableLiveData(false)
@@ -56,7 +56,7 @@ class BluetoothConnection : Connection {
     )
 
     override fun checkIfPreviousDeviceStored(context: Context) {
-        val pair = ServerDevice.loadFromSharedPreferences(context)
+        val pair = RemoteDevice.loadFromSharedPreferences(context)
         if (selectedDevice == null) {
             pair?.let {
                 val bonded = getBondedDevices()
@@ -78,7 +78,7 @@ class BluetoothConnection : Connection {
 
     fun setDevice(device: BluetoothDevice) {
         this.device = device
-        ServerDevice.device = device
+        RemoteDevice.device = device
     }
 
     override fun getSelectedDeviceCredentials() = (selectedDevice as BluetoothDevice?)?.let {
@@ -207,7 +207,7 @@ class BluetoothConnection : Connection {
     override fun getConnectionType() = ConnectionType.BLUETOOTH
 
     fun isSelectedDevicePaired() =
-        getBondedDevices()?.contains(ServerDevice.device as BluetoothDevice?) ?: false
+        getBondedDevices()?.contains(RemoteDevice.device as BluetoothDevice?) ?: false
 
     fun changeBluetoothMode() {
         isBluetoothLEMode = !isBluetoothLEMode

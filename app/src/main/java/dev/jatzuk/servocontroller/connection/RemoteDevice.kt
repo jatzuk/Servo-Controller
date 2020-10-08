@@ -6,7 +6,7 @@ import android.os.Parcelable
 import dev.jatzuk.servocontroller.other.SELECTED_DEVICE_DATA_EXTRA
 import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAME
 
-object ServerDevice {
+object RemoteDevice {
 
     var device: Parcelable? = null
 
