@@ -12,6 +12,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
+    <!--    Note: Apps holding android.Manifest.permission.NETWORK_SETTINGS permission are-->
+    <!--    exempted from scan throttling.-->
+    <uses-permission android:name="android.Manifest.permission.NETWORK_SETTINGS" />
+
     <uses-feature
         android:name="android.hardware.bluetooth_le"
         android:required="false" />

@@ -17,8 +17,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.button.MaterialButton
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.adapters.AbstractAdapter
-import dev.jatzuk.servocontroller.adapters.BluetoothDeviceAdapter
-import dev.jatzuk.servocontroller.adapters.WifiDeviceAdapter
+import dev.jatzuk.servocontroller.adapters.ParcelableDevicesAdapter
 import dev.jatzuk.servocontroller.connection.*
 import dev.jatzuk.servocontroller.connection.receiver.BluetoothReceiver
 import dev.jatzuk.servocontroller.databinding.LayoutLottieAnimationViewButtonBinding
@@ -34,7 +33,7 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
 ) : AvailableDevicesFragmentContract.Presenter, AbstractAdapter.OnSelectedDeviceClickListener {
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var availableDevicesAdapter: AbstractAdapter<out Parcelable>//DevicesAdapter
+    private lateinit var availableDevicesAdapter: AbstractAdapter<out Parcelable>
     private lateinit var lav: LottieAnimationView
     private lateinit var button: MaterialButton
 
@@ -62,6 +61,7 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun <T> RecyclerView.updateAdapterDataSet(devices: List<T>) {
         (adapter as AbstractAdapter<*>).apply {
             submitList(devices as List<Nothing>?)
@@ -110,10 +110,7 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
     override fun setupRecyclerView(recyclerView: RecyclerView) {
         this.recyclerView = recyclerView
 
-        val devicesAdapter = when (connection.getConnectionType()) {
-            ConnectionType.BLUETOOTH -> BluetoothDeviceAdapter(this)
-            ConnectionType.WIFI -> WifiDeviceAdapter(this)
-        }
+        val devicesAdapter = ParcelableDevicesAdapter(connection.getConnectionType(), this)
         availableDevicesAdapter = devicesAdapter
         recyclerView.apply {
             adapter = devicesAdapter
@@ -138,7 +135,9 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
                 }
             }
             ConnectionType.WIFI -> {
-                // TODO: 07/10/2020 wifi direct or smth else?
+                if ((connection as WifiConnection).isWifiP2pModeEnabled()) {
+                    inflater.inflate(R.menu.wifi_scan_menu, menu)
+                }
             }
         }
     }
@@ -160,7 +159,7 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
                             } else {
                                 val itemView =
                                     recyclerView.findViewHolderForAdapterPosition(position)
-                                (itemView as BluetoothDeviceAdapter.BluetoothDeviceViewHolder).bind(
+                                (itemView as ParcelableDevicesAdapter.ParcelableViewHolder).bind(
                                     device
                                 )
                                 updateSelectedItem(position)
@@ -178,7 +177,7 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
                         val prevItem = recyclerView.findViewHolderForAdapterPosition(it)
                         prevItem?.let { viewHolder ->
                             if (previouslySelectedItemPosition.value!! != position) {
-                                (viewHolder as BluetoothDeviceAdapter.BluetoothDeviceViewHolder).reset()
+                                (viewHolder as ParcelableDevicesAdapter.ParcelableViewHolder).reset()
                             }
                         }
                     }
@@ -187,7 +186,20 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
                 }
             }
             is WifiConnection -> {
+                previouslySelectedItemPosition.value?.let {
+                    val prevItem = recyclerView.findViewHolderForAdapterPosition(it)
+                    prevItem?.let { viewHolder ->
+                        if (previouslySelectedItemPosition.value!! != position) {
+                            (viewHolder as ParcelableDevicesAdapter.ParcelableViewHolder).reset()
+                        }
+                    }
+                }
 
+                selectedItemPosition.value = position
+                val viewHolder =
+                    (recyclerView.findViewHolderForAdapterPosition(position) as ParcelableDevicesAdapter.ParcelableViewHolder)
+                viewHolder.setSelectedColor()
+                previouslySelectedItemPosition.value = position
             }
         }
     }
@@ -195,16 +207,16 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
     private fun updateSelectedItem(position: Int) {
         selectedItemPosition.value = position
         val viewHolder =
-            (recyclerView.findViewHolderForAdapterPosition(position) as DevicesAdapter.ViewHolder)
+            (recyclerView.findViewHolderForAdapterPosition(position) as ParcelableDevicesAdapter.ParcelableViewHolder)
         viewHolder.setSelectedColor()
-        (connection as BluetoothConnection).setDevice(availableDevicesAdapter.currentList[position])
+        (connection as BluetoothConnection).setDevice(availableDevicesAdapter.currentList[position] as BluetoothDevice)
         previouslySelectedItemPosition.value = position
     }
 
     private fun rebindItemAt(position: Int) {
         val itemView = recyclerView.findViewHolderForAdapterPosition(position)
         val previouslySelectedDevice = availableDevicesAdapter.currentList[position]
-        (itemView as DevicesAdapter.ViewHolder).bind(previouslySelectedDevice)
+        (itemView as ParcelableDevicesAdapter.ParcelableViewHolder).bind(previouslySelectedDevice as BluetoothDevice)
     }
 
     private fun registerReceiver() {
@@ -214,7 +226,7 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
     override fun onConnectionIconPressed() {
         when (connection.getConnectionType()) {
             ConnectionType.BLUETOOTH -> (connection as BluetoothConnection).changeBluetoothMode()
-            ConnectionType.WIFI -> Unit /* no-op */
+            ConnectionType.WIFI -> (connection as WifiConnection).changeWifiMode()
         }
     }
 

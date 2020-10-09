@@ -1,14 +1,17 @@
 package dev.jatzuk.servocontroller.mvp.devicesFragment
 
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.google.android.material.tabs.TabLayoutMediator
 import dev.jatzuk.servocontroller.R
-import dev.jatzuk.servocontroller.connection.BluetoothConnection
-import dev.jatzuk.servocontroller.connection.Connection
-import dev.jatzuk.servocontroller.connection.ConnectionState
-import dev.jatzuk.servocontroller.connection.WifiConnection
+import dev.jatzuk.servocontroller.connection.*
+import dev.jatzuk.servocontroller.databinding.FragmentDevicesBinding
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_WIFI
+import dev.jatzuk.servocontroller.ui.AvailableDevicesFragment
 import dev.jatzuk.servocontroller.ui.MainActivity
+import dev.jatzuk.servocontroller.ui.PairedDevicesFragment
 import javax.inject.Inject
 
 private const val TAG = "DevicesFragmentPretr"
@@ -17,6 +20,27 @@ class DevicesFragmentPresenter @Inject constructor(
     private var view: DevicesFragmentContract.View?,
     private val connection: Connection,
 ) : DevicesFragmentContract.Presenter {
+
+    override fun createTabLayoutIfNeeded(binding: FragmentDevicesBinding) {
+        val fragment = view as Fragment
+        if (connection.getConnectionType() == ConnectionType.BLUETOOTH) {
+            val viewPager = binding.viewPager.apply {
+                adapter = FragmentAdapter(fragment)
+            }
+            TabLayoutMediator(binding.layoutTab, viewPager) { tab, position ->
+                tab.text = when (position) {
+                    0 -> fragment.requireContext().getString(R.string.available_devices)
+                    else -> fragment.requireContext().getString(R.string.paired_devices)
+                }
+            }.attach()
+        } else {
+//            fragment.childFragmentManager.beginTransaction()
+//            fragment.requireActivity().supportFragmentManager.beginTransaction()
+//                .replace(binding.layoutConstraint.id, AvailableDevicesFragment(), "AvailableDevicesFragment").commit()
+            fragment.findNavController()
+                .navigate(R.id.action_devicesFragment_to_availableDevicesFragment)
+        }
+    }
 
     override fun onViewCreated() {
         if (connection.isConnectionTypeSupported()) {
@@ -70,5 +94,15 @@ class DevicesFragmentPresenter @Inject constructor(
 
     override fun onDestroy() {
         view = null
+    }
+}
+
+class FragmentAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+
+    override fun getItemCount() = 2
+
+    override fun createFragment(position: Int): Fragment = when (position) {
+        0 -> AvailableDevicesFragment()
+        else -> PairedDevicesFragment()
     }
 }

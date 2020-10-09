@@ -3,6 +3,7 @@ package dev.jatzuk.servocontroller.mvp.devicesFragment
 import android.widget.Toast
 import androidx.annotation.RawRes
 import dev.jatzuk.servocontroller.connection.ConnectionType
+import dev.jatzuk.servocontroller.databinding.FragmentDevicesBinding
 import dev.jatzuk.servocontroller.mvp.BasePresenter
 import dev.jatzuk.servocontroller.mvp.BaseView
 
@@ -11,6 +12,8 @@ interface DevicesFragmentContract {
     interface Presenter : BasePresenter {
 
         fun onViewCreated()
+
+        fun createTabLayoutIfNeeded(binding: FragmentDevicesBinding)
 
         fun getConnectionType(): ConnectionType
 

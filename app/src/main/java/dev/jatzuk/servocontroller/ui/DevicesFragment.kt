@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.airbnb.lottie.LottieDrawable
-import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.databinding.FragmentDevicesBinding
@@ -34,17 +32,10 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
             }
         }
 
-        val viewPager = binding!!.viewPager.apply {
-            adapter = FragmentAdapter(this@DevicesFragment)
+        presenter.apply {
+            createTabLayoutIfNeeded(binding!!)
+            onViewCreated()
         }
-        TabLayoutMediator(binding!!.layoutTab, viewPager) { tab, position ->
-            tab.text = when (position) {
-                0 -> getString(R.string.available_devices)
-                else -> getString(R.string.paired_devices)
-            }
-        }.attach()
-
-        presenter.onViewCreated()
     }
 
     override fun updateTabLayoutVisibility(isVisible: Boolean) {
@@ -89,15 +80,5 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
     override fun onDestroy() {
         presenter.onDestroy()
         super.onDestroy()
-    }
-
-    class FragmentAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-
-        override fun getItemCount() = 2
-
-        override fun createFragment(position: Int): Fragment = when (position) {
-            0 -> AvailableDevicesFragment()
-            else -> PairedDevicesFragment()
-        }
     }
 }

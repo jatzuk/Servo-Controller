@@ -40,7 +40,14 @@ class BluetoothConnection : Connection {
     private var device: BluetoothDevice? = null
 
     override var receiver: BroadcastReceiver? = BluetoothReceiver(this)
-    override val selectedDevice: Parcelable? get() = RemoteDevice.device as BluetoothDevice?
+
+    override val selectedDevice: Parcelable?
+        get() = try {
+            RemoteDevice.device as BluetoothDevice?
+        } catch (e: ClassCastException) {
+            null
+        }
+
     override val connectionStrategy = ConnectionStrategy()
 
     private val _isScanning = MutableLiveData(false)

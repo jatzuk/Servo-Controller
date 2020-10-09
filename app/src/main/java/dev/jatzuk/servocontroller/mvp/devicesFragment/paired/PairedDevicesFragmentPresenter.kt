@@ -1,7 +1,7 @@
 package dev.jatzuk.servocontroller.mvp.devicesFragment.paired
 
 import androidx.recyclerview.widget.RecyclerView
-import dev.jatzuk.servocontroller.adapters.DevicesAdapter
+import dev.jatzuk.servocontroller.adapters.ParcelableDevicesAdapter
 import dev.jatzuk.servocontroller.connection.BluetoothConnection
 import dev.jatzuk.servocontroller.connection.Connection
 import dev.jatzuk.servocontroller.connection.WifiConnection
@@ -15,7 +15,9 @@ class PairedDevicesFragmentPresenter @Inject constructor(
 
     override fun setupRecyclerView(recyclerView: RecyclerView) {
         recyclerView.apply {
-            adapter = DevicesAdapter().also { it.submitList(getPairedDevices()) }
+            adapter = ParcelableDevicesAdapter(connection.getConnectionType()).also {
+                it.submitList(getPairedDevices())
+            }
             addItemDecoration(BottomPaddingDecoration(recyclerView.context))
         }
     }
