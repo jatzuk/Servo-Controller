@@ -4,17 +4,17 @@ import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.FragmentComponent
+import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.android.scopes.FragmentScoped
+import dagger.hilt.android.scopes.ActivityRetainedScoped
 import dev.jatzuk.servocontroller.connection.ConnectionFactory
 import dev.jatzuk.servocontroller.utils.SettingsHolder
 
 @Module
-@InstallIn(FragmentComponent::class)
+@InstallIn(ActivityRetainedComponent::class)
 object ConnectionModule {
 
-    @FragmentScoped
+    @ActivityRetainedScoped
     @Provides
     fun provideConnection(
         @ApplicationContext context: Context,
