@@ -57,8 +57,8 @@ class WifiReceiver(
                 Log.d(TAG, "onReceive: WIFI_P2P_PEERS_CHANGED_ACTION")
                 wifiP2pManager.requestPeers(channel) { peers ->
                     val devices = peers.deviceList.toTypedArray()
-                    Log.d(TAG, "onReceive: $peers")
-                    _availableP2PDevices.value?.addAll(devices)
+                    val filtered = devices.filter { !_availableP2PDevices.value!!.contains(it) }
+                    _availableP2PDevices.value?.addAll(filtered)
 //                    _availableDevices.value = _availableDevices.value
                 }
             }
@@ -76,12 +76,14 @@ class WifiReceiver(
                 val success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false)
                 if (success) {
                     val scanResults = wifiManager.scanResults
-                    repeat(scanResults.size) {
-                        val accessPoint = scanResults[it]
+                    val filtered =
+                        scanResults.filter { !availableWifiAccessPoints.value!!.contains(it) }
+                    availableWifiAccessPoints.value?.addAll(filtered)
+
+                    repeat(filtered.size) {
+                        val accessPoint = filtered[it]
                         Log.d(TAG, "onReceive: ${accessPoint.SSID} - ${accessPoint.BSSID}")
                     }
-
-                    availableWifiAccessPoints.value?.addAll(wifiManager.scanResults)
                 }
             }
         }
