@@ -75,6 +75,8 @@ class DevicesFragmentPresenter @Inject constructor(
                     }
                 }
             }
+
+            connection.registerReceiver((view as Fragment).requireContext())
         }
     }
 
@@ -98,6 +100,7 @@ class DevicesFragmentPresenter @Inject constructor(
     }
 
     override fun onDestroy() {
+        connection.unregisterReceiver((view as Fragment).requireContext())
         view = null
     }
 }

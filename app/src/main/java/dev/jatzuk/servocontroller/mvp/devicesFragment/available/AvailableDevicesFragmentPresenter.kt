@@ -23,13 +23,15 @@ import dev.jatzuk.servocontroller.connection.receiver.BluetoothReceiver
 import dev.jatzuk.servocontroller.databinding.LayoutLottieAnimationViewButtonBinding
 import dev.jatzuk.servocontroller.other.ACCESS_FINE_LOCATION_REQUEST_CODE
 import dev.jatzuk.servocontroller.utils.BottomPaddingDecoration
+import dev.jatzuk.servocontroller.utils.SettingsHolder
 import javax.inject.Inject
 
 private const val TAG = "AvailableDevicesFragmen"
 
 class AvailableDevicesFragmentPresenter @Inject constructor(
     private var view: AvailableDevicesFragmentContract.View?,
-    private val connection: Connection,
+    private val settingsHolder: SettingsHolder,
+    private var connection: Connection,
 ) : AvailableDevicesFragmentContract.Presenter, AbstractAdapter.OnSelectedDeviceClickListener {
 
     private lateinit var recyclerView: RecyclerView
@@ -44,6 +46,14 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
 
             button.text = (view as Fragment).requireContext().getString(R.string.scan_devices)
             this@AvailableDevicesFragmentPresenter.button = button
+        }
+
+        val settingsSavedConnectionType = settingsHolder.connectionType
+        if (connection.getConnectionType().name != settingsSavedConnectionType.name) {
+            connection = ConnectionFactory.getConnection(
+                (view as Fragment).requireContext(),
+                settingsSavedConnectionType
+            )
         }
 
         val availableDevices = when (connection.getConnectionType()) {
@@ -123,8 +133,6 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
                 }
             }
         }
-
-        registerReceiver()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -219,10 +227,6 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
         (itemView as ParcelableDevicesAdapter.ParcelableViewHolder).bind(previouslySelectedDevice as BluetoothDevice)
     }
 
-    private fun registerReceiver() {
-        connection.registerReceiver((view as Fragment).requireContext())
-    }
-
     override fun onConnectionIconPressed() {
         when (connection.getConnectionType()) {
             ConnectionType.BLUETOOTH -> (connection as BluetoothConnection).changeBluetoothMode()
@@ -271,7 +275,6 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
     }
 
     override fun onDestroy() {
-        connection.unregisterReceiver((view as Fragment).requireContext())
         view = null
     }
 
