@@ -26,14 +26,13 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
         binding = FragmentDevicesBinding.bind(view)
 
         binding?.layoutEnableHardwareRequest?.button?.apply {
-            text = getString(R.string.enable, presenter.getConnectionType().name)
             setOnClickListener {
                 presenter.onEnableHardwareButtonPressed()
             }
         }
 
         presenter.apply {
-            createTabLayoutIfNeeded(binding!!)
+            createTabLayout(binding!!)
             onViewCreated()
         }
     }
@@ -47,6 +46,12 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
                 lav.visibility = hardwareRequestVisibility
                 button.visibility = hardwareRequestVisibility
             }
+        }
+    }
+
+    override fun updateButtonText(text: String) {
+        binding?.layoutEnableHardwareRequest?.button?.apply {
+            this.text = getString(R.string.enable, text)
         }
     }
 

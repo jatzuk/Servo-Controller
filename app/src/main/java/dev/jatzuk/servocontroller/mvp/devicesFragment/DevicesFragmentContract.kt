@@ -13,7 +13,7 @@ interface DevicesFragmentContract {
 
         fun onViewCreated()
 
-        fun createTabLayoutIfNeeded(binding: FragmentDevicesBinding)
+        fun createTabLayout(binding: FragmentDevicesBinding)
 
         fun getConnectionType(): ConnectionType
 
@@ -25,6 +25,8 @@ interface DevicesFragmentContract {
     interface View : BaseView<Presenter> {
 
         fun updateTabLayoutVisibility(isVisible: Boolean)
+
+        fun updateButtonText(text: String)
 
         fun showAnimation(@RawRes resourceId: Int, speed: Float = 1f, timeout: Long = 0L)
 

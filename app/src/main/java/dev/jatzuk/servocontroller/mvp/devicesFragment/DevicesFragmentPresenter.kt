@@ -10,7 +10,6 @@ import dev.jatzuk.servocontroller.databinding.FragmentDevicesBinding
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_BT
 import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_WIFI
 import dev.jatzuk.servocontroller.ui.AvailableDevicesFragment
-import dev.jatzuk.servocontroller.ui.DevicesFragment
 import dev.jatzuk.servocontroller.ui.MainActivity
 import dev.jatzuk.servocontroller.ui.PairedDevicesFragment
 import dev.jatzuk.servocontroller.utils.SettingsHolder
@@ -24,7 +23,7 @@ class DevicesFragmentPresenter @Inject constructor(
     private var connection: Connection,
 ) : DevicesFragmentContract.Presenter {
 
-    override fun createTabLayoutIfNeeded(binding: FragmentDevicesBinding) {
+    override fun createTabLayout(binding: FragmentDevicesBinding) {
         val fragment = view as Fragment
 
         val settingsSavedConnectionType = settingsHolder.connectionType
@@ -35,33 +34,22 @@ class DevicesFragmentPresenter @Inject constructor(
             )
         }
 
-        if (connection.getConnectionType() == ConnectionType.BLUETOOTH) {
-            val viewPager = binding.viewPager.apply {
-                adapter = FragmentAdapter(fragment)
-            }
-            TabLayoutMediator(binding.layoutTab, viewPager) { tab, position ->
-                tab.text = when (position) {
-                    0 -> fragment.requireContext().getString(R.string.available_devices)
-                    else -> fragment.requireContext().getString(R.string.paired_devices)
-                }
-            }.attach()
-        } else {
-            fragment.childFragmentManager.beginTransaction()
-////            fragment.requireActivity().supportFragmentManager.beginTransaction()
-                .replace(
-                    binding.layoutConstraint.id,
-                    AvailableDevicesFragment(),
-                    "AvailableDevicesFragment"
-                ).commit()
-//            fragment.findNavController()
-//                .navigate(R.id.action_devicesFragment_to_availableDevicesFragment)
+        val viewPager = binding.viewPager.apply {
+            adapter = FragmentAdapter(fragment, getConnectionType())
         }
+        TabLayoutMediator(binding.layoutTab, viewPager) { tab, position ->
+            tab.text = when (position) {
+                0 -> fragment.requireContext().getString(R.string.available_devices)
+                else -> fragment.requireContext().getString(R.string.paired_devices)
+            }
+        }.attach()
     }
 
     override fun onViewCreated() {
         if (connection.isConnectionTypeSupported()) {
-            connection.connectionState.observe((view as DevicesFragment).viewLifecycleOwner) {
-                Log.d(TAG, "onViewCreated: $it")
+            view?.updateButtonText(getConnectionType().name)
+            connection.connectionState.observe(((view as Fragment).requireActivity())) {
+                Log.d(TAG, "observed value has changed: $it")
                 when (it!!) {
                     ConnectionState.ON -> {
                         view?.apply {
@@ -114,9 +102,15 @@ class DevicesFragmentPresenter @Inject constructor(
     }
 }
 
-class FragmentAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+class FragmentAdapter(
+    fragment: Fragment,
+    private val connectionType: ConnectionType
+) : FragmentStateAdapter(fragment) {
 
-    override fun getItemCount() = 2
+    override fun getItemCount() = when (connectionType) {
+        ConnectionType.BLUETOOTH -> 2
+        ConnectionType.WIFI -> 1
+    }
 
     override fun createFragment(position: Int): Fragment = when (position) {
         0 -> AvailableDevicesFragment()
