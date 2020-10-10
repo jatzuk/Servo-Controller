@@ -26,7 +26,7 @@ private const val TAG = "HomeFragmentPresenter"
 
 class HomeFragmentPresenter @Inject constructor(
     var view: HomeFragmentContract.View?,
-    var settingsHolder: SettingsHolder,
+    private val settingsHolder: SettingsHolder,
     private val servosModel: ServosModel,
     var connection: Connection
 ) : HomeFragmentContract.Presenter {

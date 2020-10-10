@@ -19,15 +19,8 @@
         android:id="@id/devicesFragment"
         android:name="dev.jatzuk.servocontroller.ui.DevicesFragment"
         android:label="@string/devices" />
-    <action
-        android:id="@+id/action_devicesFragment_to_availableDevicesFragment"
-        app:destination="@id/availableDevicesFragment" />
     <fragment
         android:id="@id/settingsFragment"
         android:name="dev.jatzuk.servocontroller.ui.SettingsFragment"
         android:label="@string/settings" />
-    <fragment
-        android:id="@+id/availableDevicesFragment"
-        android:name="dev.jatzuk.servocontroller.ui.AvailableDevicesFragment"
-        android:label="@string/available_devices" />
 </navigation>
