@@ -22,7 +22,7 @@
     <string name="cancel">Cancel</string>
     <string name="paired_devices">Paired devices</string>
     <string name="available_devices">Available devices</string>
-    <string name="scan_devices">Scan devices</string>
+    <string name="scan">Start scan</string>
     <string name="enable_connection_module_info">You need to enable connection module first</string>
 
     <string name="paired">Paired</string>
