@@ -62,7 +62,7 @@ class WifiConnection(private val context: Context) : Connection {
     private var connectionTimeoutJob: CompletableJob? = null
 
     private val _isScanning = MutableLiveData(false)
-    val isScanning: LiveData<Boolean> get() = _isScanning
+    override val isScanning: LiveData<Boolean> get() = _isScanning
 
     private var isWifiP2pMode = false
     private var isWifiP2pDirectModeEnabled = false // todo return to false

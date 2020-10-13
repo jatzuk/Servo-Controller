@@ -44,7 +44,7 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
             lav.visibility = View.GONE
             this@AvailableDevicesFragmentPresenter.lav = lav
 
-            button.text = (view as Fragment).requireContext().getString(R.string.scan_devices)
+            button.text = (view as Fragment).requireContext().getString(R.string.scan)
             this@AvailableDevicesFragmentPresenter.button = button
         }
 
@@ -65,10 +65,7 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
             recyclerView.updateAdapterDataSet(it)
         }
 
-        when (connection) {
-            is BluetoothConnection -> observeBluetoothConnection()
-            is WifiConnection -> observeWifiConnection()
-        }
+        observeConnection()
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -79,42 +76,24 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
         }
     }
 
-    private fun observeBluetoothConnection() {
+    private fun observeConnection() {
         val fragment = (view as Fragment)
-        (connection as BluetoothConnection).isScanning.observe(fragment.viewLifecycleOwner) {
-            if (it) {
-                view?.apply {
-                    showAnimation(R.raw.bluetooth_scan)
+        connection.isScanning.observe(fragment.viewLifecycleOwner) {
+            view?.apply {
+                if (it) {
+                    showAnimation(getCurrentConnectionRawResource())
                     updateButton(fragment.requireContext().getString(R.string.cancel))
-                }
-            } else {
-                view?.apply {
+                } else {
                     stopAnimation()
-                    updateButton(
-                        fragment.requireContext().getString(R.string.scan_devices)
-                    )
+                    updateButton(fragment.requireContext().getString(R.string.scan))
                 }
             }
         }
     }
 
-    private fun observeWifiConnection() {
-        val fragment = (view as Fragment)
-        (connection as WifiConnection).isScanning.observe(fragment.viewLifecycleOwner) {
-            if (it) {
-                view?.apply {
-                    showAnimation(R.raw.bluetooth_scan) // TODO: 07/10/2020 wifi
-                    updateButton(fragment.requireContext().getString(R.string.cancel))
-                }
-            } else {
-                view?.apply {
-                    stopAnimation()
-                    updateButton(
-                        fragment.requireContext().getString(R.string.scan_devices)
-                    )
-                }
-            }
-        }
+    private fun getCurrentConnectionRawResource() = when (connection.getConnectionType()) {
+        ConnectionType.BLUETOOTH -> R.raw.bluetooth_scan
+        ConnectionType.WIFI -> R.raw.wifi_scan
     }
 
     override fun setupRecyclerView(recyclerView: RecyclerView) {

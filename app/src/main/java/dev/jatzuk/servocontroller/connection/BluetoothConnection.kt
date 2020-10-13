@@ -51,7 +51,7 @@ class BluetoothConnection : Connection {
     override val connectionStrategy = ConnectionStrategy()
 
     private val _isScanning = MutableLiveData(false)
-    val isScanning: LiveData<Boolean> get() = _isScanning
+    override val isScanning: LiveData<Boolean> get() = _isScanning
 
     private var connectionTimeoutJob: CompletableJob? = null
 

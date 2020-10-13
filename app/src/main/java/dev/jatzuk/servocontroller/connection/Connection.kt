@@ -14,6 +14,7 @@ interface Connection {
     val connectionState: MutableLiveData<ConnectionState>
     val selectedDevice: Parcelable?
     val connectionStrategy: ConnectionStrategy
+    val isScanning: LiveData<Boolean>
 
     suspend fun connect(): Boolean
 
