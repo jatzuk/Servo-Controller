@@ -75,14 +75,13 @@ class WifiReceiver(
                 Log.d(TAG, "onReceive: SCAN_RESULTS_AVAILABLE_ACTION")
                 val success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false)
                 if (success) {
-                    val scanResults = wifiManager.scanResults
-                    val filtered =
-                        scanResults.filter { !availableWifiAccessPoints.value!!.contains(it) }
-                    availableWifiAccessPoints.value?.addAll(filtered)
-
-                    repeat(filtered.size) {
-                        val accessPoint = filtered[it]
-                        Log.d(TAG, "onReceive: ${accessPoint.SSID} - ${accessPoint.BSSID}")
+                    val scanResults = wifiManager.scanResults.sortedByDescending { it.SSID }
+                    val bssids = scanResults.map { it.BSSID }.toMutableSet()
+                    for (scanResult in scanResults) {
+                        if (scanResult.BSSID in bssids) {
+                            bssids.remove(scanResult.BSSID)
+                            _availableWifiAccessPoints.value?.add(scanResult)
+                        }
                     }
                 }
             }
