@@ -20,6 +20,10 @@
         android:name="android.hardware.bluetooth_le"
         android:required="false" />
 
+    <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="false" />
+
     <application
         android:name=".BaseApplication"
         android:allowBackup="true"
