@@ -38,7 +38,9 @@ interface Connection {
 
     fun unregisterReceiver(context: Context)
 
-    fun getAvailableDevices(): LiveData<ArrayList<Parcelable>>
+    fun getAvailableDevices(): LiveData<List<Parcelable>>
+
+    fun getBondedDevices(): List<Parcelable>?
 
     fun checkIfPreviousDeviceStored(context: Context)
 

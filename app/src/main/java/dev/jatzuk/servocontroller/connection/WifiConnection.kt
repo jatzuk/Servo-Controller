@@ -1,7 +1,6 @@
 package dev.jatzuk.servocontroller.connection
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
@@ -78,19 +77,7 @@ class WifiConnection(private val context: Context) : Connection {
         return false //TODO("Not yet implemented")
     }
 
-    override fun isConnectionTypeSupported(): Boolean {
-//        val pm = context.packageManager
-//        val features = pm.systemAvailableFeatures
-//        for (feature in features) {
-//            feature?.let {
-//                if (it.name?.toLowerCase(Locale.getDefault()) == "android.hardware.wifi.direct") {
-//                    return true
-//                }
-//            }
-//        }
-
-        return wifiManager.isP2pSupported
-    }
+    override fun isConnectionTypeSupported() = wifiManager.isP2pSupported
 
     override fun isHardwareEnabled() = wifiManager.isWifiEnabled
 
@@ -110,16 +97,14 @@ class WifiConnection(private val context: Context) : Connection {
 
     override fun getConnectionType() = ConnectionType.WIFI
 
-    fun getBondedDevices() = MutableList<BluetoothDevice?>(0) { null } // fixme
+    override fun getBondedDevices() = ArrayList<Parcelable>()  // fixme
 
-    override fun getAvailableDevices(): LiveData<ArrayList<Parcelable>> {
+    override fun getAvailableDevices(): LiveData<List<Parcelable>> {
         val wifiReceiver = (receiver as WifiReceiver)
         val devices =
             if (isWifiP2pMode) wifiReceiver.availableP2PDevices
             else wifiReceiver.availableWifiAccessPoints
-
-
-        return devices as LiveData<ArrayList<Parcelable>>
+        return devices as LiveData<List<Parcelable>>
     }
 
     override fun startScan() {

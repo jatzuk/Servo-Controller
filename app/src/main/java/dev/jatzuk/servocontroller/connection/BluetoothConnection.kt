@@ -22,6 +22,8 @@ private const val TAG = "BluetoothConnection"
 private const val UUIDString = "00001101-0000-1000-8000-00805f9b34fb"
 private const val SCAN_TIMEOUT = 10_000L
 
+private var socket: BluetoothSocket? = null
+
 class BluetoothConnection : Connection {
 
     private val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
@@ -69,7 +71,7 @@ class BluetoothConnection : Connection {
                 val bonded = getBondedDevices()
                 if (!bonded.isNullOrEmpty()) {
                     for (dev in bonded) {
-                        if (dev.address == it.second) {
+                        if ((dev as BluetoothDevice).address == it.second) {
                             setDevice(dev)
                             break
                         }
@@ -106,19 +108,7 @@ class BluetoothConnection : Connection {
 
     override fun isHardwareEnabled() = bluetoothAdapter?.isEnabled ?: false
 
-    fun buildDeviceList() {
-        getBondedDevices()?.forEach {
-            Log.d(TAG, "buildDeviceList: ${it.name} ${it.address} ${it.bluetoothClass}")
-            if (it.address == "98:D3:41:F9:79:F6") {
-                Log.d(TAG, "device found: ${it.name} ${it.address} ${it.bluetoothClass}")
-                val device = bluetoothAdapter?.getRemoteDevice(it.address)
-                setDevice(device!!)
-                return@forEach
-            }
-        }
-    }
-
-    fun getBondedDevices() = bluetoothAdapter?.bondedDevices?.toList()
+    override fun getBondedDevices() = bluetoothAdapter?.bondedDevices?.toList() as List<Parcelable>?
 
     override fun startScan() {
         if (bluetoothLEScanner != null && isBluetoothLEMode) startLEScan()
@@ -223,9 +213,9 @@ class BluetoothConnection : Connection {
     fun isBluetoothLEModeAvailable() = bluetoothLEScanner != null
 
     @Suppress("UNCHECKED_CAST")
-    override fun getAvailableDevices(): LiveData<ArrayList<Parcelable>> {
+    override fun getAvailableDevices(): LiveData<List<Parcelable>> {
         val devices = (receiver as BluetoothReceiver).availableDevices
-        return devices as LiveData<ArrayList<Parcelable>>
+        return devices as LiveData<List<Parcelable>>
     }
 
     override fun registerReceiver(context: Context) {
@@ -239,10 +229,5 @@ class BluetoothConnection : Connection {
 
     override fun unregisterReceiver(context: Context) {
         context.unregisterReceiver(receiver)
-    }
-
-    companion object {
-
-        private var socket: BluetoothSocket? = null
     }
 }
