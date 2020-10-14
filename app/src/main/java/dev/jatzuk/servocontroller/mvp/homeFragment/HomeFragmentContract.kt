@@ -44,8 +44,6 @@ interface HomeFragmentContract {
 
         fun onFinalPositionDetected(layoutPosition: Int, angle: Int)
 
-        fun buildDeviceList()
-
         fun connect()
 
         fun sendData(data: ByteArray): Boolean

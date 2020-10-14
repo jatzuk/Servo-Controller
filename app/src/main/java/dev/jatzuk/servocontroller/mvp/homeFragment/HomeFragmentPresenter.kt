@@ -164,10 +164,6 @@ class HomeFragmentPresenter @Inject constructor(
         connection.send(data.toByteArray())
     }
 
-    override fun buildDeviceList() {
-        (connection as BluetoothConnection).buildDeviceList()
-    }
-
     override fun sendData(data: ByteArray) = connection.send(data)
 
     override fun connect() {
