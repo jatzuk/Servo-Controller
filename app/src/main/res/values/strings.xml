@@ -35,5 +35,7 @@
     <string name="bluetooth_scan_mode">Bluetooth scan mode</string>
     <string name="wifi_scan_mode">WIFI scan mode</string>
     <string name="transmission_mode">Transmission mode</string>
+    <string name="wifi_network_available">Network available</string>
+    <string name="wifi_direct_available">WI-FI direct available</string>
 
 </resources>
