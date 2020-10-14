@@ -13,6 +13,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dev.jatzuk.servocontroller.connection.ConnectionState
 import dev.jatzuk.servocontroller.connection.WifiConnection
+import dev.jatzuk.servocontroller.utils.notifyDataSetChanged
 
 private const val TAG = "WifiReceiver"
 
@@ -81,6 +82,7 @@ class WifiReceiver(
                         if (scanResult.BSSID in bssids) {
                             bssids.remove(scanResult.BSSID)
                             _availableWifiAccessPoints.value?.add(scanResult)
+                            _availableWifiAccessPoints.notifyDataSetChanged()
                         }
                     }
                 }
