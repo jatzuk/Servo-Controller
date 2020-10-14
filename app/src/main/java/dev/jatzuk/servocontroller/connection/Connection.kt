@@ -10,7 +10,6 @@ import dev.jatzuk.servocontroller.mvp.homeFragment.ConnectionStrategy
 interface Connection {
 
     var receiver: BroadcastReceiver?
-
     val connectionState: MutableLiveData<ConnectionState>
     val selectedDevice: Parcelable?
     val connectionStrategy: ConnectionStrategy
