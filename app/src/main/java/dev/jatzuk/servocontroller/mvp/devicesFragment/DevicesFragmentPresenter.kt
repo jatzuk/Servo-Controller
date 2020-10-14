@@ -12,27 +12,17 @@ import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_WIFI
 import dev.jatzuk.servocontroller.ui.AvailableDevicesFragment
 import dev.jatzuk.servocontroller.ui.MainActivity
 import dev.jatzuk.servocontroller.ui.PairedDevicesFragment
-import dev.jatzuk.servocontroller.utils.SettingsHolder
 import javax.inject.Inject
 
 private const val TAG = "DevicesFragmentPretr"
 
 class DevicesFragmentPresenter @Inject constructor(
     private var view: DevicesFragmentContract.View?,
-    private val settingsHolder: SettingsHolder,
-    private var connection: Connection,
+    private val connection: Connection,
 ) : DevicesFragmentContract.Presenter {
 
     override fun createTabLayout(binding: FragmentDevicesBinding) {
         val fragment = view as Fragment
-
-        val settingsSavedConnectionType = settingsHolder.connectionType
-        if (connection.getConnectionType().name != settingsSavedConnectionType.name) {
-            connection = ConnectionFactory.getConnection(
-                fragment.requireContext(),
-                settingsSavedConnectionType
-            )
-        }
 
         val viewPager = binding.viewPager.apply {
             adapter = FragmentAdapter(fragment, getConnectionType())

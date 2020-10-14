@@ -19,7 +19,7 @@ interface AvailableDevicesFragmentContract {
 
         fun setupRecyclerView(recyclerView: RecyclerView)
 
-        fun getAvailableDevices(): LiveData<ArrayList<Parcelable>>
+        fun getAvailableDevices(): LiveData<List<Parcelable>>
 
         fun onScanAvailableDevicesPressed()
 

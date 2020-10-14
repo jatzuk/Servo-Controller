@@ -1,6 +1,6 @@
 package dev.jatzuk.servocontroller.mvp.devicesFragment.paired
 
-import android.bluetooth.BluetoothDevice
+import android.os.Parcelable
 import androidx.recyclerview.widget.RecyclerView
 import dev.jatzuk.servocontroller.mvp.BasePresenter
 import dev.jatzuk.servocontroller.mvp.BaseView
@@ -11,8 +11,7 @@ interface PairedDevicesFragmentContract {
 
         fun setupRecyclerView(recyclerView: RecyclerView)
 
-        fun getPairedDevices(): List<BluetoothDevice>?
-
+        fun getPairedDevices(): List<Parcelable>?
     }
 
     interface View : BaseView<Presenter> {

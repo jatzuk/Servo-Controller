@@ -4,15 +4,12 @@ import android.Manifest
 import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
 import android.os.Parcelable
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.button.MaterialButton
@@ -24,26 +21,22 @@ import dev.jatzuk.servocontroller.connection.receiver.BluetoothReceiver
 import dev.jatzuk.servocontroller.databinding.LayoutLottieAnimationViewButtonBinding
 import dev.jatzuk.servocontroller.other.ACCESS_FINE_LOCATION_REQUEST_CODE
 import dev.jatzuk.servocontroller.utils.BottomPaddingDecoration
-import dev.jatzuk.servocontroller.utils.SettingsHolder
 import javax.inject.Inject
 
 private const val TAG = "AvailableDevicesFragmen"
 
+private val previouslySelectedItemPosition = MutableLiveData<Int>(null)
+private val selectedItemPosition = MutableLiveData<Int>(null)
+
 class AvailableDevicesFragmentPresenter @Inject constructor(
     private var view: AvailableDevicesFragmentContract.View?,
-    private val settingsHolder: SettingsHolder,
-    private var connection: Connection,
+    private val connection: Connection,
 ) : AvailableDevicesFragmentContract.Presenter, AbstractAdapter.OnSelectedDeviceClickListener {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var availableDevicesAdapter: AbstractAdapter<out Parcelable>
     private lateinit var lav: LottieAnimationView
     private lateinit var button: MaterialButton
-
-    private val observer = Observer<ArrayList<Parcelable>> {
-        Log.d(TAG, "observer notified: $it")
-        if (it.isNotEmpty()) recyclerView.updateAdapterDataSet(it)
-    }
 
     override fun onViewCreated(layoutScanAvailableDevices: LayoutLottieAnimationViewButtonBinding) {
         layoutScanAvailableDevices.apply {
@@ -54,21 +47,10 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
             this@AvailableDevicesFragmentPresenter.button = button
         }
 
-        val settingsSavedConnectionType = settingsHolder.connectionType
-        if (connection.getConnectionType().name != settingsSavedConnectionType.name) {
-            connection = ConnectionFactory.getConnection(
-                (view as Fragment).requireContext(),
-                settingsSavedConnectionType
-            )
+        connection.getAvailableDevices().observe((view as Fragment).viewLifecycleOwner) {
+            if (::recyclerView.isInitialized) recyclerView.updateAdapterDataSet(it)
         }
 
-        connection.getAvailableDevices().observeForever(observer)
-//            .observeForever((view as Fragment).viewLifecycleOwnerLiveData.value!!) {
-//                Log.d(TAG, "observed value updated! $it")
-//                recyclerView.updateAdapterDataSet(it)
-//            }
-
-        Log.d(TAG, "onViewCreated: ${connection.getConnectionType()}")
         observeConnectionScanningState()
     }
 
@@ -225,8 +207,7 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
         connection.startScan()
     }
 
-    override fun getAvailableDevices(): LiveData<ArrayList<Parcelable>> =
-        connection.getAvailableDevices()
+    override fun getAvailableDevices() = connection.getAvailableDevices()
 
     override fun permissionDenied() {
         view?.apply {
@@ -258,14 +239,6 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
     }
 
     override fun onDestroy() {
-        Log.d(TAG, "onDestroy: observer removed")
-//        connection.getAvailableDevices().removeObserver(observer)
         view = null
-    }
-
-    companion object {
-
-        private val previouslySelectedItemPosition = MutableLiveData<Int>(null)
-        private val selectedItemPosition = MutableLiveData<Int>(null)
     }
 }
