@@ -83,11 +83,12 @@ abstract class AbstractAdapter<T : Parcelable>(
 
             private var isPaired = false
 
-            override fun bind(device: Parcelable) {
+            override fun initializePermanentViews(device: Parcelable) {
                 device as BluetoothDevice
                 binding.apply {
                     tvName.text = device.name
                     tvMacAddress.text = device.address
+                    ivDeviceIcon.setImageResource(R.drawable.ic_bluetooth)
                 }
             }
 
@@ -95,6 +96,14 @@ abstract class AbstractAdapter<T : Parcelable>(
                 isPaired = BluetoothAdapter.getDefaultAdapter().bondedDevices.contains(device)
                 val colorRes = if (isPaired) R.color.colorPrimary else R.color.colorGrey
                 defaultColor = ContextCompat.getColor(itemView.context, colorRes)
+                binding.apply {
+                    tvStatus.text = provideResetText()
+                }
+            }
+
+            override fun provideResetText(): String {
+                val stringResource = if (isPaired) R.string.paired else R.string.unpaired
+                return itemView.context.getString(stringResource)
             }
         }
 
@@ -102,49 +111,58 @@ abstract class AbstractAdapter<T : Parcelable>(
 
             override var defaultColor = 0
 
-            override fun bind(device: Parcelable) {
+            override fun initializePermanentViews(device: Parcelable) {
                 device as WifiP2pDevice
                 binding.apply {
                     tvName.text = device.deviceName
                     tvMacAddress.text = device.deviceAddress
-
-                    tvStatus.text = "wifi p2p device"
+                    ivDeviceIcon.setImageResource(R.drawable.ic_bluetooth)
                 }
-
             }
 
             override fun updateInfo(device: Parcelable) {
-
+                binding.apply {
+                    tvStatus.text = provideResetText()
+                }
             }
+
+            override fun provideResetText() =
+                itemView.context.getString(R.string.wifi_direct_available)
         }
 
         inner class WifiScanResultDeviceBindingStrategy : CommonBindingStrategy() {
 
             override var defaultColor = 0
 
-            override fun bind(device: Parcelable) {
+            override fun initializePermanentViews(device: Parcelable) {
                 device as ScanResult
                 binding.apply {
                     tvName.text = device.SSID
                     tvMacAddress.text = device.BSSID
-
-                    tvStatus.text = "WIFI STATUS"
-//                    ivStatus.setColorFilter()
-
-//                    ivDeviceIcon.setImageResource()
+                    ivDeviceIcon.setImageResource(R.drawable.ic_wifi)
                 }
             }
 
             override fun updateInfo(device: Parcelable) {
+                binding.apply {
+                    tvStatus.text = provideResetText()
+                }
             }
 
+            override fun provideResetText() =
+                itemView.context.getString(R.string.wifi_network_available)
         }
 
         abstract inner class CommonBindingStrategy : BindingStrategy {
 
             override var defaultColor: Int = 0
 
-            abstract override fun bind(device: Parcelable)
+            final override fun bind(device: Parcelable) {
+                initializePermanentViews(device)
+                updateInfo(device)
+            }
+
+            abstract fun initializePermanentViews(device: Parcelable)
 
             final override fun setSelected() {
                 binding.apply {
@@ -157,10 +175,12 @@ abstract class AbstractAdapter<T : Parcelable>(
 
             final override fun reset() {
                 binding.apply {
-                    tvStatus.text = "some common text here"
+                    tvStatus.text = provideResetText()
                     ivStatus.setColorFilter(defaultColor)
                 }
             }
+
+            abstract fun provideResetText(): String
         }
     }
 
