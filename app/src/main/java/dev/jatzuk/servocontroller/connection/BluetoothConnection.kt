@@ -223,9 +223,9 @@ class BluetoothConnection : Connection {
     fun isBluetoothLEModeAvailable() = bluetoothLEScanner != null
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T> getAvailableDevices(): LiveData<ArrayList<T>> {
+    override fun getAvailableDevices(): LiveData<ArrayList<Parcelable>> {
         val devices = (receiver as BluetoothReceiver).availableDevices
-        return devices as LiveData<ArrayList<T>>
+        return devices as LiveData<ArrayList<Parcelable>>
     }
 
     override fun registerReceiver(context: Context) {

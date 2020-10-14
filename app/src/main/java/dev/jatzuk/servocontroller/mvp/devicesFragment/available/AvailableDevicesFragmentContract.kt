@@ -1,5 +1,6 @@
 package dev.jatzuk.servocontroller.mvp.devicesFragment.available
 
+import android.os.Parcelable
 import android.view.Menu
 import android.view.MenuInflater
 import android.widget.Toast
@@ -18,7 +19,7 @@ interface AvailableDevicesFragmentContract {
 
         fun setupRecyclerView(recyclerView: RecyclerView)
 
-        fun <T> getAvailableDevices(): LiveData<ArrayList<T>>?
+        fun getAvailableDevices(): LiveData<ArrayList<Parcelable>>
 
         fun onScanAvailableDevicesPressed()
 

@@ -112,14 +112,14 @@ class WifiConnection(private val context: Context) : Connection {
 
     fun getBondedDevices() = MutableList<BluetoothDevice?>(0) { null } // fixme
 
-    override fun <T> getAvailableDevices(): LiveData<ArrayList<T>> {
+    override fun getAvailableDevices(): LiveData<ArrayList<Parcelable>> {
         val wifiReceiver = (receiver as WifiReceiver)
         val devices =
             if (isWifiP2pMode) wifiReceiver.availableP2PDevices
             else wifiReceiver.availableWifiAccessPoints
 
 
-        return devices as LiveData<ArrayList<T>>
+        return devices as LiveData<ArrayList<Parcelable>>
     }
 
     override fun startScan() {

@@ -3,8 +3,8 @@ package dev.jatzuk.servocontroller.mvp.devicesFragment.available
 import android.Manifest
 import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
-import android.net.wifi.p2p.WifiP2pDevice
 import android.os.Parcelable
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.button.MaterialButton
@@ -39,6 +40,11 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
     private lateinit var lav: LottieAnimationView
     private lateinit var button: MaterialButton
 
+    private val observer = Observer<ArrayList<Parcelable>> {
+        Log.d(TAG, "observer notified: $it")
+        if (it.isNotEmpty()) recyclerView.updateAdapterDataSet(it)
+    }
+
     override fun onViewCreated(layoutScanAvailableDevices: LayoutLottieAnimationViewButtonBinding) {
         layoutScanAvailableDevices.apply {
             lav.visibility = View.GONE
@@ -56,16 +62,14 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
             )
         }
 
-        val availableDevices = when (connection.getConnectionType()) {
-            ConnectionType.BLUETOOTH -> getAvailableDevices<BluetoothDevice>()
-            ConnectionType.WIFI -> getAvailableDevices<WifiP2pDevice>()
-        }
+        connection.getAvailableDevices().observeForever(observer)
+//            .observeForever((view as Fragment).viewLifecycleOwnerLiveData.value!!) {
+//                Log.d(TAG, "observed value updated! $it")
+//                recyclerView.updateAdapterDataSet(it)
+//            }
 
-        availableDevices.observe((view as Fragment).viewLifecycleOwner) {
-            recyclerView.updateAdapterDataSet(it)
-        }
-
-        observeConnection()
+        Log.d(TAG, "onViewCreated: ${connection.getConnectionType()}")
+        observeConnectionScanningState()
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -76,7 +80,7 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
         }
     }
 
-    private fun observeConnection() {
+    private fun observeConnectionScanningState() {
         val fragment = (view as Fragment)
         connection.isScanning.observe(fragment.viewLifecycleOwner) {
             view?.apply {
@@ -221,7 +225,7 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
         connection.startScan()
     }
 
-    override fun <T> getAvailableDevices(): LiveData<ArrayList<T>> =
+    override fun getAvailableDevices(): LiveData<ArrayList<Parcelable>> =
         connection.getAvailableDevices()
 
     override fun permissionDenied() {
@@ -254,6 +258,8 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
     }
 
     override fun onDestroy() {
+        Log.d(TAG, "onDestroy: observer removed")
+//        connection.getAvailableDevices().removeObserver(observer)
         view = null
     }
 
