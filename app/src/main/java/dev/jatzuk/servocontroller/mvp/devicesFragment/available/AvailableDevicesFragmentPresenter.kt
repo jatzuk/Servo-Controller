@@ -101,17 +101,12 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        when (connection.getConnectionType()) {
-            ConnectionType.BLUETOOTH -> {
-                if ((connection as BluetoothConnection).isBluetoothLEModeAvailable()) {
-                    inflater.inflate(R.menu.bluetooth_scan_menu, menu)
-                }
+        if (connection.isAdditionalModeSupported()) {
+            val menuResource = when (connection.getConnectionType()) {
+                ConnectionType.BLUETOOTH -> R.menu.bluetooth_scan_menu
+                ConnectionType.WIFI -> R.menu.wifi_scan_menu
             }
-            ConnectionType.WIFI -> {
-                if ((connection as WifiConnection).isWifiP2pModeEnabled()) {
-                    inflater.inflate(R.menu.wifi_scan_menu, menu)
-                }
-            }
+            inflater.inflate(menuResource, menu)
         }
     }
 

@@ -210,7 +210,9 @@ class BluetoothConnection : Connection {
         isBluetoothLEMode = !isBluetoothLEMode
     }
 
-    fun isBluetoothLEModeAvailable() = bluetoothLEScanner != null
+    private fun isBluetoothLEModeAvailable() = bluetoothLEScanner != null
+
+    override fun isAdditionalModeSupported() = isBluetoothLEModeAvailable()
 
     @Suppress("UNCHECKED_CAST")
     override fun getAvailableDevices(): LiveData<List<Parcelable>> {

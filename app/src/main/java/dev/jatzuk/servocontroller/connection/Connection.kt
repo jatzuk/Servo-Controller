@@ -44,6 +44,8 @@ interface Connection {
     fun checkIfPreviousDeviceStored(context: Context)
 
     fun getSelectedDeviceCredentials(): Pair<String, String>?
+
+    fun isAdditionalModeSupported(): Boolean
 }
 
 enum class ConnectionState {

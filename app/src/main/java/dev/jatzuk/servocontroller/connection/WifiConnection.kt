@@ -164,7 +164,9 @@ class WifiConnection(private val context: Context) : Connection {
         isWifiP2pMode = !isWifiP2pMode
     }
 
-    fun isWifiP2pModeEnabled() = isWifiP2pDirectModeEnabled
+    private fun isWifiP2pModeEnabled() = isWifiP2pDirectModeEnabled
+
+    override fun isAdditionalModeSupported() = isWifiP2pModeEnabled()
 
     override fun registerReceiver(context: Context) {
         val intentFilter = IntentFilter().apply {
