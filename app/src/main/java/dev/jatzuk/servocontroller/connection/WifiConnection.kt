@@ -108,7 +108,11 @@ class WifiConnection(private val context: Context) : Connection {
 
     override fun getConnectionType() = ConnectionType.WIFI
 
-    override fun getBondedDevices() = ArrayList<Parcelable>()  // fixme
+    override fun getBondedDevices(): List<Parcelable>? { //ArrayList<Parcelable>()  // fixme
+        val wifiReceiver = (receiver as WifiReceiver)
+        return if (isWifiP2pMode) wifiReceiver.availableP2PDevices.value
+        else wifiReceiver.availableWifiAccessPoints.value
+    }
 
     override fun getAvailableDevices(): LiveData<List<Parcelable>> {
         val wifiReceiver = (receiver as WifiReceiver)
@@ -198,12 +202,37 @@ class WifiConnection(private val context: Context) : Connection {
         val pair = RemoteDevice.loadFromSharedPreferences(context)
         if (selectedDevice == null) {
             pair?.let {
-//                val bonded =
+                val networks = getBondedDevices()
+                if (!networks.isNullOrEmpty()) {
+                    for (network in networks) {
+                        if (isWifiP2pMode) {
+                            if ((network as WifiP2pDevice).deviceAddress == it.second) {
+                                setDevice(network)
+                                break
+                            }
+                        } else {
+                            if ((network as ScanResult).BSSID == it.second) {
+                                setDevice(network)
+                                break
+                            }
+                        }
+                    }
+                }
             }
+        } else {
+            // TODO: 16/10/2020 ???????
         }
     }
 
-    override fun getSelectedDeviceCredentials() = (selectedDevice as WifiP2pDevice?)?.let {
-        it.deviceName to it.deviceAddress
+    override fun getSelectedDeviceCredentials(): Pair<String, String>? {
+        return if (isWifiP2pMode) {
+            (selectedDevice as WifiP2pDevice?)?.let {
+                it.deviceName to it.deviceAddress
+            }
+        } else {
+            (selectedDevice as ScanResult?)?.let {
+                it.SSID to it.BSSID
+            }
+        }
     }
 }
