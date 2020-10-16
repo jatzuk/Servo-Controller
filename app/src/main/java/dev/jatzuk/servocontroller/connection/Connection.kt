@@ -15,6 +15,8 @@ interface Connection {
     val connectionStrategy: ConnectionStrategy
     val isScanning: LiveData<Boolean>
 
+    fun setDevice(device: Parcelable)
+
     suspend fun connect(): Boolean
 
     fun send(data: ByteArray): Boolean

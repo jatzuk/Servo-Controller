@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
+import android.net.wifi.ScanResult
 import android.net.wifi.WifiManager
 import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pManager
@@ -34,9 +35,12 @@ class WifiConnection(private val context: Context) : Connection {
         else ConnectionState.OFF
     )
 
+    private var device: Parcelable? = null
+
     override val selectedDevice: Parcelable?
         get() = try {
-            RemoteDevice.device as WifiP2pDevice?
+            if (isWifiP2pMode) RemoteDevice.device as WifiP2pDevice?
+            else RemoteDevice.device as ScanResult?
         } catch (e: ClassCastException) {
             null
         }
@@ -93,6 +97,13 @@ class WifiConnection(private val context: Context) : Connection {
 //        TODO("Not yet implemented")
         channel?.close()
         return false
+    }
+
+    override fun setDevice(device: Parcelable) {
+        this.device =
+            if (isWifiP2pMode) device as WifiP2pDevice
+            else device as ScanResult
+        RemoteDevice.device = device
     }
 
     override fun getConnectionType() = ConnectionType.WIFI
@@ -184,8 +195,6 @@ class WifiConnection(private val context: Context) : Connection {
     }
 
     override fun checkIfPreviousDeviceStored(context: Context) {
-//        TODO("Not yet implemented")
-
         val pair = RemoteDevice.loadFromSharedPreferences(context)
         if (selectedDevice == null) {
             pair?.let {

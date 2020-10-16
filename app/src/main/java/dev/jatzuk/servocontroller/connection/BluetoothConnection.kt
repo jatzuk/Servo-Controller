@@ -85,8 +85,8 @@ class BluetoothConnection : Connection {
         }
     }
 
-    fun setDevice(device: BluetoothDevice) {
-        this.device = device
+    override fun setDevice(device: Parcelable) {
+        this.device = device as BluetoothDevice
         RemoteDevice.device = device
     }
 
