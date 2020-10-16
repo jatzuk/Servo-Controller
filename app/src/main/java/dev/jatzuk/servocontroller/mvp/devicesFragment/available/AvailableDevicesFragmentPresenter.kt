@@ -3,6 +3,8 @@ package dev.jatzuk.servocontroller.mvp.devicesFragment.available
 import android.Manifest
 import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
+import android.net.wifi.ScanResult
+import android.net.wifi.WifiConfiguration
 import android.os.Parcelable
 import android.view.Menu
 import android.view.MenuInflater
@@ -18,6 +20,7 @@ import dev.jatzuk.servocontroller.adapters.AbstractAdapter
 import dev.jatzuk.servocontroller.adapters.ParcelableDevicesAdapter
 import dev.jatzuk.servocontroller.connection.*
 import dev.jatzuk.servocontroller.connection.receiver.BluetoothReceiver
+import dev.jatzuk.servocontroller.connection.receiver.WifiReceiver
 import dev.jatzuk.servocontroller.databinding.LayoutLottieAnimationViewButtonBinding
 import dev.jatzuk.servocontroller.other.ACCESS_FINE_LOCATION_REQUEST_CODE
 import dev.jatzuk.servocontroller.utils.BottomPaddingDecoration
@@ -163,11 +166,7 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
                     }
                 }
 
-                selectedItemPosition.value = position
-                val viewHolder =
-                    (recyclerView.findViewHolderForAdapterPosition(position) as ParcelableDevicesAdapter.ParcelableViewHolder)
-                viewHolder.setSelectedColor()
-                previouslySelectedItemPosition.value = position
+                updateSelectedItem(position)
             }
         }
     }
@@ -177,7 +176,7 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
         val viewHolder =
             (recyclerView.findViewHolderForAdapterPosition(position) as ParcelableDevicesAdapter.ParcelableViewHolder)
         viewHolder.setSelectedColor()
-        (connection as BluetoothConnection).setDevice(availableDevicesAdapter.currentList[position] as BluetoothDevice)
+        connection.setDevice(availableDevicesAdapter.currentList[position])
         previouslySelectedItemPosition.value = position
     }
 
