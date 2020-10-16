@@ -220,7 +220,10 @@ class WifiConnection(private val context: Context) : Connection {
                 }
             }
         } else {
-            // TODO: 16/10/2020 ???????
+            device =
+                if (isWifiP2pMode) selectedDevice as WifiP2pDevice
+                else selectedDevice as ScanResult
+            if (isConnected()) connectionState.postValue(ConnectionState.CONNECTED)
         }
     }
 
