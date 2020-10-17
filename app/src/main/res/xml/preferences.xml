@@ -4,6 +4,7 @@
     <PreferenceCategory app:title="@string/transmission_mode">
 
         <DropDownPreference
+            android:enabled="false"
             app:entries="@array/connection_types"
             app:entryValues="@array/connection_types"
             app:icon="@drawable/ic_bluetooth"
@@ -12,11 +13,11 @@
             app:title="@string/connection_type" />
 
         <SeekBarPreference
+            android:defaultValue="1"
             android:max="10"
             app:icon="@drawable/ic_amount"
             app:key="@string/key_servos_count"
             app:min="1"
-            android:defaultValue="1"
             app:showSeekBarValue="true"
             app:title="Servos count" />
 
@@ -29,12 +30,14 @@
             app:title="@string/servos_textures" />
 
         <SwitchPreferenceCompat
+            android:defaultValue="true"
             android:dependency="@string/key_servos_textures"
             android:icon="@drawable/ic_texture"
-            android:defaultValue="true"
             android:key="@string/key_is_angle_grid_should_show"
             android:title="Angle grid "
-            app:summary="is showing" />
+            app:summary="@string/enabled"
+            app:summaryOff="@string/disabled"
+            app:summaryOn="@string/enabled" />
 
     </PreferenceCategory>
 

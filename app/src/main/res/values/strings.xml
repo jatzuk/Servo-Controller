@@ -20,6 +20,8 @@
     <string name="disconnect">Disconnect</string>
     <string name="enable">Enable %s</string>
     <string name="cancel">Cancel</string>
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
     <string name="paired_devices">Paired devices</string>
     <string name="available_devices">Available devices</string>
     <string name="scan">Start scan</string>
