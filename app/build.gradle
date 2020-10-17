@@ -31,6 +31,19 @@ android {
         }
     }
 
+    flavorDimensions "store"
+
+    productFlavors {
+
+        google {
+            dimension "store"
+        }
+
+        huawei {
+            dimension "store"
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -118,4 +131,7 @@ dependencies {
 
 //    def leak_canary_version = "2.4"
 //    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leak_canary_version"
+
+    def google_ads_version = "19.4.0"
+    googleImplementation "com.google.android.gms:play-services-ads:$google_ads_version"
 }
