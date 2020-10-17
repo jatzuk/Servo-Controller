@@ -10,6 +10,9 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var navController: NavController
+    private lateinit var adView: AdView
 
     lateinit var enableHardwareContractLauncher: ActivityResultLauncher<Int>
         private set
@@ -31,6 +35,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        initializeAds()
 
         val radius = resources.getDimension(R.dimen.side_nav_bar_corner_radius)
         val navViewBackground = (binding.navView.background as MaterialShapeDrawable)
@@ -60,6 +66,12 @@ class MainActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+    }
+
+    private fun initializeAds() {
+        MobileAds.initialize(this) {}
+        adView = binding.drawerContent.adView
+        adView.loadAd(AdRequest.Builder().build())
     }
 
     override fun onSupportNavigateUp(): Boolean {
