@@ -39,6 +39,14 @@
             app:summaryOff="@string/disabled"
             app:summaryOn="@string/enabled" />
 
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/abc_vector_test"
+            android:key="@string/key_should_keep_screen_on"
+            android:title="@string/keep_screen_active"
+            app:summaryOff="@string/disabled"
+            app:summaryOn="@string/enabled" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>

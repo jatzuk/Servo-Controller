@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.preference.DropDownPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SeekBarPreference
+import androidx.preference.SwitchPreferenceCompat
 import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.connection.ConnectionType
@@ -67,6 +68,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 val textureType = ServoTexture.values()[index]
                 settingsHolder.applyChanges(
                     servosTexture = textureType
+                )
+                true
+            }
+        }
+
+        preferenceScreen.findPreference<SwitchPreferenceCompat>(
+            requireContext().getString(R.string.key_should_keep_screen_on)
+        )?.apply {
+            setOnPreferenceChangeListener { _, newValue ->
+                settingsHolder.applyChanges(
+                    shouldKeepScreenOn = newValue as Boolean
                 )
                 true
             }

@@ -2,6 +2,7 @@ package dev.jatzuk.servocontroller.mvp.homeFragment
 
 import android.content.res.Configuration
 import android.util.Log
+import android.view.WindowManager
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -65,11 +66,18 @@ class HomeFragmentPresenter @Inject constructor(
     }
 
     override fun onViewCreated() {
-        val context = (view as Fragment).requireContext()
+        val activity = (view as Fragment).requireActivity()
+
+        if (settingsHolder.shouldKeepScreenOn) {
+            activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
 
         val settingsSavedConnectionType = settingsHolder.connectionType
         if (connection.getConnectionType().name != settingsSavedConnectionType.name) {
-            connection = ConnectionFactory.getConnection(context, settingsSavedConnectionType)
+            connection =
+                ConnectionFactory.getConnection(activity.baseContext, settingsSavedConnectionType)
         }
 
         if (isConnectionTypeSupported()) {
@@ -78,7 +86,7 @@ class HomeFragmentPresenter @Inject constructor(
             }
             servosModel.loadServosFromDB(settingsHolder.servosCount)
             registerBroadcastReceiver()
-            connection.checkIfPreviousDeviceStored(context)
+            connection.checkIfPreviousDeviceStored(activity.baseContext)
         }
     }
 
@@ -96,34 +104,35 @@ class HomeFragmentPresenter @Inject constructor(
     }
 
     override fun onStart() {
-        if (isConnectionTypeSupported()) {
-            connection.connectionState.observe((view as HomeFragment).viewLifecycleOwner) {
-                connection.connectionStrategy.currentStrategy = when (it!!) {
-                    ConnectionState.ON -> {
-                        OnStrategy(this, connection.selectedDevice == null)
-                    }
-                    ConnectionState.CONNECTING -> {
-                        ConnectingStrategy(this)
-                    }
-                    ConnectionState.CONNECTED -> {
-                        val shouldShowConnectedAnimation =
-                            connection.connectionStrategy.currentStrategy !is ConnectedStrategy
-                        ConnectedStrategy(this, shouldShowConnectedAnimation)
-                    }
-                    ConnectionState.DISCONNECTING -> {
-                        DisconnectingStrategy(this)
-                    }
-                    ConnectionState.DISCONNECTED -> {
-                        DisconnectedStrategy(this)
-                    }
-                    ConnectionState.OFF -> {
-                        OffStrategy(this)
-                    }
-                }
-            }
-        } else {
-            connection.connectionStrategy.currentStrategy = UnsupportedConnectionTypeStrategy(this)
-        }
+        connection.connectionStrategy.currentStrategy = ConnectedStrategy(this)
+//        if (isConnectionTypeSupported()) {
+//            connection.connectionState.observe((view as HomeFragment).viewLifecycleOwner) {
+//                connection.connectionStrategy.currentStrategy = when (it!!) {
+//                    ConnectionState.ON -> {
+//                        OnStrategy(this, connection.selectedDevice == null)
+//                    }
+//                    ConnectionState.CONNECTING -> {
+//                        ConnectingStrategy(this)
+//                    }
+//                    ConnectionState.CONNECTED -> {
+//                        val shouldShowConnectedAnimation =
+//                            connection.connectionStrategy.currentStrategy !is ConnectedStrategy
+//                        ConnectedStrategy(this, shouldShowConnectedAnimation)
+//                    }
+//                    ConnectionState.DISCONNECTING -> {
+//                        DisconnectingStrategy(this)
+//                    }
+//                    ConnectionState.DISCONNECTED -> {
+//                        DisconnectedStrategy(this)
+//                    }
+//                    ConnectionState.OFF -> {
+//                        OffStrategy(this)
+//                    }
+//                }
+//            }
+//        } else {
+//            connection.connectionStrategy.currentStrategy = UnsupportedConnectionTypeStrategy(this)
+//        }
     }
 
     override fun onDestroyView() {
@@ -161,7 +170,7 @@ class HomeFragmentPresenter @Inject constructor(
 
         val data = "$command$finalAngle"
         Log.d(TAG, "onFinalPositionDetected: $data")
-        connection.send(data.toByteArray())
+//        connection.send(data.toByteArray())
     }
 
     override fun sendData(data: ByteArray) = connection.send(data)

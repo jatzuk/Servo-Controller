@@ -25,10 +25,14 @@ data class SettingsHolder @Inject constructor(
     private var _servosTexture: ServoTexture = loadServosTextureTypeFromSharedPreferences()
     val texture get() = _servosTexture
 
+    private var _shouldKeepScreenOn: Boolean = loadShouldKeepScreenOnValueFromSharedPreferences()
+    val shouldKeepScreenOn get() = _shouldKeepScreenOn
+
     fun applyChanges(
         connectionType: ConnectionType = this.connectionType,
         servosCount: Int = this.servosCount,
-        servosTexture: ServoTexture = this.texture
+        servosTexture: ServoTexture = this.texture,
+        shouldKeepScreenOn: Boolean = this.shouldKeepScreenOn
     ) {
         sharedPreferences.edit().run {
             if (connectionType != _connectionType) {
@@ -46,12 +50,19 @@ data class SettingsHolder @Inject constructor(
                     servosTexture.name
                 )
             }
+            if (shouldKeepScreenOn != _shouldKeepScreenOn) {
+                putBoolean(
+                    applicationContext.getString(R.string.key_should_keep_screen_on),
+                    shouldKeepScreenOn
+                )
+            }
             apply()
         }
 
         _connectionType = connectionType
         _servosCount = servosCount
         _servosTexture = servosTexture
+        _shouldKeepScreenOn = shouldKeepScreenOn
     }
 
     private fun loadConnectionTypeFromSharedPreferences(): ConnectionType {
@@ -77,4 +88,10 @@ data class SettingsHolder @Inject constructor(
         _servosTexture = type
         return type
     }
+
+    private fun loadShouldKeepScreenOnValueFromSharedPreferences() =
+        sharedPreferences.getBoolean(
+            applicationContext.getString(R.string.key_should_keep_screen_on),
+            false
+        ).also { _shouldKeepScreenOn = it }
 }
