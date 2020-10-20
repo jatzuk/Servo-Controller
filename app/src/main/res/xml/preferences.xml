@@ -19,14 +19,14 @@
             app:key="@string/key_servos_count"
             app:min="1"
             app:showSeekBarValue="true"
-            app:title="Servos count" />
+            app:title="@string/servos_count" />
 
         <DropDownPreference
             android:icon="@drawable/ic_texture"
             app:entries="@array/servo_view"
             app:entryValues="@array/servo_view"
             app:key="@string/key_servos_textures"
-            app:summary="textures"
+            app:summary="@string/textures"
             app:title="@string/servos_textures" />
 
         <SwitchPreferenceCompat
@@ -34,7 +34,7 @@
             android:dependency="@string/key_servos_textures"
             android:icon="@drawable/ic_texture"
             android:key="@string/key_is_angle_grid_should_show"
-            android:title="Angle grid "
+            android:title="@string/angle_grid"
             app:summary="@string/enabled"
             app:summaryOff="@string/disabled"
             app:summaryOn="@string/enabled" />
@@ -43,7 +43,7 @@
             android:defaultValue="false"
             android:icon="@drawable/abc_vector_test"
             android:key="@string/key_should_keep_screen_on"
-            android:title="@string/keep_screen_active"
+            android:title="@string/keep_screen_on"
             app:summaryOff="@string/disabled"
             app:summaryOn="@string/enabled" />
 

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <array name="servo_view">
-        <item>Картинка</item>
-        <item>Полоса</item>
-    </array>
-</resources>
