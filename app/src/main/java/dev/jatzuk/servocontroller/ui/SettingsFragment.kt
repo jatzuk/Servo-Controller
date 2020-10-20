@@ -52,7 +52,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
             getString(R.string.key_servos_count)
         )?.apply {
             setOnPreferenceChangeListener { _, newValue ->
-                // FIXME: 18/08/2020 ???
                 settingsHolder.applyChanges(
                     servosCount = newValue as Int
                 )
