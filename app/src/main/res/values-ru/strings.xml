@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="servos">Сервоприводы</string>
+    <string name="settings">Настройки</string>
+    <string name="connection_type">Тип соединения</string>
+    <string name="devices">Устройства</string>
+    <string name="connection_state">Состояние соединения</string>
+    <string name="servos_textures">Отображение сервопривода</string>
+    <string name="command">Команда</string>
+    <string name="your_command_here">Место для вашей команды</string>
+    <string name="tag">Тэг</string>
+    <string name="your_tag_here">Тэг</string>
+    <string name="restore_defaults">Сбросить настройки</string>
+    <string name="connect">Подлючиться</string>
+    <string name="disconnect">Отключиться</string>
+    <string name="enable">Включить %s</string>
+    <string name="cancel">Отмена</string>
+    <string name="enabled">Включено</string>
+    <string name="disabled">Отключено</string>
+    <string name="paired_devices">Сопряженные устройства</string>
+    <string name="available_devices">Доступные устройства</string>
+    <string name="scan">Начать сканирование</string>
+    <string name="enable_connection_module_info">Сначала необходимо включить модуль соединения</string>
+    <string name="paired">Сопряжено</string>
+    <string name="unpaired">Не сопряжено</string>
+    <string name="selected">Выбрано</string>
+    <string name="no_device_selected">Устройство не выбрано</string>
+    <string name="change_connection_type">Смена соединения</string>
+    <string name="select_device">Выбрать устройство</string>
+    <string name="unsupported">Не поддерживается</string>
+    <string name="bluetooth_scan_mode">Тип Bluetooth соединения</string>
+    <string name="wifi_scan_mode">Тип WIFI соединения</string>
+    <string name="transmission_mode">Тип передачи данных</string>
+    <string name="wifi_network_available">Сеть доступна</string>
+    <string name="wifi_direct_available">WI-FI direct доступен</string>
+    <string name="servos_count">Сервоприводы</string>
+    <string name="textures">Текстуры</string>
+    <string name="angle_grid">Шкала значений</string>
+    <string name="keep_screen_on">Отключить затухание экрана</string>
+    <string name="write_mode">Write mode</string>
+    <string name="send_on">Отправить по</string>
+    <string name="release">Удержание</string>
+    <string name="button_click">Нажатие кнопки</string>
+</resources>

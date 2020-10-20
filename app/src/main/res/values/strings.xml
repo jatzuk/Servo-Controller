@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Servo Controller</string>
+    <string name="app_name" translatable="false">Servo Controller</string>
 
     <!--    fragments-->
     <string name="servos">Servos</string>
@@ -9,7 +9,10 @@
     <string name="connection_type">Connection Type</string>
     <string name="devices">Devices</string>
     <string name="connection_state">Connection state</string>
+    <string name="servos_count">Servos count</string>
     <string name="servos_textures">Servo texture</string>
+    <string name="textures">Textures</string>
+    <string name="angle_grid">Angle grid</string>
     <string name="command">Command</string>
     <string name="your_command_here">Your command here</string>
     <string name="tag">Tag</string>
@@ -26,7 +29,7 @@
     <string name="available_devices">Available devices</string>
     <string name="scan">Start scan</string>
     <string name="enable_connection_module_info">You need to enable connection module first</string>
-    <string name="keep_screen_active">Keep screen active</string>
+    <string name="keep_screen_on">Keep screen on</string>
 
     <string name="paired">Paired</string>
     <string name="unpaired">Unpaired</string>
@@ -40,5 +43,11 @@
     <string name="transmission_mode">Transmission mode</string>
     <string name="wifi_network_available">Network available</string>
     <string name="wifi_direct_available">WI-FI direct available</string>
+    <string name="write_mode">Write mode</string>
+    <string name="millis" translatable="false">Millis</string>
+    <string name="microseconds" translatable="false">Microseconds</string>
+    <string name="send_on">Send on</string>
+    <string name="release">Release</string>
+    <string name="button_click">Button click</string>
 
 </resources>
