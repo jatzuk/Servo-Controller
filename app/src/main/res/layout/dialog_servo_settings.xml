@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="32dp"
-            android:text="Write mode"
+            android:text="@string/write_mode"
             app:layout_constraintBottom_toBottomOf="@+id/radio_group_write_mode"
             app:layout_constraintEnd_toEndOf="@+id/tv_tag"
             app:layout_constraintStart_toStartOf="parent"
@@ -92,7 +92,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
-                android:text="Millis"
+                android:text="@string/millis"
                 android:textSize="16sp" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
@@ -101,7 +101,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
-                android:text="Microseconds"
+                android:text="@string/microseconds"
                 android:textSize="16sp" />
         </RadioGroup>
 
@@ -111,7 +111,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="32dp"
-            android:text="Send on"
+            android:text="@string/send_on"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@+id/radio_group_send_mode"
             app:layout_constraintStart_toStartOf="parent"
@@ -134,7 +134,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
-                android:text="Release"
+                android:text="@string/release"
                 android:textSize="16sp" />
 
             <com.google.android.material.radiobutton.MaterialRadioButton
@@ -143,7 +143,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
-                android:text="Button click"
+                android:text="@string/button_click"
                 android:textSize="16sp" />
         </RadioGroup>
 
