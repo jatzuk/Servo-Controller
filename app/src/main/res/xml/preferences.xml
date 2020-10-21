@@ -15,7 +15,7 @@
         <SeekBarPreference
             android:defaultValue="1"
             android:max="10"
-            app:icon="@drawable/ic_amount"
+            app:icon="@drawable/ic_counter"
             app:key="@string/key_servos_count"
             app:min="1"
             app:showSeekBarValue="true"
@@ -32,7 +32,7 @@
         <SwitchPreferenceCompat
             android:defaultValue="true"
             android:dependency="@string/key_servos_textures"
-            android:icon="@drawable/ic_texture"
+            android:icon="@drawable/ic_angle_grid"
             android:key="@string/key_is_angle_grid_should_show"
             android:title="@string/angle_grid"
             app:summary="@string/enabled"

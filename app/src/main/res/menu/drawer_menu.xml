@@ -4,7 +4,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/homeFragment"
-            android:icon="@drawable/ic_launcher_foreground"
+            android:icon="@drawable/ic_servo"
             android:title="@string/app_name" />
         <item
             android:id="@+id/devicesFragment"
@@ -12,7 +12,7 @@
             android:title="@string/devices" />
         <item
             android:id="@+id/settingsFragment"
-            android:icon="@mipmap/ic_launcher_round"
+            android:icon="@drawable/ic_settings"
             android:title="@string/settings" />
 
     </group>
