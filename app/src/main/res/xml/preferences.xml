@@ -41,7 +41,7 @@
 
         <SwitchPreferenceCompat
             android:defaultValue="false"
-            android:icon="@drawable/abc_vector_test"
+            android:icon="@drawable/ic_phone_screen"
             android:key="@string/key_should_keep_screen_on"
             android:title="@string/keep_screen_on"
             app:summaryOff="@string/disabled"
