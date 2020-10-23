@@ -8,7 +8,7 @@
             android:title="@string/app_name" />
         <item
             android:id="@+id/devicesFragment"
-            android:icon="@drawable/ic_bluetooth"
+            android:icon="@drawable/ic_devices"
             android:title="@string/devices" />
         <item
             android:id="@+id/settingsFragment"

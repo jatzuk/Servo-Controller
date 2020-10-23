@@ -8,13 +8,13 @@
     <path
         android:pathData="m3.9139,1.4625c-1.2736,0 -2.3917,0.9063 -2.3917,2.1524L1.5222,20.6913c0,1.2461 1.1181,2.1524 2.3917,2.1524h7.8635c1.2736,0 2.3917,-0.9063 2.3917,-2.1524L14.1691,3.6149c0,-1.2461 -1.1181,-2.1524 -2.3917,-2.1524zM3.9139,2.336h7.8635c0.9317,0 1.5881,0.6235 1.5881,1.2789L13.3655,20.6913c0,0.6554 -0.6564,1.2789 -1.5881,1.2789L3.9139,21.9702c-0.9317,0 -1.5881,-0.6235 -1.5881,-1.2789L2.3259,3.6149c0,-0.6554 0.6564,-1.2789 1.5881,-1.2789z"
         android:strokeWidth="2"
-        android:strokeColor="#000000" />
+        android:strokeColor="@android:color/white" />
     <path
-        android:fillColor="#000000"
+        android:fillColor="@android:color/white"
         android:pathData="M14.6663,7.2874a1.2909,7.9395 63.7618,1 0,1.1414 2.3158a1.2909,7.9395 63.7618,1 0,-1.1414 -2.3158z"
         android:strokeWidth="2"
-        android:strokeColor="#000000" />
+        android:strokeColor="@android:color/white" />
     <path
-        android:fillColor="#000000"
+        android:fillColor="@android:color/white"
         android:pathData="M6.055,12.1531a1.9803,1.7089 0,1 0,3.9606 0a1.9803,1.7089 0,1 0,-3.9606 0z" />
 </vector>
