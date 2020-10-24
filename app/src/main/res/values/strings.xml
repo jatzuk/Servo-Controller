@@ -2,7 +2,6 @@
     <string name="app_name" translatable="false">Servo Controller</string>
 
     <!--    fragments-->
-    <string name="servos">Servos</string>
     <string name="settings">Settings</string>
 
     <!--    preferences-->
