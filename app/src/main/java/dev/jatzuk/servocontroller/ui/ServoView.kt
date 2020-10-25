@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAME
@@ -28,6 +29,7 @@ class ServoView @JvmOverloads constructor(
 
     private lateinit var servoBase: Bitmap
     private var servoSetupArea = RectF()
+    private val frameRect = RectF()
     private lateinit var servoHead: Bitmap
     private val servoHeadMatrix = Matrix()
 
@@ -46,8 +48,6 @@ class ServoView @JvmOverloads constructor(
     var tag = ""
     private var shouldRotateTagToFitSelf = false
 
-    private var radiusOffsetLabel = 30
-
     private var labelTextSize = 0f
     private var zoomTextSize = 0f
     private var valueTextSize = 0f
@@ -55,8 +55,6 @@ class ServoView @JvmOverloads constructor(
 
     private val sharedPreferences =
         context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
-    private val servosCount =
-        sharedPreferences.getInt(context.getString(R.string.key_servos_count), 1)
 
     private val isAngleGridIsShown = sharedPreferences.getBoolean(
         context.getString(R.string.key_is_angle_grid_should_show),
@@ -93,17 +91,9 @@ class ServoView @JvmOverloads constructor(
             else -> desiredHeight
         }
 
-        var bitmapSizeFactor = if (servosCount < 3) 2 else 4
-
-        // if tablet or smth
-        if (windowWidth / 3 > width || windowHeight / 3 > height) {
-            bitmapSizeFactor = 1
-        }
-        val servoBaseSize = height / 5 / bitmapSizeFactor
-        val servoHeadSize = height / 10 / bitmapSizeFactor
-
-        servoBase = createScaledBitmap(R.drawable.servo_base, servoBaseSize, servoBaseSize)
-        servoHead = createScaledBitmap(R.drawable.servo_head, servoHeadSize, servoHeadSize)
+        val scaleFactor = height / 2
+        servoBase = createScaledBitmap(R.drawable.ic_servo_base, scaleFactor / 2, scaleFactor)
+        servoHead = createScaledBitmap(R.drawable.ic_servo_head, scaleFactor / 3, scaleFactor)
 
         setMeasuredDimension(width, height)
     }
@@ -119,14 +109,17 @@ class ServoView @JvmOverloads constructor(
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        radius = (min(width, height) / 2 * 0.8).toFloat()
+        radius = (min(width, height) / Math.PI).toFloat()
 
-        servoSetupArea.apply {
-            left = width / 2f - servoBase.width / 2
-            top = height / 2f
-            right = width / 2f + servoBase.width / 2
-            bottom = height.toFloat()
-        }
+        labelTextSize = min(labelTextSize, width / 18f)
+
+        servoSetupArea.set(
+            width / 2f - servoBase.width / 2,
+            height / 2f,
+            width / 2f + servoBase.width / 2,
+            height.toFloat()
+        )
+        frameRect.set(0f, 0f, width.toFloat(), height.toFloat())
 
         paint.textSize = zoomTextSize
         shouldRotateTagToFitSelf = paint.measureText(tag) > width / 2 - servoBase.width / 2
@@ -143,8 +136,7 @@ class ServoView @JvmOverloads constructor(
         drawServoHead(canvas)
         drawValue(canvas)
         drawTag(canvas)
-
-//        canvas.drawRect(servoSetupArea, paint)
+        drawViewFrame(canvas)
     }
 
     private fun drawServoBase(canvas: Canvas) {
@@ -234,11 +226,14 @@ class ServoView @JvmOverloads constructor(
             paint.apply {
                 textSize = labelTextSize
                 color = Color.BLACK
+                strokeWidth = 1f
+                style = Paint.Style.FILL
             }
-            val labelRadius = radius + radiusOffsetLabel
-            repeat(19) { i ->
-                labelPosition.computeXY(i * 10, labelRadius)
-                canvas.drawText((i * 10).toString(), labelPosition.x, labelPosition.y, paint)
+            val labelRadius = radius + labelTextSize * 2
+            val step = 1
+            repeat(18 / step + 1) { i ->
+                labelPosition.computeXY(i * 10 * step, labelRadius)
+                canvas.drawText((i * 10 * step).toString(), labelPosition.x, labelPosition.y, paint)
             }
         }
     }
@@ -266,36 +261,28 @@ class ServoView @JvmOverloads constructor(
         }
     }
 
+    private fun drawViewFrame(canvas: Canvas) {
+        paint.apply {
+            style = Paint.Style.STROKE
+            strokeWidth = 10f
+        }
+        canvas.drawRoundRect(frameRect, 0f, 0f, paint)
+    }
+
     private fun createScaledBitmap(
         @DrawableRes resourceId: Int,
         targetWidth: Int,
         targetHeight: Int
-    ) = BitmapFactory.Options().run {
-        inJustDecodeBounds = true
-        BitmapFactory.decodeResource(resources, resourceId, this)
-        inSampleSize = calculateInSampleSize(this, targetWidth, targetHeight)
-        inJustDecodeBounds = false
-        BitmapFactory.decodeResource(resources, resourceId, this)
-    }
-
-    private fun calculateInSampleSize(
-        options: BitmapFactory.Options,
-        targetWidth: Int,
-        targetHeight: Int
-    ): Int {
-        val (w, h) = options.run { outWidth to outHeight }
-        var inSampleSize = 1
-
-        if (w > targetWidth || h > targetHeight) {
-            val halfW = w / 2
-            val halfH = h / 2
-
-            while (halfW / inSampleSize >= targetWidth && halfH / inSampleSize >= targetHeight) {
-                inSampleSize *= 2
-            }
-        }
-
-        return inSampleSize
+    ) = Bitmap.createBitmap(
+        targetWidth,
+        targetHeight,
+        Bitmap.Config.ARGB_8888
+    ).run {
+        val canvas = Canvas(this)
+        val drawable = AppCompatResources.getDrawable(context, resourceId)!!
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+        this
     }
 
     interface OnSetupClickListener {
