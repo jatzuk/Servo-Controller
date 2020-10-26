@@ -222,6 +222,13 @@ class ServoView @JvmOverloads constructor(
         ((180 / PI) * atan2(y, x)).roundToInt()
 
     private fun drawLabels(canvas: Canvas) {
+        paint.apply {
+            textSize = labelTextSize
+            color = Color.WHITE
+            strokeWidth = 1f
+            style = Paint.Style.FILL
+        }
+
         if (isAngleGridIsShown) {
             val labelRadius = radius + labelTextSize * 2
             val step = 2
