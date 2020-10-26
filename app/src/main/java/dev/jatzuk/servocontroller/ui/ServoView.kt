@@ -223,17 +223,17 @@ class ServoView @JvmOverloads constructor(
 
     private fun drawLabels(canvas: Canvas) {
         if (isAngleGridIsShown) {
-            paint.apply {
-                textSize = labelTextSize
-                color = Color.BLACK
-                strokeWidth = 1f
-                style = Paint.Style.FILL
-            }
             val labelRadius = radius + labelTextSize * 2
-            val step = 1
+            val step = 2
             repeat(18 / step + 1) { i ->
                 labelPosition.computeXY(i * 10 * step, labelRadius)
                 canvas.drawText((i * 10 * step).toString(), labelPosition.x, labelPosition.y, paint)
+            }
+
+            val pointsOffset = labelRadius - 15 * resources.displayMetrics.density
+            repeat(19) { i ->
+                labelPosition.computeXY(i * 10, pointsOffset)
+                canvas.drawCircle(labelPosition.x, labelPosition.y, 5f, paint)
             }
         }
     }
