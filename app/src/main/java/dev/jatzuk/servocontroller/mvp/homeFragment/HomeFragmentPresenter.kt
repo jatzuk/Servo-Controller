@@ -92,7 +92,6 @@ class HomeFragmentPresenter @Inject constructor(
 
     override fun optionsMenuCreated() {
         if (!isConnectionTypeSupported()) {
-            // TODO: 16/08/20 disable bluetooth views and functionality
             val message = "${settingsHolder.connectionType} module is not found on this device"
             Log.d(TAG, message)
             view?.apply {
@@ -104,35 +103,34 @@ class HomeFragmentPresenter @Inject constructor(
     }
 
     override fun onStart() {
-        connection.connectionStrategy.currentStrategy = ConnectedStrategy(this)
-//        if (isConnectionTypeSupported()) {
-//            connection.connectionState.observe((view as HomeFragment).viewLifecycleOwner) {
-//                connection.connectionStrategy.currentStrategy = when (it!!) {
-//                    ConnectionState.ON -> {
-//                        OnStrategy(this, connection.selectedDevice == null)
-//                    }
-//                    ConnectionState.CONNECTING -> {
-//                        ConnectingStrategy(this)
-//                    }
-//                    ConnectionState.CONNECTED -> {
-//                        val shouldShowConnectedAnimation =
-//                            connection.connectionStrategy.currentStrategy !is ConnectedStrategy
-//                        ConnectedStrategy(this, shouldShowConnectedAnimation)
-//                    }
-//                    ConnectionState.DISCONNECTING -> {
-//                        DisconnectingStrategy(this)
-//                    }
-//                    ConnectionState.DISCONNECTED -> {
-//                        DisconnectedStrategy(this)
-//                    }
-//                    ConnectionState.OFF -> {
-//                        OffStrategy(this)
-//                    }
-//                }
-//            }
-//        } else {
-//            connection.connectionStrategy.currentStrategy = UnsupportedConnectionTypeStrategy(this)
-//        }
+        if (isConnectionTypeSupported()) {
+            connection.connectionState.observe((view as HomeFragment).viewLifecycleOwner) {
+                connection.connectionStrategy.currentStrategy = when (it!!) {
+                    ConnectionState.ON -> {
+                        OnStrategy(this, connection.selectedDevice == null)
+                    }
+                    ConnectionState.CONNECTING -> {
+                        ConnectingStrategy(this)
+                    }
+                    ConnectionState.CONNECTED -> {
+                        val shouldShowConnectedAnimation =
+                            connection.connectionStrategy.currentStrategy !is ConnectedStrategy
+                        ConnectedStrategy(this, shouldShowConnectedAnimation)
+                    }
+                    ConnectionState.DISCONNECTING -> {
+                        DisconnectingStrategy(this)
+                    }
+                    ConnectionState.DISCONNECTED -> {
+                        DisconnectedStrategy(this)
+                    }
+                    ConnectionState.OFF -> {
+                        OffStrategy(this)
+                    }
+                }
+            }
+        } else {
+            connection.connectionStrategy.currentStrategy = UnsupportedConnectionTypeStrategy(this)
+        }
     }
 
     override fun onDestroyView() {
@@ -169,8 +167,7 @@ class HomeFragmentPresenter @Inject constructor(
         }
 
         val data = "$command$finalAngle"
-        Log.d(TAG, "onFinalPositionDetected: $data")
-//        connection.send(data.toByteArray())
+        connection.send(data.toByteArray())
     }
 
     override fun sendData(data: ByteArray) = connection.send(data)
