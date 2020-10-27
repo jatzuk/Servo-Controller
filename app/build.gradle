@@ -126,10 +126,9 @@ dependencies {
     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
 
     // hilt
-    androidTestImplementation  "com.google.dagger:hilt-android-testing:$hilt_version"
+    androidTestImplementation "com.google.dagger:hilt-android-testing:$hilt_version"
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hilt_version"
 
 //    def leak_canary_version = "2.4"
 //    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leak_canary_version"
-
 }
