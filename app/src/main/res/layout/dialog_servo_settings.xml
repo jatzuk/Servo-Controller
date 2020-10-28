@@ -113,6 +113,7 @@
             android:layout_marginTop="32dp"
             android:text="@string/send_on"
             android:textSize="16sp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@+id/radio_group_send_mode"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_write_mode" />
@@ -125,6 +126,7 @@
             android:checkedButton="@id/rb_send_on_release"
             android:gravity="center_vertical|center_horizontal"
             android:orientation="horizontal"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="@+id/radio_group_write_mode"
             app:layout_constraintTop_toBottomOf="@+id/radio_group_write_mode">
 
