@@ -230,6 +230,10 @@ class BluetoothConnection : Connection {
     }
 
     override fun unregisterReceiver(context: Context) {
-        context.unregisterReceiver(receiver)
+        try {
+            context.unregisterReceiver(receiver)
+        } catch (e: IllegalArgumentException) {
+            Log.e(TAG, "Receiver deregistration failed", e)
+        }
     }
 }
