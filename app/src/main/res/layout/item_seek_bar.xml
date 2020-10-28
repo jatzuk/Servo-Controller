@@ -18,6 +18,7 @@
             android:id="@+id/tv_tag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/colorPrimary"
             android:textSize="24sp" />
 
         <com.google.android.material.slider.Slider
