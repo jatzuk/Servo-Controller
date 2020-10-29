@@ -131,4 +131,10 @@ dependencies {
 
 //    def leak_canary_version = "2.4"
 //    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leak_canary_version"
+
+    def google_ads_version = "19.5.0"
+    googleImplementation "com.google.android.gms:play-services-ads:$google_ads_version"
+
+    def huawei_ads_version = "13.4.30.301"
+    huaweiImplementation "com.huawei.hms:ads-lite:$huawei_ads_version"
 }

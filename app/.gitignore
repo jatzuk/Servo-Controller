@@ -1,2 +1,3 @@
 /build
-/src/main/res/values/secrets.xml
+/src/google/res/values/secrets.xml
+/src/huawei/res/values/secrets.xml
