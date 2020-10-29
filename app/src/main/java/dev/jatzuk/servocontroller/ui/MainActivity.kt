@@ -15,7 +15,9 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.databinding.ActivityMainBinding
+import dev.jatzuk.servocontroller.utils.CommonAdsInitializer
 import dev.jatzuk.servocontroller.utils.EnableConnectionHardwareContract
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -26,6 +28,9 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var enableHardwareContractLauncher: ActivityResultLauncher<Int>
         private set
+
+    @Inject
+    lateinit var adsInitializer: CommonAdsInitializer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +70,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initializeAds() {
+        adsInitializer.initializeAds(this)
+        binding.drawerContent.adBanner.adView.loadAd(adsInitializer.provideAdRequest())
     }
 
     override fun onSupportNavigateUp(): Boolean {
