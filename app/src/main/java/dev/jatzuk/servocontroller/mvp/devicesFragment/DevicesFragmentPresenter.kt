@@ -1,6 +1,5 @@
 package dev.jatzuk.servocontroller.mvp.devicesFragment
 
-import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
@@ -12,9 +11,8 @@ import dev.jatzuk.servocontroller.other.REQUEST_ENABLE_WIFI
 import dev.jatzuk.servocontroller.ui.AvailableDevicesFragment
 import dev.jatzuk.servocontroller.ui.MainActivity
 import dev.jatzuk.servocontroller.ui.PairedDevicesFragment
+import timber.log.Timber
 import javax.inject.Inject
-
-private const val TAG = "DevicesFragmentPretr"
 
 class DevicesFragmentPresenter @Inject constructor(
     private var view: DevicesFragmentContract.View?,
@@ -39,7 +37,7 @@ class DevicesFragmentPresenter @Inject constructor(
         if (connection.isConnectionTypeSupported()) {
             view?.updateButtonText(getConnectionType().name)
             connection.connectionState.observe(((view as Fragment).requireActivity())) {
-                Log.d(TAG, "observed value has changed: $it")
+                Timber.d("observed value has changed: $it")
                 when (it!!) {
                     ConnectionState.ON -> {
                         view?.apply {

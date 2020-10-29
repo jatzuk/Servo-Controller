@@ -11,8 +11,6 @@ import dev.jatzuk.servocontroller.connection.BluetoothConnection
 import dev.jatzuk.servocontroller.connection.ConnectionState
 import dev.jatzuk.servocontroller.utils.notifyDataSetChanged
 
-private const val TAG = "BluetoothReceiver"
-
 class BluetoothReceiver(
     private val connection: BluetoothConnection
 ) : BroadcastReceiver() {

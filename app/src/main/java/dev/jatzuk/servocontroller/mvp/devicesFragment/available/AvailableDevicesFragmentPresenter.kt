@@ -23,8 +23,6 @@ import dev.jatzuk.servocontroller.other.ACCESS_FINE_LOCATION_REQUEST_CODE
 import dev.jatzuk.servocontroller.utils.BottomPaddingDecoration
 import javax.inject.Inject
 
-private const val TAG = "AvailableDevicesFragmen"
-
 private val previouslySelectedItemPosition = MutableLiveData<Int>(null)
 private val selectedItemPosition = MutableLiveData<Int>(null)
 

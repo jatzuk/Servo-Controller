@@ -9,16 +9,15 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
 import android.os.Parcelable
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dev.jatzuk.servocontroller.connection.receiver.BluetoothReceiver
 import dev.jatzuk.servocontroller.mvp.homeFragment.ConnectionStrategy
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.io.IOException
 import java.util.*
 
-private const val TAG = "BluetoothConnection"
 private const val UUIDString = "00001101-0000-1000-8000-00805f9b34fb"
 private const val SCAN_TIMEOUT = 10_000L
 
@@ -31,7 +30,7 @@ class BluetoothConnection : Connection {
     private val leScanCallback: ScanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
-            Log.d(TAG, "onScanResult: $result")
+            Timber.d("onScanResult: $result")
             result?.let {
                 (receiver as BluetoothReceiver).availableDevices.value!!.add(it.device)
             }
@@ -100,7 +99,7 @@ class BluetoothConnection : Connection {
             method.invoke(it) as Boolean && socket != null
         }
     } catch (e: IllegalStateException) {
-        Log.e(TAG, "isConnected: illegal state exception", e)
+        Timber.e(e, "isConnected: illegal state exception")
         false
     } ?: false
 
@@ -169,10 +168,10 @@ class BluetoothConnection : Connection {
             connectionState.postValue(ConnectionState.CONNECTING)
             socket?.connect()
             connectionState.postValue(ConnectionState.CONNECTED)
-            Log.d(TAG, "got output stream")
+            Timber.d("got output stream")
             true
         } catch (e: IOException) {
-            Log.e(TAG, "Failed to connect", e)
+            Timber.e(e, "Failed to connect")
             connectionState.postValue(ConnectionState.DISCONNECTED)
             false
         }
@@ -182,7 +181,7 @@ class BluetoothConnection : Connection {
         socket?.outputStream!!.write(data)
         true
     } catch (e: IOException) {
-        Log.e(TAG, "Error occurred when sending data", e)
+        Timber.e(e, "Error occurred when sending data")
         false
     }
 
@@ -194,7 +193,7 @@ class BluetoothConnection : Connection {
             socket = null
             true
         } catch (e: IOException) {
-            Log.e(TAG, "Could not close the client socket", e)
+            Timber.e(e, "Could not close the client socket")
             false
         } finally {
             connectionState.postValue(ConnectionState.DISCONNECTED)
@@ -233,7 +232,7 @@ class BluetoothConnection : Connection {
         try {
             context.unregisterReceiver(receiver)
         } catch (e: IllegalArgumentException) {
-            Log.e(TAG, "Receiver deregistration failed", e)
+            Timber.e(e, "Receiver deregistration failed")
         }
     }
 }

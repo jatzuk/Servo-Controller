@@ -14,8 +14,6 @@ import dev.jatzuk.servocontroller.other.ServoTexture
 import dev.jatzuk.servocontroller.ui.HomeFragment
 import dev.jatzuk.servocontroller.ui.ServoView
 
-private const val TAG = "ServoAdapter"
-
 class ServoAdapter(
     private val textureType: ServoTexture
 ) : ListAdapter<Servo, ServoAdapter.AbstractViewHolder>(ServoDiffCallback()) {

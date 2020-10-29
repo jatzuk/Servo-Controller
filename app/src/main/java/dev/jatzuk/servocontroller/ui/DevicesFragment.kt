@@ -11,8 +11,6 @@ import dev.jatzuk.servocontroller.databinding.FragmentDevicesBinding
 import dev.jatzuk.servocontroller.mvp.devicesFragment.DevicesFragmentContract
 import javax.inject.Inject
 
-private const val TAG = "DevicesFragment"
-
 @AndroidEntryPoint
 class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentContract.View {
 

@@ -16,7 +16,6 @@ private const val DEFAULT_ZOOM_TEXT_SIZE = 10f
 private const val DEFAULT_LABEL_TEXT_SIZE = 14f
 private const val DEFAULT_VALUE_TEXT_SIZE = 24f
 private const val SETUP_DIALOG_CLICK_LISTENER_DELAY = 1000L
-private const val TAG = "ServoView"
 
 class ServoView @JvmOverloads constructor(
     context: Context,

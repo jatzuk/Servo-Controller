@@ -8,14 +8,12 @@ import android.net.wifi.ScanResult
 import android.net.wifi.WifiManager
 import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pManager
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dev.jatzuk.servocontroller.connection.ConnectionState
 import dev.jatzuk.servocontroller.connection.WifiConnection
 import dev.jatzuk.servocontroller.utils.notifyDataSetChanged
-
-private const val TAG = "WifiReceiver"
+import timber.log.Timber
 
 class WifiReceiver(
     private val connection: WifiConnection,
@@ -36,11 +34,10 @@ class WifiReceiver(
             WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION -> {
                 // Check to see if Wi-Fi is enabled and notify appropriate activity
 
-                val state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1)
-                when (state) {
+                when (intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1)) {
                     WifiP2pManager.WIFI_P2P_STATE_ENABLED -> {
                         // Wifi P2P is enabled
-                        Log.d(TAG, "onReceive: WIFI_P2P_STATE_ENABLED")
+                        Timber.d("onReceive: WIFI_P2P_STATE_ENABLED")
                         connection.connectionState.postValue(ConnectionState.ON)
 //                        manager.requestPeers(channel) { peers ->
 //                            Log.d(TAG, "onReceive peer: $peers")
@@ -48,14 +45,14 @@ class WifiReceiver(
                     }
                     else -> {
                         // Wifi p2p is not enabled
-                        Log.d(TAG, "onReceive: WIFI_P2P_STATE_DISABLED")
+                        Timber.d("onReceive: WIFI_P2P_STATE_DISABLED")
                         connection.connectionState.postValue(ConnectionState.OFF)
                     }
                 }
             }
             WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION -> {
                 // Call WifiP2pManager.requestPeers() to get a list of current peers
-                Log.d(TAG, "onReceive: WIFI_P2P_PEERS_CHANGED_ACTION")
+                Timber.d("onReceive: WIFI_P2P_PEERS_CHANGED_ACTION")
                 wifiP2pManager.requestPeers(channel) { peers ->
                     val devices = peers.deviceList.toTypedArray()
                     val filtered = devices.filter { !_availableP2PDevices.value!!.contains(it) }
@@ -73,7 +70,7 @@ class WifiReceiver(
 
             // default wifi scan
             WifiManager.SCAN_RESULTS_AVAILABLE_ACTION -> {
-                Log.d(TAG, "onReceive: SCAN_RESULTS_AVAILABLE_ACTION")
+                Timber.d("onReceive: SCAN_RESULTS_AVAILABLE_ACTION")
                 val success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false)
                 if (success) {
                     val scanResults = wifiManager.scanResults.sortedByDescending { it.SSID }

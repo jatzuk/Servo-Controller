@@ -17,8 +17,6 @@ import dev.jatzuk.servocontroller.other.Servo
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
-private const val TAG = "HomeFragment"
-
 @AndroidEntryPoint
 class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View {
 

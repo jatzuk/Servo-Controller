@@ -15,7 +15,6 @@ import dev.jatzuk.servocontroller.mvp.servoSetupDialog.ServoSetupDialogPresenter
 import dev.jatzuk.servocontroller.other.Servo
 import javax.inject.Inject
 
-private const val TAG = "ServoSetupDialog"
 private const val POSITION_ARG_KEY = "POSITION_ARG_KEY"
 
 @AndroidEntryPoint

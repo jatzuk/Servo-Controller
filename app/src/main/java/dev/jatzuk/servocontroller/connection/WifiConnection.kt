@@ -16,7 +16,6 @@ import dev.jatzuk.servocontroller.connection.receiver.WifiReceiver
 import dev.jatzuk.servocontroller.mvp.homeFragment.ConnectionStrategy
 import kotlinx.coroutines.*
 
-private const val TAG = "WifiConnection"
 private const val SCAN_TIMEOUT = 10_000L
 
 class WifiConnection(private val context: Context) : Connection {

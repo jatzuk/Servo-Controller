@@ -14,8 +14,6 @@ import dev.jatzuk.servocontroller.utils.PreferenceDropDownSummaryProvider
 import dev.jatzuk.servocontroller.utils.SettingsHolder
 import javax.inject.Inject
 
-private const val TAG = "SettingsFragment"
-
 @AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat() {
 

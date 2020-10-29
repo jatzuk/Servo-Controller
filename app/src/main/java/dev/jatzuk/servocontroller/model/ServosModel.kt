@@ -9,8 +9,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-private const val TAG = "ServosModel"
-
 class ServosModel @Inject constructor(private val servoDAO: ServoDAO) {
 
     private val _servos = MutableLiveData(ArrayList<Servo>())

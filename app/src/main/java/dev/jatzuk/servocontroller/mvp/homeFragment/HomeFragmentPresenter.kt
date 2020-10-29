@@ -1,7 +1,6 @@
 package dev.jatzuk.servocontroller.mvp.homeFragment
 
 import android.content.res.Configuration
-import android.util.Log
 import android.view.WindowManager
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -21,9 +20,8 @@ import dev.jatzuk.servocontroller.ui.ServoSetupDialog
 import dev.jatzuk.servocontroller.utils.BottomPaddingDecoration
 import dev.jatzuk.servocontroller.utils.SettingsHolder
 import kotlinx.coroutines.*
+import timber.log.Timber
 import javax.inject.Inject
-
-private const val TAG = "HomeFragmentPresenter"
 
 class HomeFragmentPresenter @Inject constructor(
     var view: HomeFragmentContract.View?,
@@ -93,7 +91,7 @@ class HomeFragmentPresenter @Inject constructor(
     override fun optionsMenuCreated() {
         if (!isConnectionTypeSupported()) {
             val message = "${settingsHolder.connectionType} module is not found on this device"
-            Log.d(TAG, message)
+            Timber.d(message)
             view?.apply {
                 showToast(message)
                 updateConnectionMenuIconVisibility(false)
@@ -225,7 +223,7 @@ class HomeFragmentPresenter @Inject constructor(
                 requestConnectionHardware()
             }
             else -> {
-                Log.d(TAG, "connectionIconPressed: nothing to do")
+                Timber.d("connectionIconPressed: nothing to do")
             }
         }
     }
@@ -249,7 +247,7 @@ class HomeFragmentPresenter @Inject constructor(
                     requestConnectionHardware()
                 }
                 else -> {
-                    Log.d(TAG, "connectionButtonPressed: nothing to do")
+                    Timber.d("connectionButtonPressed: nothing to do")
                 }
             }
         }
