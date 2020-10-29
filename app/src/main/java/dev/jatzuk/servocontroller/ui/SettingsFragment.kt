@@ -42,12 +42,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
         }
 
-        preferenceScreen.findPreference<DropDownPreference>(
-            getString(R.string.key_servos_textures)
-        )?.apply {
-            summaryProvider = PreferenceDropDownSummaryProvider()
-        }
-
         preferenceScreen.findPreference<SeekBarPreference>(
             getString(R.string.key_servos_count)
         )?.apply {
@@ -62,11 +56,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
         preferenceScreen.findPreference<DropDownPreference>(
             getString(R.string.key_servos_textures)
         )?.apply {
+            summaryProvider = PreferenceDropDownSummaryProvider()
+            val angleGridPreference = findPreference<SwitchPreferenceCompat>(
+                getString(R.string.key_is_angle_grid_should_show)
+            )!!
+            var servoTexture = ServoTexture.values()[entryValues.indexOf(value)]
+            angleGridPreference.isEnabled = servoTexture == ServoTexture.TEXTURE
             setOnPreferenceChangeListener { _, newValue ->
-                val index = entryValues.indexOf(newValue)
-                val textureType = ServoTexture.values()[index]
+                servoTexture = ServoTexture.values()[entryValues.indexOf(newValue)]
+                angleGridPreference.isEnabled = servoTexture == ServoTexture.TEXTURE
                 settingsHolder.applyChanges(
-                    servosTexture = textureType
+                    servosTexture = servoTexture
                 )
                 true
             }
