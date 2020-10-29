@@ -1,9 +1,8 @@
-package dev.jatzuk.servocontroller
+package dev.jatzuk.servocontroller.utils
 
 import android.content.Context
 import com.huawei.hms.ads.AdParam
 import com.huawei.hms.ads.HwAds
-import dev.jatzuk.servocontroller.utils.CommonAdsInitializer
 
 class AdsInitializer : CommonAdsInitializer {
 

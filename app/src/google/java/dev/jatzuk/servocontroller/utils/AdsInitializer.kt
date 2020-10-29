@@ -1,9 +1,8 @@
-package dev.jatzuk.servocontroller
+package dev.jatzuk.servocontroller.utils
 
 import android.content.Context
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
-import dev.jatzuk.servocontroller.utils.CommonAdsInitializer
 
 class AdsInitializer : CommonAdsInitializer {
 
