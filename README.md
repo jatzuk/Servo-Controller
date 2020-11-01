@@ -29,11 +29,9 @@
 # Screenshots
 
 <img src=".github/screenshots/main_screen.png" width="250"/>
-
 <img src=".github/screenshots/main_screen_double_servo.png" width="250"/>
 
 <img src=".github/screenshots/main_screen_quad_servo.png" width="250"/>
-
 <img src=".github/screenshots/main_screen_dialog_window.png" width="250"/>
 
 ## Download
