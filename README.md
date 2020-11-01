@@ -1,6 +1,6 @@
 # Servo Controller
 
-## Android Application for communicating with Arduino-comparable Bluetooth hardware and modules
+## Android Application for communicating with Arduino-compatible Bluetooth hardware and modules
 
 ## Technologies and libraries
 
