@@ -28,11 +28,10 @@
 
 # Screenshots
 
-<img src=".github/screenshots/main_screen.png" width="250"/>
-<img src=".github/screenshots/main_screen_double_servo.png" width="250"/>
-
-<img src=".github/screenshots/main_screen_quad_servo.png" width="250"/>
-<img src=".github/screenshots/main_screen_dialog_window.png" width="250"/>
+<img src=".github/screenshots/main_screen.png" alt="Screenshot Main Screen" width="200"/>
+<img src=".github/screenshots/main_screen_double_servo.png" alt="Screenshot double servos" width="200"/>
+<img src=".github/screenshots/main_screen_quad_servo.png" alt="Screenshot quad servos" width="200"/>
+<img src=".github/screenshots/main_screen_dialog_window.png" alt="Screenshot window dialog" width="200"/>
 
 ## Download
 
