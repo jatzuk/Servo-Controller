@@ -9,12 +9,16 @@
         <item name="android:colorBackground">@color/colorPrimaryDark</item>
         <item name="colorSurface">@color/colorPrimaryDark</item>
 
-
         <item name="appBarLayoutStyle">@style/AppbarStyle</item>
         <item name="toolbarStyle">@style/ToolbarStyle</item>
         <item name="drawerArrowStyle">@style/ToolbarDrawerIconStyle</item>
 
         <item name="materialButtonStyle">@style/ButtonStyle</item>
+    </style>
+
+    <style name="SplashScreenTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_image</item>
+        <item name="android:statusBarColor">@color/colorAccent</item>
     </style>
 
     <style name="AppbarStyle" parent="@style/Widget.MaterialComponents.AppBarLayout.Primary">
