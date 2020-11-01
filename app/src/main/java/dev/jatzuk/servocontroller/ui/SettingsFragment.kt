@@ -58,7 +58,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
             val angleGridPreference = findPreference<SwitchPreferenceCompat>(
                 getString(R.string.key_is_angle_grid_should_show)
             )!!
-            var servoTexture = ServoTexture.values()[entryValues.indexOf(value)]
+            val index =
+                if (value.isNullOrEmpty()) 0 // in case value is not loaded properly(cold start)
+                else entryValues.indexOf(value)
+            var servoTexture = ServoTexture.values()[index]
             angleGridPreference.isEnabled = servoTexture == ServoTexture.TEXTURE
             setOnPreferenceChangeListener { _, newValue ->
                 servoTexture = ServoTexture.values()[entryValues.indexOf(newValue)]
