@@ -1,3 +1,5 @@
 /build
 /src/google/res/values/secrets.xml
 /src/huawei/res/values/secrets.xml
+/google/release/
+/huawei/release/
