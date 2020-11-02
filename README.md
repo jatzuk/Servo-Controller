@@ -4,7 +4,7 @@
 
 ### Description
 
-Application allows you to send data over Bluetooth protocol to Arduino compatible Bluetooth modules(such as HC-06 or similar).
+Servo Controller allows you to send data over Bluetooth protocol to Arduino compatible Bluetooth modules(such as HC-06 or similar).
 It has a cute simple servomotor texture to intuitively control rotation with your smartphone.
 
 Features:
