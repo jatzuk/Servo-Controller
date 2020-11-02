@@ -2,6 +2,20 @@
 
 ## Android Application for communicating with Arduino-compatible Bluetooth hardware and modules
 
+### Description
+
+Application allows you to send data over Bluetooth protocol to Arduino compatible Bluetooth modules(such as HC-06 or similar).
+It has a cute simple servomotor texture to intuitively control rotation with your smartphone.
+
+Features:
+
+- Setup commands that will transfer to the Arduino.
+- Tag each servo to differ them.
+- Choose write mode(millis/microseconds).
+- Simultaneously control up to 10 servos.
+- Keep the phone screen awake on an active connection session.
+- Change the servomotor texture view option for a better experience.
+
 ## Technologies and libraries
 
 - [MVP](https://www.raywenderlich.com/7026-getting-started-with-mvp-model-view-presenter-on-android)
@@ -16,7 +30,7 @@
 - [Timber](https://github.com/JakeWharton/timber)
 - [Motion Layout](https://developer.android.com/training/constraint-layout/motionlayout)
 
-### Testing section
+## Testing section
 
 - [Junit](https://developer.android.com/training/testing/unit-testing/local-unit-tests)
 - [Truth](https://truth.dev)
@@ -26,15 +40,15 @@
 - [Fragment Testing](https://developer.android.com/training/basics/fragments/testing)
 - [Leak canary](https://square.github.io/leakcanary/)
 
-# Screenshots
+## Screenshots
 
-<img src=".github/screenshots/main_screen.png" 
+<img src=".github/screenshots/main_screen.png"
   alt="Screenshot Main Screen" width="200"/>
-<img src=".github/screenshots/main_screen_double_servo.png" 
+<img src=".github/screenshots/main_screen_double_servo.png"
   alt="Screenshot double servos" width="200"/>
-<img src=".github/screenshots/main_screen_quad_servo.png" 
+<img src=".github/screenshots/main_screen_quad_servo.png"
   alt="Screenshot quad servos" width="200"/>
-<img src=".github/screenshots/main_screen_dialog_window.png" 
+<img src=".github/screenshots/main_screen_dialog_window.png"
   alt="Screenshot window dialog" width="200"/>
 
 ## Download
