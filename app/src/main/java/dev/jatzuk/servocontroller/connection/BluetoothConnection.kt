@@ -182,6 +182,9 @@ class BluetoothConnection : Connection {
         true
     } catch (e: IOException) {
         Timber.e(e, "Error occurred when sending data")
+        CoroutineScope(Dispatchers.IO).launch {
+            disconnect()
+        }
         false
     }
 
