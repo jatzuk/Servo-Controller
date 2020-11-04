@@ -31,6 +31,7 @@ class HomeFragmentPresenter @Inject constructor(
 ) : HomeFragmentContract.Presenter {
 
     private lateinit var connectionJob: CompletableJob
+    private var shouldDisplaySentData = false
 
     override fun setupRecyclerView(recyclerView: RecyclerView) {
         recyclerView.apply {
@@ -85,6 +86,8 @@ class HomeFragmentPresenter @Inject constructor(
             servosModel.loadServosFromDB(settingsHolder.servosCount)
             registerBroadcastReceiver()
             connection.checkIfPreviousDeviceStored(activity.baseContext)
+
+            shouldDisplaySentData = settingsHolder.shouldDisplaySentData
         }
     }
 
@@ -165,7 +168,10 @@ class HomeFragmentPresenter @Inject constructor(
         }
 
         val data = "$command$finalAngle"
-        connection.send(data.toByteArray())
+        val success = connection.send(data.toByteArray())
+        if (success && shouldDisplaySentData) {
+            view?.showToast(data, Toast.LENGTH_SHORT)
+        }
     }
 
     override fun sendData(data: ByteArray) = connection.send(data)

@@ -40,4 +40,5 @@
     <string name="send_on">Отправить по</string>
     <string name="release">Удержание</string>
     <string name="button_click">Нажатие кнопки</string>
+    <string name="display_sent_data">Показывать отправленные данные</string>
 </resources>

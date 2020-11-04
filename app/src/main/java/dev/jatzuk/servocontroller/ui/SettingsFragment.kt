@@ -51,6 +51,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
         }
 
+        preferenceScreen.findPreference<SwitchPreferenceCompat>(
+            getString(R.string.key_should_display_sent_data)
+        )?.apply {
+            setOnPreferenceChangeListener { _, newValue ->
+                settingsHolder.applyChanges(
+                    shouldDisplaySentData = newValue as Boolean
+                )
+                true
+            }
+        }
+
         preferenceScreen.findPreference<DropDownPreference>(
             getString(R.string.key_servos_textures)
         )?.apply {

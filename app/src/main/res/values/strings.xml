@@ -48,5 +48,6 @@
     <string name="send_on">Send on</string>
     <string name="release">Release</string>
     <string name="button_click">Button click</string>
+    <string name="display_sent_data">Display sent data</string>
 
 </resources>

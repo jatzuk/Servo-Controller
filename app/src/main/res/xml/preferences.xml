@@ -21,6 +21,14 @@
             app:showSeekBarValue="true"
             app:title="@string/servos_count" />
 
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:icon="@drawable/ic_display_sent_data"
+            android:key="@string/key_should_display_sent_data"
+            android:title="@string/display_sent_data"
+            app:summaryOff="@string/disabled"
+            app:summaryOn="@string/enabled" />
+
         <DropDownPreference
             android:icon="@drawable/ic_texture"
             app:entries="@array/servo_view"

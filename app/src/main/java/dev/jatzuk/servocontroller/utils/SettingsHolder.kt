@@ -28,9 +28,14 @@ data class SettingsHolder @Inject constructor(
     private var _shouldKeepScreenOn: Boolean = loadShouldKeepScreenOnValueFromSharedPreferences()
     val shouldKeepScreenOn get() = _shouldKeepScreenOn
 
+    private var _shouldDisplaySentData: Boolean =
+        loadShouldDisplaySentDataValueFromSharedPreferences()
+    val shouldDisplaySentData get() = _shouldDisplaySentData
+
     fun applyChanges(
         connectionType: ConnectionType = this.connectionType,
         servosCount: Int = this.servosCount,
+        shouldDisplaySentData: Boolean = this.shouldDisplaySentData,
         servosTexture: ServoTexture = this.texture,
         shouldKeepScreenOn: Boolean = this.shouldKeepScreenOn
     ) {
@@ -39,6 +44,12 @@ data class SettingsHolder @Inject constructor(
                 putString(
                     applicationContext.getString(R.string.key_connection_type),
                     connectionType.name
+                )
+            }
+            if (shouldDisplaySentData != _shouldDisplaySentData) {
+                putBoolean(
+                    applicationContext.getString(R.string.key_should_display_sent_data),
+                    shouldDisplaySentData
                 )
             }
             if (servosCount != _servosCount) {
@@ -60,10 +71,17 @@ data class SettingsHolder @Inject constructor(
         }
 
         _connectionType = connectionType
+        _shouldDisplaySentData = shouldDisplaySentData
         _servosCount = servosCount
         _servosTexture = servosTexture
         _shouldKeepScreenOn = shouldKeepScreenOn
     }
+
+    private fun loadShouldDisplaySentDataValueFromSharedPreferences() =
+        sharedPreferences.getBoolean(
+            applicationContext.getString(R.string.key_should_display_sent_data),
+            false
+        ).also { _shouldDisplaySentData = it }
 
     private fun loadConnectionTypeFromSharedPreferences(): ConnectionType {
         val stringType = sharedPreferences.getString(
