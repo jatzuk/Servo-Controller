@@ -1,6 +1,5 @@
 package dev.jatzuk.servocontroller.mvp.devicesFragment
 
-import android.widget.Toast
 import androidx.annotation.RawRes
 import dev.jatzuk.servocontroller.connection.ConnectionType
 import dev.jatzuk.servocontroller.databinding.FragmentDevicesBinding
@@ -31,8 +30,6 @@ interface DevicesFragmentContract {
         fun showAnimation(@RawRes resourceId: Int, speed: Float = 1f, timeout: Long = 0L)
 
         fun stopAnimation()
-
-        fun showToast(message: String, length: Int = Toast.LENGTH_SHORT)
 
         override fun assignPresenter(presenter: Presenter) {}
     }

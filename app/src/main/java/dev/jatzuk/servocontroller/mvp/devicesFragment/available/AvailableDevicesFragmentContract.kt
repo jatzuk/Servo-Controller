@@ -3,7 +3,6 @@ package dev.jatzuk.servocontroller.mvp.devicesFragment.available
 import android.os.Parcelable
 import android.view.Menu
 import android.view.MenuInflater
-import android.widget.Toast
 import androidx.annotation.RawRes
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
@@ -46,8 +45,6 @@ interface AvailableDevicesFragmentContract {
         fun stopAnimation()
 
         fun updateButton(text: String, isVisible: Boolean = true)
-
-        fun showToast(message: String, length: Int = Toast.LENGTH_SHORT)
 
         override fun assignPresenter(presenter: Presenter) {}
     }

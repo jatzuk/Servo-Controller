@@ -1,7 +1,7 @@
 package dev.jatzuk.servocontroller.ui
 
 import android.os.Bundle
-import android.widget.Toast
+import android.util.TypedValue
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -15,6 +15,7 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.databinding.ActivityMainBinding
+import dev.jatzuk.servocontroller.mvp.BaseView
 import dev.jatzuk.servocontroller.utils.CommonAdsInitializer
 import dev.jatzuk.servocontroller.utils.EnableConnectionHardwareContract
 import javax.inject.Inject

@@ -10,6 +10,7 @@ import com.airbnb.lottie.LottieDrawable
 import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.databinding.FragmentAvailableDevicesBinding
+import dev.jatzuk.servocontroller.databinding.LayoutToastBinding
 import dev.jatzuk.servocontroller.mvp.devicesFragment.available.AvailableDevicesFragmentContract
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -19,6 +20,7 @@ class AvailableDevicesFragment : Fragment(R.layout.fragment_available_devices),
     AvailableDevicesFragmentContract.View {
 
     private var binding: FragmentAvailableDevicesBinding? = null
+    private var toastBinding: LayoutToastBinding? = null
 
     @Inject
     lateinit var presenter: AvailableDevicesFragmentContract.Presenter
@@ -37,6 +39,7 @@ class AvailableDevicesFragment : Fragment(R.layout.fragment_available_devices),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentAvailableDevicesBinding.bind(view)
+        toastBinding = LayoutToastBinding.inflate(layoutInflater)
 
         presenter.apply {
             onViewCreated(binding!!.layoutScanAvailableDevices)
@@ -115,7 +118,17 @@ class AvailableDevicesFragment : Fragment(R.layout.fragment_available_devices),
     }
 
     override fun showToast(message: String, length: Int) {
-        Toast.makeText(requireContext(), message, length).show()
+        try {
+            toastBinding?.textView?.text = message
+            Toast(requireContext()).apply {
+                view = toastBinding!!.root
+                setGravity(Gravity.TOP, 0, MainActivity.toastOffset)
+                duration = length
+                show()
+            }
+        } catch (e: IllegalArgumentException) {
+            Toast.makeText(requireContext(), message, length).show()
+        }
     }
 
     override fun updateButton(text: String, isVisible: Boolean) {
@@ -132,6 +145,7 @@ class AvailableDevicesFragment : Fragment(R.layout.fragment_available_devices),
 
     override fun onDestroyView() {
         binding = null
+        toastBinding = null
         super.onDestroyView()
     }
 }

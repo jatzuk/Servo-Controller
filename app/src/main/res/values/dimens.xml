@@ -4,4 +4,5 @@
     <dimen name="side_nav_bar_corner_radius">64dp</dimen>
     <dimen name="item_decoration_padding_offset">8dp</dimen>
     <dimen name="lottie_animation_size">150dp</dimen>
+    <dimen name="toast_image_view_padding">5dp</dimen>
 </resources>

@@ -22,6 +22,8 @@ import javax.inject.Inject
 class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View {
 
     private var binding: FragmentHomeBinding? = null
+    private var toastBinding: LayoutToastBinding? = null
+
     private lateinit var connectionIcon: MenuItem
     private lateinit var servoAdapter: ServoAdapter
 
@@ -42,6 +44,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentHomeBinding.bind(view)
+        toastBinding = LayoutToastBinding.inflate(layoutInflater)
 
         binding?.layoutIncludedEnableHardwareRequest?.button?.setOnClickListener {
             presenter.connectionButtonPressed()
@@ -91,7 +94,17 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
     }
 
     override fun showToast(message: String, length: Int) {
-        Toast.makeText(requireContext(), message, length).show()
+        try {
+            toastBinding?.textView?.text = message
+            Toast(requireContext()).apply {
+                view = toastBinding!!.root
+                setGravity(Gravity.TOP, 0, MainActivity.toastOffset)
+                duration = length
+                show()
+            }
+        } catch (e: IllegalArgumentException) {
+            Toast.makeText(requireContext(), message, length).show()
+        }
     }
 
     override fun updateConnectionMenuIconVisibility(isVisible: Boolean) {

@@ -172,7 +172,7 @@ class HomeFragmentPresenter @Inject constructor(
         val data = "$command$finalAngle"
         val success = connection.send(data.toByteArray())
         if (success && shouldDisplaySentData) {
-            view?.showToast(data, Toast.LENGTH_SHORT)
+            view?.showToast(data)
         }
     }
 

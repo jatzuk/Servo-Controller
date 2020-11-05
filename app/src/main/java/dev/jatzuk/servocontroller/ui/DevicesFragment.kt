@@ -1,7 +1,6 @@
 package dev.jatzuk.servocontroller.ui
 
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.widget.Toast
@@ -19,11 +18,6 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
 
     private var binding: FragmentDevicesBinding? = null
     private var toastBinding: LayoutToastBinding? = null
-    private var toastOffset = 0
-
-//    @Inject
-//    @Named("devicesFragmentR")
-//    lateinit var enableHardwareContractLauncher: ActivityResultLauncher<Int>
 
     @Inject
     lateinit var presenter: DevicesFragmentContract.Presenter
@@ -32,19 +26,6 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentDevicesBinding.bind(view)
         toastBinding = LayoutToastBinding.inflate(layoutInflater)
-
-        val tv = TypedValue()
-        toastOffset = if (requireActivity().theme.resolveAttribute(
-                R.attr.actionBarSize,
-                tv,
-                true
-            )
-        ) {
-            val size = TypedValue.complexToDimensionPixelOffset(tv.data, resources.displayMetrics)
-            size + size / 2
-        } else {
-            0
-        }
 
         binding?.layoutEnableHardwareRequest?.button?.apply {
             setOnClickListener {
@@ -57,9 +38,6 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
             onViewCreated()
         }
     }
-
-//    override fun <T : Any> getRequestLauncher() =
-//        enableHardwareContractLauncher as ActivityResultLauncher<T>
 
     override fun updateTabLayoutVisibility(isVisible: Boolean) {
         binding?.apply {
@@ -102,7 +80,7 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
             toastBinding?.textView?.text = message
             Toast(requireContext()).apply {
                 view = toastBinding!!.root
-                setGravity(Gravity.TOP, 0, toastOffset)
+                setGravity(Gravity.TOP, 0, MainActivity.toastOffset)
                 duration = length
                 show()
             }
