@@ -93,11 +93,13 @@ class HomeFragmentPresenter @Inject constructor(
 
     override fun optionsMenuCreated() {
         if (!isConnectionTypeSupported()) {
-            val message = "${settingsHolder.connectionType} module is not found on this device"
+            val message = (view as Fragment).requireContext()
+                .getString(R.string.module_not_found, "${settingsHolder.connectionType}")
             Timber.d(message)
             view?.apply {
                 showToast(message)
                 updateConnectionMenuIconVisibility(false)
+                updateNavigationMenuItemAvailability(false, 1)
             }
         }
         view?.updateConnectionStateIcon(getIconBasedOnConnectionType())

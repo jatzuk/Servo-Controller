@@ -53,6 +53,7 @@ class OffStrategy(presenter: HomeFragmentPresenter) : AbstractConnectionStrategy
         presenter.view?.apply {
             setRecyclerViewVisibility(false)
             updateConnectionButton(provideButtonText())
+            updateNavigationMenuItemAvailability(false, 1)
             updateSelectedDeviceHint(false)
             showAnimation(R.raw.bluetooth_enable)
         }
@@ -83,6 +84,7 @@ class OnStrategy(
             }
 
             updateConnectionButton(provideButtonText())
+            updateNavigationMenuItemAvailability(true, 1)
             stopAnimation()
         }
     }

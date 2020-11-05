@@ -12,6 +12,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.adapters.ServoAdapter
 import dev.jatzuk.servocontroller.databinding.FragmentHomeBinding
+import dev.jatzuk.servocontroller.databinding.LayoutToastBinding
 import dev.jatzuk.servocontroller.mvp.homeFragment.HomeFragmentContract
 import dev.jatzuk.servocontroller.other.Servo
 import kotlinx.coroutines.*
@@ -99,6 +100,11 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
         }
     }
 
+    override fun updateNavigationMenuItemAvailability(isAvailable: Boolean, index: Int) {
+        (requireActivity() as NavigationMenuAvailabilitySwitcher)
+            .updateNavigationMenuItemAvailability(isAvailable, index)
+    }
+
     override fun setRecyclerViewVisibility(isVisible: Boolean) {
         binding?.recyclerView?.updateVisibility(isVisible)
     }
@@ -166,6 +172,12 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
 
     override fun onDestroyView() {
         binding = null
+        toastBinding = null
         super.onDestroyView()
+    }
+
+    interface NavigationMenuAvailabilitySwitcher {
+
+        fun updateNavigationMenuItemAvailability(isVisible: Boolean, index: Int)
     }
 }

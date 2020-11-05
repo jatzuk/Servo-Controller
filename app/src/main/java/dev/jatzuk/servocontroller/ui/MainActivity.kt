@@ -20,7 +20,7 @@ import dev.jatzuk.servocontroller.utils.EnableConnectionHardwareContract
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), HomeFragment.NavigationMenuAvailabilitySwitcher {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -57,17 +57,22 @@ class MainActivity : AppCompatActivity() {
 
         enableHardwareContractLauncher =
             registerForActivityResult(EnableConnectionHardwareContract()) { result ->
-                if (result) {
-                    when (val fragment = supportFragmentManager.fragments[0]) {
-                        is HomeFragment -> fragment.presenter.onRequestEnableHardwareReceived()
-                        is DevicesFragment -> fragment.presenter.onRequestEnableHardwareReceived()
-                    }
-                } else Toast.makeText(
-                    this,
-                    getString(R.string.enable_connection_module_info),
-                    Toast.LENGTH_SHORT
-                ).show()
+                val fragment =
+                    supportFragmentManager.fragments.last().childFragmentManager.fragments.last()
+                if (!result) {
+                    (fragment as BaseView<*>).showToast(
+                        getString(R.string.enable_connection_module_info)
+                    )
+                }
             }
+
+        val tv = TypedValue()
+        toastOffset = if (theme.resolveAttribute(R.attr.actionBarSize, tv, true)) {
+            val height = TypedValue.complexToDimensionPixelOffset(tv.data, resources.displayMetrics)
+            height + height / 2
+        } else {
+            0
+        }
     }
 
     private fun initializeAds() {
@@ -77,5 +82,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+    override fun updateNavigationMenuItemAvailability(isVisible: Boolean, index: Int) {
+        binding.navView.menu.getItem(index).isEnabled = isVisible
+    }
+
+    companion object {
+
+        var toastOffset = 0
+            private set
     }
 }

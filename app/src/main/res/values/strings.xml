@@ -28,6 +28,7 @@
     <string name="available_devices">Available devices</string>
     <string name="scan">Start scan</string>
     <string name="enable_connection_module_info">You need to enable connection module first</string>
+    <string name="module_not_found">%s connection module not found on this device</string>
     <string name="keep_screen_on">Keep screen on</string>
 
     <string name="paired">Paired</string>

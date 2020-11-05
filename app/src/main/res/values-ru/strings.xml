@@ -41,4 +41,5 @@
     <string name="release">Удержание</string>
     <string name="button_click">Нажатие кнопки</string>
     <string name="display_sent_data">Показывать отправленные данные</string>
+    <string name="module_not_found">%s модуль связи не установлен на устройство</string>
 </resources>

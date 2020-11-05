@@ -1,6 +1,5 @@
 package dev.jatzuk.servocontroller.mvp.homeFragment
 
-import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
 import androidx.recyclerview.widget.RecyclerView
@@ -53,7 +52,7 @@ interface HomeFragmentContract {
 
     interface View : BaseView<Presenter> {
 
-        fun showToast(message: String, length: Int = Toast.LENGTH_SHORT)
+        fun updateNavigationMenuItemAvailability(isAvailable: Boolean, index: Int)
 
         fun updateConnectionStateIcon(@DrawableRes resourceId: Int)
 
