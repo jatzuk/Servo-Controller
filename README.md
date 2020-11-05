@@ -53,5 +53,5 @@ Features:
 
 ## Download
 
-<a href="todo"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" target="_blank" alt="Get it on Google Play" height="80"></a>
-<a href="todo"><img src="https://huaweimobileservices.com/wp-content/uploads/2019/12/AppGallery_DownlaodBadge_ENG.png" target="_blank" alt="Download on AppGallery" height="80"></a>
+<a href="https://play.google.com/store/apps/details?id=dev.jatzuk.servocontroller" target="_blank"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80"></a>
+<a href="https://appgallery.huawei.com#/app/C103077747" target="_blank"><img src="https://huaweimobileservices.com/wp-content/uploads/2019/12/AppGallery_DownlaodBadge_ENG.png" alt="Download on AppGallery" height="80"></a>
