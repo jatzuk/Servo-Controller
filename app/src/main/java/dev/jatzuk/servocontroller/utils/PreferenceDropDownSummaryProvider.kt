@@ -5,7 +5,7 @@ import androidx.preference.Preference
 
 class PreferenceDropDownSummaryProvider : Preference.SummaryProvider<DropDownPreference> {
 
-    override fun provideSummary(preference: DropDownPreference?): CharSequence {
-        return preference?.entry.toString()
+    override fun provideSummary(preference: DropDownPreference): CharSequence {
+        return preference.entry.toString()
     }
 }

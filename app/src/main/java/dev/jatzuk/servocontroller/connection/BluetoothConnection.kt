@@ -205,8 +205,10 @@ class BluetoothConnection : Connection {
 
     override fun getConnectionType() = ConnectionType.BLUETOOTH
 
-    fun isSelectedDevicePaired() =
-        getBondedDevices()?.contains(RemoteDevice.device as BluetoothDevice?) ?: false
+    fun isSelectedDevicePaired(): Boolean {
+        val device = RemoteDevice.device as? BluetoothDevice ?: return false
+        return getBondedDevices()?.contains(device) ?: false
+    }
 
     fun changeBluetoothMode() {
         isBluetoothLEMode = !isBluetoothLEMode

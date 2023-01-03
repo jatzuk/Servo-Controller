@@ -6,8 +6,8 @@ import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import dev.jatzuk.servocontroller.db.ServoDatabase
 import dev.jatzuk.servocontroller.other.SERVOS_DATABASE_NAME
 import dev.jatzuk.servocontroller.other.SHARED_PREFERENCES_NAME
@@ -15,7 +15,7 @@ import dev.jatzuk.servocontroller.utils.SettingsHolder
 import javax.inject.Singleton
 
 @Module
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 object AppModule {
 
     @Singleton

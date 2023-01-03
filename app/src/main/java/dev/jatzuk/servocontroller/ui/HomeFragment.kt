@@ -72,6 +72,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
         servoAdapter.notifyItemChanged(index)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.home_menu, menu)
@@ -79,6 +80,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
         presenter.optionsMenuCreated()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
         R.id.ic_connection_action -> {
             presenter.connectionIconPressed()

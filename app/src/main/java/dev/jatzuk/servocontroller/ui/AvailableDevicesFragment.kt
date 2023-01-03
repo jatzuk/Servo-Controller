@@ -51,11 +51,13 @@ class AvailableDevicesFragment : Fragment(R.layout.fragment_available_devices),
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         presenter.onCreateOptionsMenu(menu, inflater)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.ic_scan_type -> {
@@ -71,6 +73,7 @@ class AvailableDevicesFragment : Fragment(R.layout.fragment_available_devices),
         presenter.onStop()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
