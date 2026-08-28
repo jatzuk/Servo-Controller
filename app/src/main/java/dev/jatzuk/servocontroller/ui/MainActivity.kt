@@ -2,6 +2,7 @@ package dev.jatzuk.servocontroller.ui
 
 import android.os.Bundle
 import android.util.TypedValue
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.NavigationMenuAvailabilit
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setTheme(R.style.AppTheme)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -68,7 +70,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.NavigationMenuAvailabilit
             }
 
         val tv = TypedValue()
-        toastOffset = if (theme.resolveAttribute(R.attr.actionBarSize, tv, true)) {
+        toastOffset = if (theme.resolveAttribute(androidx.appcompat.R.attr.actionBarSize, tv, true)) {
             val height = TypedValue.complexToDimensionPixelOffset(tv.data, resources.displayMetrics)
             height + height / 2
         } else {

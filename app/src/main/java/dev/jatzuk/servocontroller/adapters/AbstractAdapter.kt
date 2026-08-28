@@ -1,11 +1,16 @@
 package dev.jatzuk.servocontroller.adapters
 
-import android.bluetooth.BluetoothAdapter
+import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothManager
+import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.wifi.ScanResult
 import android.net.wifi.p2p.WifiP2pDevice
 import android.os.Parcelable
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -83,7 +88,9 @@ abstract class AbstractAdapter<T : Parcelable>(
 
             private var isPaired = false
 
+            @SuppressLint("MissingPermission")
             override fun initializePermanentViews(device: Parcelable) {
+                if (!canAccessBluetoothDevice()) return
                 device as BluetoothDevice
                 binding.apply {
                     tvName.text = device.name
@@ -92,8 +99,12 @@ abstract class AbstractAdapter<T : Parcelable>(
                 }
             }
 
+            @SuppressLint("MissingPermission")
             override fun updateInfo(device: Parcelable) {
-                isPaired = BluetoothAdapter.getDefaultAdapter().bondedDevices.contains(device)
+                if (!canAccessBluetoothDevice()) return
+                val bluetoothManager =
+                    itemView.context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+                isPaired = bluetoothManager.adapter?.bondedDevices?.contains(device) == true
                 val colorRes = if (isPaired) R.color.colorPrimary else R.color.colorGrey
                 defaultColor = ContextCompat.getColor(itemView.context, colorRes)
                 binding.apply {
@@ -105,6 +116,13 @@ abstract class AbstractAdapter<T : Parcelable>(
                 val stringResource = if (isPaired) R.string.paired else R.string.unpaired
                 return itemView.context.getString(stringResource)
             }
+
+            private fun canAccessBluetoothDevice() =
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+                    ContextCompat.checkSelfPermission(
+                        itemView.context,
+                        Manifest.permission.BLUETOOTH_CONNECT
+                    ) == PackageManager.PERMISSION_GRANTED
         }
 
         inner class WifiP2PDeviceBindingStrategy : CommonBindingStrategy() {
@@ -184,7 +202,7 @@ abstract class AbstractAdapter<T : Parcelable>(
         }
     }
 
-    abstract class AbstractDevicesDiffCallback<T> : DiffUtil.ItemCallback<T>() {
+    abstract class AbstractDevicesDiffCallback<T : Any> : DiffUtil.ItemCallback<T>() {
 
         override fun areItemsTheSame(oldItem: T, newItem: T) = oldItem == newItem
 

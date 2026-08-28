@@ -1,8 +1,11 @@
 package dev.jatzuk.servocontroller.ui
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
@@ -31,6 +34,15 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
     lateinit var presenter: HomeFragmentContract.Presenter
 
     private lateinit var animationJob: CompletableJob
+
+    private val connectionPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grants ->
+            if (grants.isNotEmpty() && grants.values.all { it }) {
+                presenter.connectionPermissionGranted()
+            } else {
+                presenter.connectionPermissionDenied()
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -128,6 +140,19 @@ class HomeFragment : Fragment(R.layout.fragment_home), HomeFragmentContract.View
         binding?.layoutIncludedEnableHardwareRequest?.button?.apply {
             this.text = text
             updateVisibility(isVisible)
+        }
+    }
+
+    override fun requestConnectionPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            connectionPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                )
+            )
+        } else {
+            presenter.connectionPermissionGranted()
         }
     }
 

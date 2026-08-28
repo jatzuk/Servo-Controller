@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Google-provided demo IDs are safe for local development builds. -->
+    <string name="google_ad_key" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
+    <string name="google_banner_ad_key" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+
+    <!-- Huawei test banner slot ID. -->
+    <string name="huawei_ad_key" translatable="false">testw6vs28auh3</string>
+</resources>

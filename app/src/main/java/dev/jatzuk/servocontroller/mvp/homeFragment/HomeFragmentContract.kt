@@ -29,6 +29,10 @@ interface HomeFragmentContract {
 
         fun connectionButtonPressed()
 
+        fun connectionPermissionGranted()
+
+        fun connectionPermissionDenied()
+
         fun requestConnectionHardwareButtonPressed()
 
         fun isConnectionTypeSupported(): Boolean
@@ -76,6 +80,8 @@ interface HomeFragmentContract {
         fun stopAnimation()
 
         fun updateConnectionButton(text: String, isVisible: Boolean = true)
+
+        fun requestConnectionPermissions()
 
         fun navigateTo(id: Int)
 

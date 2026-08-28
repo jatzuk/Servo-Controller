@@ -40,6 +40,12 @@ Features:
 - [Fragment Testing](https://developer.android.com/training/basics/fragments/testing)
 - [Leak canary](https://square.github.io/leakcanary/)
 
+## Release builds
+
+Debug builds use the ad networks' test IDs. Before creating a release, copy
+`app/ad_keys.xml.example` to `app/src/release/res/values/ad_keys.xml` and replace all three
+placeholders with the production AdMob and Huawei banner IDs. The release file is ignored by Git.
+
 ## Screenshots
 
 <img src=".github/screenshots/main_screen.png"

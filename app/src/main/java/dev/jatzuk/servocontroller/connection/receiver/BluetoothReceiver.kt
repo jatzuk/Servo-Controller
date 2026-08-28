@@ -1,10 +1,14 @@
 package dev.jatzuk.servocontroller.connection.receiver
 
+import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dev.jatzuk.servocontroller.connection.BluetoothConnection
@@ -66,7 +70,12 @@ class BluetoothReceiver(
                 }
             }
             BluetoothDevice.ACTION_BOND_STATE_CHANGED -> {
-                device?.let {
+                val canAccessDevice = Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.BLUETOOTH_CONNECT
+                    ) == PackageManager.PERMISSION_GRANTED
+                if (canAccessDevice) device?.let {
                     isPairingProcess.value = when (it.bondState) {
                         BluetoothDevice.BOND_BONDING -> true
                         BluetoothDevice.BOND_BONDED -> false

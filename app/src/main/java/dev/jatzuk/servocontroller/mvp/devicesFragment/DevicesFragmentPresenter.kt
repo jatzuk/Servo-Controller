@@ -68,6 +68,26 @@ class DevicesFragmentPresenter @Inject constructor(
     override fun getConnectionType() = connection.getConnectionType()
 
     override fun onEnableHardwareButtonPressed() {
+        val bluetoothConnection = connection as? BluetoothConnection
+        if (bluetoothConnection != null && !bluetoothConnection.hasConnectionPermission()) {
+            view?.requestConnectionPermissions()
+            return
+        }
+        requestConnectionHardware()
+    }
+
+    override fun connectionPermissionGranted() {
+        val bluetoothConnection = connection as? BluetoothConnection ?: return
+        bluetoothConnection.refreshConnectionState()
+        if (!bluetoothConnection.isHardwareEnabled()) requestConnectionHardware()
+    }
+
+    override fun connectionPermissionDenied() {
+        val message = (view as? Fragment)?.getString(R.string.enable_connection_module_info)
+        message?.let { view?.showToast(it) }
+    }
+
+    private fun requestConnectionHardware() {
         val requestCode = when (connection) {
             is BluetoothConnection -> REQUEST_ENABLE_BT
             is WifiConnection -> REQUEST_ENABLE_WIFI

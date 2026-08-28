@@ -18,6 +18,10 @@ interface DevicesFragmentContract {
 
         fun onEnableHardwareButtonPressed()
 
+        fun connectionPermissionGranted()
+
+        fun connectionPermissionDenied()
+
         fun onRequestEnableHardwareReceived()
     }
 
@@ -26,6 +30,8 @@ interface DevicesFragmentContract {
         fun updateTabLayoutVisibility(isVisible: Boolean)
 
         fun updateButtonText(text: String)
+
+        fun requestConnectionPermissions()
 
         fun showAnimation(@RawRes resourceId: Int, speed: Float = 1f, timeout: Long = 0L)
 

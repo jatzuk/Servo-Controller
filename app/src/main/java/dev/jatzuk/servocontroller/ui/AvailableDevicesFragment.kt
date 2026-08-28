@@ -1,6 +1,5 @@
 package dev.jatzuk.servocontroller.ui
 
-import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.*
@@ -12,6 +11,7 @@ import dev.jatzuk.servocontroller.R
 import dev.jatzuk.servocontroller.databinding.FragmentAvailableDevicesBinding
 import dev.jatzuk.servocontroller.databinding.LayoutToastBinding
 import dev.jatzuk.servocontroller.mvp.devicesFragment.available.AvailableDevicesFragmentContract
+import dev.jatzuk.servocontroller.other.CONNECTION_PERMISSION_REQUEST_CODE
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
@@ -79,8 +79,11 @@ class AvailableDevicesFragment : Fragment(R.layout.fragment_available_devices),
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if (permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION
-            && grantResults[0] == PackageManager.PERMISSION_GRANTED
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode != CONNECTION_PERMISSION_REQUEST_CODE) return
+
+        if (grantResults.isNotEmpty() &&
+            grantResults.all { it == PackageManager.PERMISSION_GRANTED }
         ) {
             presenter.permissionGranted()
         } else {

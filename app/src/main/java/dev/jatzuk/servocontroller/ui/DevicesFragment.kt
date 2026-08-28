@@ -1,10 +1,13 @@
 package dev.jatzuk.servocontroller.ui
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.activity.result.contract.ActivityResultContracts
 import com.airbnb.lottie.LottieDrawable
 import dagger.hilt.android.AndroidEntryPoint
 import dev.jatzuk.servocontroller.R
@@ -21,6 +24,15 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
 
     @Inject
     lateinit var presenter: DevicesFragmentContract.Presenter
+
+    private val connectionPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { grants ->
+            if (grants.isNotEmpty() && grants.values.all { it }) {
+                presenter.connectionPermissionGranted()
+            } else {
+                presenter.connectionPermissionDenied()
+            }
+        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -54,6 +66,19 @@ class DevicesFragment : Fragment(R.layout.fragment_devices), DevicesFragmentCont
     override fun updateButtonText(text: String) {
         binding?.layoutEnableHardwareRequest?.button?.apply {
             this.text = getString(R.string.enable, text)
+        }
+    }
+
+    override fun requestConnectionPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            connectionPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                )
+            )
+        } else {
+            presenter.connectionPermissionGranted()
         }
     }
 

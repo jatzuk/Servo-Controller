@@ -4,20 +4,21 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'dagger.hilt.android.plugin'
 
 android {
-    compileSdkVersion 33
-    buildToolsVersion "30.0.2"
+    namespace "dev.jatzuk.servocontroller"
+    compileSdkVersion 36
 
     defaultConfig {
         applicationId "dev.jatzuk.servocontroller"
         minSdkVersion 21
-        targetSdkVersion 33
-        versionCode 4
-        versionName "1.0.1"
+        targetSdkVersion 36
+        versionCode 5
+        versionName "1.0.2"
 
         testInstrumentationRunner "dev.jatzuk.servocontroller.HiltTestRunner"
     }
 
     buildFeatures {
+        buildConfig true
         viewBinding true
         dataBinding true
     }
@@ -44,11 +45,11 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11
+        jvmTarget = JavaVersion.VERSION_17
     }
 
     testOptions {
@@ -60,6 +61,8 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.9.0'
+    // Activity 1.10.1 supports predictive back while retaining minSdk 21.
+    implementation 'androidx.activity:activity-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
 
@@ -112,7 +115,7 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
     androidTestImplementation "androidx.test.espresso:espresso-contrib:$espresso_version"
 
-    def mockk_version = "1.9.3"
+    def mockk_version = "1.14.5"
     testImplementation "io.mockk:mockk:$mockk_version"
     androidTestImplementation "io.mockk:mockk-android:$mockk_version"
 
@@ -134,9 +137,10 @@ dependencies {
 //    def leak_canary_version = "2.4"
 //    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leak_canary_version"
 
-    def google_ads_version = "21.4.0"
+    // 23.6.0 is the newest line that still supports minSdk 21.
+    def google_ads_version = "23.6.0"
     googleImplementation "com.google.android.gms:play-services-ads:$google_ads_version"
 
-    def huawei_ads_version = "13.4.30.301"
+    def huawei_ads_version = "13.4.86.300"
     huaweiImplementation "com.huawei.hms:ads-lite:$huawei_ads_version"
 }

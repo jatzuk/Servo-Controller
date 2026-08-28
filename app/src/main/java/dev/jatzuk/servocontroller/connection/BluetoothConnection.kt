@@ -1,14 +1,20 @@
 package dev.jatzuk.servocontroller.connection
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothSocket
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Parcelable
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dev.jatzuk.servocontroller.connection.receiver.BluetoothReceiver
@@ -23,10 +29,14 @@ private const val SCAN_TIMEOUT = 10_000L
 
 private var socket: BluetoothSocket? = null
 
-class BluetoothConnection : Connection {
+class BluetoothConnection(context: Context) : Connection {
 
-    private val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
-    private val bluetoothLEScanner = bluetoothAdapter?.bluetoothLeScanner
+    private val applicationContext = context.applicationContext
+    private val bluetoothManager =
+        applicationContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+    private val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
+    private val bluetoothLEScanner
+        get() = if (hasScanPermission()) bluetoothAdapter?.bluetoothLeScanner else null
     private val leScanCallback: ScanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
@@ -56,12 +66,7 @@ class BluetoothConnection : Connection {
 
     private var connectionTimeoutJob: CompletableJob? = null
 
-    override val connectionState = MutableLiveData(
-        when (bluetoothAdapter?.state) {
-            BluetoothAdapter.STATE_ON -> ConnectionState.ON
-            else -> ConnectionState.OFF
-        }
-    )
+    override val connectionState = MutableLiveData(currentConnectionState())
 
     override fun checkIfPreviousDeviceStored(context: Context) {
         val pair = RemoteDevice.loadFromSharedPreferences(context)
@@ -89,32 +94,54 @@ class BluetoothConnection : Connection {
         RemoteDevice.device = device
     }
 
-    override fun getSelectedDeviceCredentials() = (selectedDevice as BluetoothDevice?)?.let {
-        it.name to it.address
+    @SuppressLint("MissingPermission")
+    override fun getSelectedDeviceCredentials(): Pair<String, String>? {
+        if (!hasConnectPermission()) return null
+        return (selectedDevice as BluetoothDevice?)?.let { it.name to it.address }
     }
 
-    override fun isConnected() = try {
-        device?.let {
-            val method = it.javaClass.getMethod("isConnected")
-            method.invoke(it) as Boolean && socket != null
+    @SuppressLint("MissingPermission")
+    override fun isConnected(): Boolean {
+        if (!hasConnectPermission()) return false
+        return try {
+            device?.let {
+                val method = it.javaClass.getMethod("isConnected")
+                method.invoke(it) as Boolean && socket != null
+            } ?: false
+        } catch (e: ReflectiveOperationException) {
+            Timber.e(e, "isConnected: reflection failed")
+            false
+        } catch (e: IllegalStateException) {
+            Timber.e(e, "isConnected: illegal state")
+            false
+        } catch (e: SecurityException) {
+            Timber.e(e, "isConnected: Bluetooth permission unavailable")
+            false
         }
-    } catch (e: IllegalStateException) {
-        Timber.e(e, "isConnected: illegal state exception")
-        false
-    } ?: false
+    }
 
     override fun isConnectionTypeSupported() = bluetoothAdapter != null
 
-    override fun isHardwareEnabled() = bluetoothAdapter?.isEnabled ?: false
+    @SuppressLint("MissingPermission")
+    override fun isHardwareEnabled(): Boolean {
+        if (!hasConnectPermission()) return false
+        return bluetoothAdapter?.isEnabled ?: false
+    }
 
-    override fun getBondedDevices() = bluetoothAdapter?.bondedDevices?.toList() as List<Parcelable>?
+    @SuppressLint("MissingPermission")
+    override fun getBondedDevices(): List<Parcelable>? {
+        if (!hasConnectPermission()) return emptyList()
+        return bluetoothAdapter?.bondedDevices?.toList()
+    }
 
     override fun startScan() {
         if (bluetoothLEScanner != null && isBluetoothLEMode) startLEScan()
         else startDefaultScan()
     }
 
+    @SuppressLint("MissingPermission")
     private fun startDefaultScan() {
+        if (!hasScanPermission()) return
         if (!isScanning.value!!) {
             connectionTimeoutJob = Job()
             CoroutineScope(Dispatchers.IO + connectionTimeoutJob!!).launch {
@@ -129,7 +156,9 @@ class BluetoothConnection : Connection {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun startLEScan() {
+        if (!hasScanPermission()) return
         if (!_isScanning.value!!) {
             connectionTimeoutJob = Job()
             CoroutineScope(Dispatchers.IO + connectionTimeoutJob!!).launch {
@@ -144,16 +173,18 @@ class BluetoothConnection : Connection {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private fun stopLEScan() {
-        bluetoothLEScanner?.stopScan(leScanCallback)
+        if (hasScanPermission()) bluetoothLEScanner?.stopScan(leScanCallback)
         _isScanning.postValue(false)
         connectionTimeoutJob?.let {
             if (it.isActive) it.cancel()
         }
     }
 
+    @SuppressLint("MissingPermission")
     override fun stopScan() {
-        bluetoothAdapter?.cancelDiscovery()
+        if (hasScanPermission()) bluetoothAdapter?.cancelDiscovery()
         _isScanning.postValue(false)
         connectionTimeoutJob?.let {
             if (it.isActive) it.cancel()
@@ -161,10 +192,15 @@ class BluetoothConnection : Connection {
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
+    @SuppressLint("MissingPermission")
     override suspend fun connect() = withContext(Dispatchers.IO) {
-        socket = device!!.createInsecureRfcommSocketToServiceRecord(UUID.fromString(UUIDString))
-        bluetoothAdapter?.cancelDiscovery()
+        if (!hasConnectPermission()) return@withContext false
         try {
+            val selectedDevice = device ?: return@withContext false
+            socket = selectedDevice.createInsecureRfcommSocketToServiceRecord(
+                UUID.fromString(UUIDString)
+            )
+            if (hasScanPermission()) bluetoothAdapter?.cancelDiscovery()
             connectionState.postValue(ConnectionState.CONNECTING)
             socket?.connect()
             connectionState.postValue(ConnectionState.CONNECTED)
@@ -172,6 +208,10 @@ class BluetoothConnection : Connection {
             true
         } catch (e: IOException) {
             Timber.e(e, "Failed to connect")
+            connectionState.postValue(ConnectionState.DISCONNECTED)
+            false
+        } catch (e: SecurityException) {
+            Timber.e(e, "Bluetooth permission unavailable while connecting")
             connectionState.postValue(ConnectionState.DISCONNECTED)
             false
         }
@@ -205,7 +245,9 @@ class BluetoothConnection : Connection {
 
     override fun getConnectionType() = ConnectionType.BLUETOOTH
 
+    @SuppressLint("MissingPermission")
     fun isSelectedDevicePaired(): Boolean {
+        if (!hasConnectPermission()) return false
         val device = RemoteDevice.device as? BluetoothDevice ?: return false
         return getBondedDevices()?.contains(device) ?: false
     }
@@ -217,6 +259,13 @@ class BluetoothConnection : Connection {
     private fun isBluetoothLEModeAvailable() = bluetoothLEScanner != null
 
     override fun isAdditionalModeSupported() = isBluetoothLEModeAvailable()
+
+    @SuppressLint("MissingPermission")
+    fun refreshConnectionState() {
+        connectionState.value = currentConnectionState()
+    }
+
+    fun hasConnectionPermission() = hasConnectPermission()
 
     @Suppress("UNCHECKED_CAST")
     override fun getAvailableDevices(): LiveData<List<Parcelable>> {
@@ -239,5 +288,33 @@ class BluetoothConnection : Connection {
         } catch (e: IllegalArgumentException) {
             Timber.e(e, "Receiver deregistration failed")
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun currentConnectionState(): ConnectionState {
+        if (!hasConnectPermission()) return ConnectionState.OFF
+        return when (bluetoothAdapter?.state) {
+            BluetoothAdapter.STATE_ON -> ConnectionState.ON
+            else -> ConnectionState.OFF
+        }
+    }
+
+    private fun hasConnectPermission() =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+            ContextCompat.checkSelfPermission(
+                applicationContext,
+                Manifest.permission.BLUETOOTH_CONNECT
+            ) == PackageManager.PERMISSION_GRANTED
+
+    private fun hasScanPermission() = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> ContextCompat.checkSelfPermission(
+            applicationContext,
+            Manifest.permission.BLUETOOTH_SCAN
+        ) == PackageManager.PERMISSION_GRANTED
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> ContextCompat.checkSelfPermission(
+            applicationContext,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+        else -> true
     }
 }

@@ -8,6 +8,7 @@ import android.net.wifi.ScanResult
 import android.net.wifi.WifiManager
 import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pManager
+import android.os.Build
 import android.os.Looper
 import android.os.Parcelable
 import androidx.lifecycle.LiveData
@@ -94,7 +95,9 @@ class WifiConnection(private val context: Context) : Connection {
 
     override suspend fun disconnect(): Boolean {
 //        TODO("Not yet implemented")
-        channel?.close()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            channel?.close()
+        }
         return false
     }
 

@@ -5,6 +5,7 @@ import dev.jatzuk.servocontroller.connection.BluetoothConnection
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Test
 
@@ -27,7 +28,7 @@ class HomeFragmentPresenterTest {
     fun connectionType_isSupported() {
         every {
             presenter.connection
-        } returns BluetoothConnection()
+        } returns mockk<BluetoothConnection>(relaxed = true)
 
         every {
             presenter.isConnectionTypeSupported()

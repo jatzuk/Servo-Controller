@@ -50,7 +50,7 @@
                     app:layout_constraintBottom_toTopOf="@+id/ad_view"
                     app:layout_constraintTop_toTopOf="parent"
                     app:navGraph="@navigation/nav_graph"
-                    tools:ignore="FragmentTagUsage"
+                    tools:ignore="FragmentTagUsage,NotSibling"
                     tools:layout="@layout/fragment_home" />
 
                 <include

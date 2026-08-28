@@ -216,6 +216,8 @@ class HomeFragmentPresenter @Inject constructor(
     }
 
     override fun connectionIconPressed() {
+        if (requestConnectionPermissionIfNeeded()) return
+
         when (connection.connectionState.value) {
             ConnectionState.ON, ConnectionState.DISCONNECTED -> {
                 connect()
@@ -237,6 +239,8 @@ class HomeFragmentPresenter @Inject constructor(
     }
 
     override fun connectionButtonPressed() {
+        if (requestConnectionPermissionIfNeeded()) return
+
         if (!isConnectionTypeSupported()) {
             view?.navigateTo(R.id.action_homeFragment_to_settingsFragment)
         } else {
@@ -261,8 +265,25 @@ class HomeFragmentPresenter @Inject constructor(
         }
     }
 
+    override fun connectionPermissionGranted() {
+        (connection as? BluetoothConnection)?.refreshConnectionState()
+        connectionButtonPressed()
+    }
+
+    override fun connectionPermissionDenied() {
+        val message = (view as? Fragment)?.getString(R.string.enable_connection_module_info)
+        message?.let { view?.showToast(it) }
+    }
+
     override fun requestConnectionHardwareButtonPressed() {
         requestConnectionHardware()
+    }
+
+    private fun requestConnectionPermissionIfNeeded(): Boolean {
+        val bluetoothConnection = connection as? BluetoothConnection ?: return false
+        if (bluetoothConnection.hasConnectionPermission()) return false
+        view?.requestConnectionPermissions()
+        return true
     }
 
     override fun onRequestEnableHardwareReceived() {

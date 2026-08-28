@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="dev.jatzuk.servocontroller">
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Required by optional notification code inside Huawei Ads Lite. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:usesCleartextTraffic="true"

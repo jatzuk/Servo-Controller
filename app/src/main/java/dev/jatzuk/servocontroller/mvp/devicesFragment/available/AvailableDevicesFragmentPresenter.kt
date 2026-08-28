@@ -1,8 +1,10 @@
 package dev.jatzuk.servocontroller.mvp.devicesFragment.available
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Parcelable
 import android.view.Menu
 import android.view.MenuInflater
@@ -19,7 +21,7 @@ import dev.jatzuk.servocontroller.adapters.ParcelableDevicesAdapter
 import dev.jatzuk.servocontroller.connection.*
 import dev.jatzuk.servocontroller.connection.receiver.BluetoothReceiver
 import dev.jatzuk.servocontroller.databinding.LayoutLottieAnimationViewButtonBinding
-import dev.jatzuk.servocontroller.other.ACCESS_FINE_LOCATION_REQUEST_CODE
+import dev.jatzuk.servocontroller.other.CONNECTION_PERMISSION_REQUEST_CODE
 import dev.jatzuk.servocontroller.utils.BottomPaddingDecoration
 import javax.inject.Inject
 
@@ -109,9 +111,20 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
 //        }
     }
 
+    @SuppressLint("MissingPermission")
     override fun onClick(position: Int) {
         when (connection) {
             is BluetoothConnection -> {
+                val fragment = view as Fragment
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                    ContextCompat.checkSelfPermission(
+                        fragment.requireContext(),
+                        Manifest.permission.BLUETOOTH_CONNECT
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    checkPermission()
+                    return
+                }
                 val device = availableDevicesAdapter.currentList[position] as BluetoothDevice
                 val bluetoothReceiver = connection.receiver as BluetoothReceiver
 
@@ -194,6 +207,7 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
     }
 
     override fun permissionGranted() {
+        (connection as? BluetoothConnection)?.refreshConnectionState()
         connection.startScan()
     }
 
@@ -211,13 +225,23 @@ class AvailableDevicesFragmentPresenter @Inject constructor(
 
     private fun checkPermission() {
         val fragment = view as Fragment
-        if (ContextCompat.checkSelfPermission(
-                fragment.requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
+        val requiredPermissions = when {
+            connection is BluetoothConnection && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
+                arrayOf(
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                )
+            else -> arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+        val missingPermissions = requiredPermissions.filter {
+            ContextCompat.checkSelfPermission(fragment.requireContext(), it) !=
+                PackageManager.PERMISSION_GRANTED
+        }
+
+        if (missingPermissions.isNotEmpty()) {
             fragment.requestPermissions(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                ACCESS_FINE_LOCATION_REQUEST_CODE
+                missingPermissions.toTypedArray(),
+                CONNECTION_PERMISSION_REQUEST_CODE
             )
         } else {
             permissionGranted()

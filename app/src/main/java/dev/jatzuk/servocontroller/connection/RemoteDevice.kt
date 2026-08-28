@@ -1,6 +1,5 @@
 package dev.jatzuk.servocontroller.connection
 
-import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.net.wifi.ScanResult
 import android.os.Parcelable
@@ -16,18 +15,15 @@ object RemoteDevice {
         when (connection.getConnectionType()) {
             ConnectionType.BLUETOOTH -> {
                 val isPaired = (connection as BluetoothConnection).isSelectedDevicePaired()
-                if (isPaired) processBluetoothDevice(context)
+                if (isPaired) {
+                    connection.getSelectedDeviceCredentials()?.let {
+                        saveToSharedPreferences(context, it.first, it.second)
+                    }
+                }
             }
             ConnectionType.WIFI -> {
                 processWifiNetwork(context)
             }
-        }
-    }
-
-    private fun processBluetoothDevice(context: Context) {
-        device?.let {
-            it as BluetoothDevice
-            saveToSharedPreferences(context, it.name, it.address)
         }
     }
 
